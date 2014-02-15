@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>Berusky</title>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+		}
+	</style>
+	<script src="pixi/bin/pixi.dev.js"></script>
+</head>
+
+<script type="text/javascript" src="defines.js"></script>
+<script type="text/javascript" src="helpers.js"></script>
+<script type="text/javascript" src="graphics.js"></script>
+<script type="text/javascript" src="load.js"></script>
+
+<body>
+	<script>
+  var i;
+
+  i  = graph.sprite_insert("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
+  i += graph.sprite_insert("data/Graphics/global2.spr", FIRST_GLOBAL_LEVEL + ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/global3.spr", FIRST_GLOBAL_LEVEL + 2 * ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/global4.spr", FIRST_GLOBAL_LEVEL + 3 * ROT_SHIFT);
+
+  i += graph.sprite_insert("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
+  i += graph.sprite_insert("data/Graphics/klasik2.spr", FIRST_CLASSIC_LEVEL + ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/klasik3.spr", FIRST_CLASSIC_LEVEL + 2 * ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/klasik4.spr", FIRST_CLASSIC_LEVEL + 3 * ROT_SHIFT);
+
+  i += graph.sprite_insert("data/Graphics/kyber1.spr", FIRST_CYBER_LEVEL);
+  i += graph.sprite_insert("data/Graphics/kyber2.spr", FIRST_CYBER_LEVEL + ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/kyber3.spr", FIRST_CYBER_LEVEL + 2 * ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/kyber4.spr", FIRST_CYBER_LEVEL + 3 * ROT_SHIFT);
+
+  i += graph.sprite_insert("data/Graphics/herni1.spr",  FIRST_OTHER);
+  i += graph.sprite_insert("data/Graphics/herni2.spr",  FIRST_OTHER + ROT_SHIFT);
+
+  i += graph.sprite_insert("data/Graphics/game_cur.spr", FIRST_CURSOR);
+
+  i += graph.sprite_insert("data/Graphics/hraci1.spr", FIRST_PLAYER);
+  i += graph.sprite_insert("data/Graphics/hraci2.spr", FIRST_PLAYER + ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/hraci3.spr", FIRST_PLAYER + 2 * ROT_SHIFT);
+  i += graph.sprite_insert("data/Graphics/hraci4.spr", FIRST_PLAYER + 3 * ROT_SHIFT);
+
+  console.log("Loaded sprites " + i);
+
+/*  
+  function renderLoop() {
+	    requestAnimFrame(renderLoop);
+	    renderer.render(stage);
+	}
+
+  // create an new instance of a pixi stage
+	var stage = new PIXI.Stage(0x000000);
+
+	// create a renderer instance
+	var renderer = PIXI.autoDetectRenderer(640, 480);
+
+	// add the renderer view element to the DOM
+	document.body.appendChild(renderer.view);
+
+	stage.addChild(bunny);
+  
+	requestAnimFrame(renderLoop);
+*/
+	</script>
+
+	</body>
+</html>
