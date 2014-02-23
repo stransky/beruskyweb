@@ -35,3 +35,19 @@ function load_file_text(file) {
 function load_file_json(file) {
   return JSON.parse(load_file_text(file));
 }
+
+function load_file_binary(file) {
+  var request = new XMLHttpRequest();
+  request.open('GET', file, false);
+  request.responseType = "arraybuffer";
+  request.send();
+  return request.response;
+}
+
+function load_file_blob(file) {
+  var request = new XMLHttpRequest();
+  request.open('GET', file, false);
+  request.responseType = "blob";
+  request.send();
+  return request.response;
+}
