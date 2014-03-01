@@ -27,45 +27,104 @@
 
 var H_LEVEL    = "Level 3 (C) Anakreon 1999"
 var LEVEL_SIZE = 28361
+var LEVEL_CELLS_X = 32
+var LEVEL_CELLS_Y = 21
+var loaded_level = {};
 
 /* Level structure (packed)
 
-char signum[30];               // -> "Berusky (C) Anakreon 1998"
-char back;                     // -> background number
-char music;                    // -> track number
-char rot[5];                   // -> players rotation
-char rezerved[100];            // -> reserved
-word floor[LEVEL_CELLS_Y][LEVEL_CELLS_X][10];  //-> floor cells
-word level[LEVEL_CELLS_Y][LEVEL_CELLS_X][10];  //-> level items
-word players[LEVEL_CELLS_Y][LEVEL_CELLS_X];    //-> players
+#define LEVEL_CELLS_X             32
+#define LEVEL_CELLS_Y             21
 
+char signum[30];
+char back;
+char music;
+char rot[5];
+char rezerved[100];
+word floor[LEVEL_CELLS_Y][LEVEL_CELLS_X][10];
+word level[LEVEL_CELLS_Y][LEVEL_CELLS_X][10];
+word players[LEVEL_CELLS_Y][LEVEL_CELLS_X];
 */
 
 function Level() {
-  this.rezerved = 0;
+  this.name = "a.lv3";
+  this.loaded = false;
+}
+
+/* Memory layout
+
+  [LEVEL_CELLS_Y]
+    [LEVEL_CELLS_X]
+      [10]
+      [10]
+      [10]
+    [LEVEL_CELLS_X+1]
+      [10]
+      [10]
+      [10]
+  [LEVEL_CELLS_Y+1]
+    [LEVEL_CELLS_X]
+      [10]
+      [10]
+      [10]
+    [LEVEL_CELLS_X+1]
+      [10]
+      [10]
+      [10]
+*/
+function level_index(x, y, layer)
+{
+  return(y * (LEVEL_CELLS_X*10) + x * (10) + layer);
+}
+
+function player_index(x, y)
+{
+  return(y * (LEVEL_CELLS_X) + x);
+}
+
+function level_load_callback_set_level(level)
+{
+  loaded_level = level;
+}
+
+level_load_callback = function() {
+  var data = new Uint8Array(this.response);
+
+  // Check level size and signature
+  if(data.length != LEVEL_SIZE)
+    return;
+  
+  for(var i = 0; i < H_LEVEL.length; i++) {
+    if(String.fromCharCode(data[i]) != H_LEVEL[i])
+      return;
+  }
+
+  loaded_level.background = data[30];
+  loaded_level.music = data[31];
+
+  loaded_level.rotation = Array();
+  for(var i = 0; i < 5; i++) {
+    loaded_level.rotation[i] = data[32+i];
+  }  
+  
+  // Skip rezerved[100]
+  
+  loaded_level.floor = new Uint16Array(data, 137, 6720);
+  loaded_level.level = new Uint16Array(data, 137 + 6720, 6720);
+  loaded_level.players = new Uint16Array(data, 137 + 6720 + 6720, 672);
+
+  console.log("Level " + loaded_level.name + " loaded.");
+
+  loaded_level.loaded = true;
 }
 
 // Load binary level data from original lv3 files
 // use the Blob interface
 Level.prototype.load = function(file) {
-  var data = new Uint8Array(load_file_binary(file));
-
-  // Check level size and signature
-  if(data.length != LEVEL_SIZE)
-    return(false);
+  this.name = file;
+  this.loaded = false;
+  console.log("Loading " + this.name);
   
-  for(var i = 0; i < H_LEVEL.length; i++) {
-    if(data[i] != H_LEVEL[i])
-      return(false);
-  }
-
-  this.background = data[30];
-  this.music = data[31];
-  
-  this.rotation = Array();
-  for(var i = 0; i < 5; i++) {
-    this.rotation[i] = data[32+i];
-  }
-  
-  return(true);
+  level_load_callback_set_level(this);
+  load_file_binary(file, level_load_callback);
 }

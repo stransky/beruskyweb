@@ -31,13 +31,11 @@
   graph.init();
 
   var level = new Level();
-  var loaded = level.load("data/Levels/j01.lv3");
+  level.load("data/Levels/j01.lv3");  
   
-  console.log("level.load() = " + loaded);
-  
-	document.body.appendChild(graph.get_renderer().view);
-	requestAnimFrame(gameLoop);
-	</script>
+  document.body.appendChild(graph.get_renderer().view);
+  requestAnimFrame(gameLoop);
+  </script>
 
 	</body>
 </html>
