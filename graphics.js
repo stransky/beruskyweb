@@ -93,18 +93,6 @@ Graph.prototype.draw = function(spr, x, y)
   this.stage.addChild(sprite);
 }
 
-var FIRST_GLOBAL_LEVEL      = 0
-var FIRST_CLASSIC_LEVEL     = 100
-var FIRST_CYBER_LEVEL       = 200
-var FIRST_BACKGROUND        = 400
-var FIRST_OTHER             = 410
-var FIRST_CURSOR            = 590
-var FIRST_PLAYER            = 600
-var FIRST_MENU              = 700
-var FIRST_LOGO              = 800
-var FIRST_FONT              = 1000
-var ROT_SHIFT               = 10000
-
 Graph.prototype.load = function()
 {
   var i;
