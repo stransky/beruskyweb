@@ -19,6 +19,7 @@
 <script type="text/javascript" src="graphics.js"></script>
 <script type="text/javascript" src="load.js"></script>
 <script type="text/javascript" src="level.js"></script>
+<script type="text/javascript" src="game_object.js"></script>
 
 <body>
 	<script>
@@ -31,7 +32,10 @@
   graph.init();
 
   var level = new Level();
-  level.load("data/Levels/j01.lv3");  
+  level.load("data/Levels/j01.lv3");
+  
+  var repo = new ObjectsRepository();
+  repo.load();
   
   document.body.appendChild(graph.get_renderer().view);
   requestAnimFrame(gameLoop);

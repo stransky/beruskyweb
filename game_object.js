@@ -53,10 +53,39 @@ function ObjectsRepository() {
   this.repo = {};
 }
 
-#define REC_NUM 12
+var REC_NUM = 12
+
+ObjectsRepository.prototype.parse_line = function(line)
+{
+  tokens = line.split("\t");
+  for(var i = 0, var token_pos = 0; i < tokens.length; i++) {
+    var token = tokens[i];
+    if(token.length != 0) {
+      // we should have 12 tokens
+      switch(token_pos) {
+        case 0: // item number
+        this.item = token_translate(token);
+        break;
+        case 1: // item function
+        this.func = token_translate(token);
+        break;
+      
+      
+      }
+      token_pos++;
+    }
+  }  
+}
 
 ObjectsRepository.prototype.load = function()
 {
-
-
+  var data = load_file_text("data/GameData/items.dat");
+  var lines = data.split("\n");
+  
+  for(var i = 0; i < lines.length; i++) {
+    var tline = lines[i].trim();
+    if(tline[0] != '#' && tline.length != 0) {
+      this.parse_line(tline);
+    }
+  }
 }
