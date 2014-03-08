@@ -209,19 +209,29 @@ var parser_table =
 */  
 };
 
+function TokenItem(base, offset, num) {
+  this.base = base;
+  this.offset = offset;
+  this.num = num;
+}
+
 function token_translate(token)
 { 
   // split by "+"
   var items = token.split("+");
   var ret = 0;
+  var base = 0;
   
   for(var i = 0; i < items.length; i++) {
     var item = items[i].trim();
-    if(is_number(item))
+    if(is_number(item)) {
       ret += parseInt(item);
-    else
-      ret += parser_table[item];
+    }
+    else {      
+      base = parser_table[item];
+      ret += ret;
+    }
   }
   
-  return(ret);
+  return(TokenItem(base, ret - base, ret));
 }

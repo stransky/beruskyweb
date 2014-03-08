@@ -18,8 +18,8 @@
 <script type="text/javascript" src="helpers.js"></script>
 <script type="text/javascript" src="graphics.js"></script>
 <script type="text/javascript" src="load.js"></script>
-<script type="text/javascript" src="level.js"></script>
 <script type="text/javascript" src="game_object.js"></script>
+<script type="text/javascript" src="level.js"></script>
 
 <body>
 	<script>
@@ -36,7 +36,9 @@
   
   var repo = new ObjectsRepository();
   repo.load();
+
   
+
   document.body.appendChild(graph.get_renderer().view);
   requestAnimFrame(gameLoop);
   </script>

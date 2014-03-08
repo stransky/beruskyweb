@@ -36,6 +36,11 @@ var loaded_level = {};
 #define LEVEL_CELLS_X             32
 #define LEVEL_CELLS_Y             21
 
+Layers:
+item:     0
+variant:  1
+rotation: 2
+
 char signum[30];
 char back;
 char music;
@@ -107,8 +112,7 @@ level_load_callback = function() {
     loaded_level.rotation[i] = data[32+i];
   }  
   
-  // Skip rezerved[100]
-  
+  // Skip rezerved[100]  
   loaded_level.floor = new Uint16Array(data, 137, 6720);
   loaded_level.level = new Uint16Array(data, 137 + 6720, 6720);
   loaded_level.players = new Uint16Array(data, 137 + 6720 + 6720, 672);
@@ -128,3 +132,21 @@ Level.prototype.load = function(file) {
   level_load_callback_set_level(this);
   load_file_binary(file, level_load_callback);
 }
+
+// Render the level on screen
+Level.prototype.render = function() {
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; y < LEVEL_CELLS_X; x++) {
+      var item = this.floor[level_index(x, y, LAYER_ITEM)];
+      var variant = this.floor[level_index(x, y, LAYER_VARIANT)];
+      
+      
+      
+      //graph.draw = function(spr, x, y) 
+    }
+  }
+}
+
+var LAYER_ITEM                = 0
+var LAYER_VARIANT             = 1
+var LAYER_ROTATION            = 2

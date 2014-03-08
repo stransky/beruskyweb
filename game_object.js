@@ -30,8 +30,9 @@ var GAME_REPO_FILE = "data/GameData/items.dat"
 function GameObject() {
 
   this.item = 0;  // object number
-  this.func = 0;  // item function
+  this.variant = 0;  // object variant
   
+  this.func = 0;  // item function  
   this.flags = 0; // sprite flags
   
   // x - corrections for main item
@@ -61,34 +62,35 @@ GameObject.prototype.parse_line = function(line)
       // we should have 12 tokens
       switch(token_pos) {
         case 0: // item number
-        this.item = token_translate(token);
+        this.item = token_translate(token).base;
+        this.variant = token_translate(token).variant;
         break;
         case 1: // item function
-        this.func = token_translate(token);
+        this.func = token_translate(token).num;
         break;
         case 2: // flags
-        this.flags = token_translate(token);
+        this.flags = token_translate(token).num;
         break;
         case 3: // minus_x
-        this.minus_x = parseInt(token);
+        this.minus_x = parseInt(token).num;
         break;
         case 4: // plus_x
-        this.plus_x = parseInt(token);
+        this.plus_x = parseInt(token).num;
         break;
         case 5: // x_cor
-        this.x_cor = parseInt(token);
+        this.x_cor = parseInt(token).num;
         break;
         case 6: // y_cor
-        this.y_cor = parseInt(token);
+        this.y_cor = parseInt(token).num;
         break;
         case 7: // sprite
-        this.sprite = token_translate(token);
+        this.sprite = token_translate(token).num;
         break;
         case 8: // animation
-        this.animation = token_translate(token);
+        this.animation = token_translate(token).num;
         break;
         case 9: // animation flags
-        this.flags |= token_translate(token);
+        this.flags |= token_translate(token).num;
         break;
         case 10: // sub-object1
         break;
@@ -103,7 +105,7 @@ GameObject.prototype.parse_line = function(line)
 }
 
 function ObjectsRepository() {
-  // Array of GameObject's
+  // Two dimensional arrays of GameObjects
   this.repo = Array();
 }
 
@@ -118,7 +120,11 @@ ObjectsRepository.prototype.load = function()
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameObject();
       obj.parse_line(tline);
-      this.repo.push(obj);
+      
+      if(!(this.repo[obj.item].isArray()))
+        this.repo[obj.item] = Array();
+      
+      this.repo[obj.item][obj.variant] = obj;
     }
   }
   
