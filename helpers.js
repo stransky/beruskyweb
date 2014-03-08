@@ -43,3 +43,7 @@ function load_file_binary(file, callback) {
   request.onload = callback;  
   request.send();
 }
+
+function is_number(value) {
+  return !isNaN(parseInt(value));
+}

@@ -48,17 +48,14 @@ function GameObject() {
   this.sub_objects = []; // two sub-objects
 }
 
-function ObjectsRepository() {
-  // Array of GameObject's
-  this.repo = {};
-}
-
 var REC_NUM = 12
 
-ObjectsRepository.prototype.parse_line = function(line)
+GameObject.prototype.parse_line = function(line)
 {
+  var token_pos = 0;
+  
   tokens = line.split("\t");
-  for(var i = 0, var token_pos = 0; i < tokens.length; i++) {
+  for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
     if(token.length != 0) {
       // we should have 12 tokens
@@ -69,12 +66,45 @@ ObjectsRepository.prototype.parse_line = function(line)
         case 1: // item function
         this.func = token_translate(token);
         break;
-      
-      
+        case 2: // flags
+        this.flags = token_translate(token);
+        break;
+        case 3: // minus_x
+        this.minus_x = parseInt(token);
+        break;
+        case 4: // plus_x
+        this.plus_x = parseInt(token);
+        break;
+        case 5: // x_cor
+        this.x_cor = parseInt(token);
+        break;
+        case 6: // y_cor
+        this.y_cor = parseInt(token);
+        break;
+        case 7: // sprite
+        this.sprite = token_translate(token);
+        break;
+        case 8: // animation
+        this.animation = token_translate(token);
+        break;
+        case 9: // animation flags
+        this.flags |= token_translate(token);
+        break;
+        case 10: // sub-object1
+        break;
+        case 11: // sub-object2
+        break;
+        default:
+        break;
       }
       token_pos++;
     }
   }  
+}
+
+function ObjectsRepository() {
+  // Array of GameObject's
+  this.repo = Array();
 }
 
 ObjectsRepository.prototype.load = function()
@@ -82,10 +112,15 @@ ObjectsRepository.prototype.load = function()
   var data = load_file_text("data/GameData/items.dat");
   var lines = data.split("\n");
   
+  this.repo = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
     if(tline[0] != '#' && tline.length != 0) {
-      this.parse_line(tline);
+      var obj = new GameObject();
+      obj.parse_line(tline);
+      this.repo.push(obj);
     }
   }
+  
+  console.log("Repository objects loaded = " + this.repo.length);
 }

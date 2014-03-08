@@ -210,6 +210,18 @@ var parser_table =
 };
 
 function token_translate(token)
-{
-  return(parser_table[token]);
+{ 
+  // split by "+"
+  var items = token.split("+");
+  var ret = 0;
+  
+  for(var i = 0; i < items.length; i++) {
+    var item = items[i].trim();
+    if(is_number(item))
+      ret += parseInt(item);
+    else
+      ret += parser_table[item];
+  }
+  
+  return(ret);
 }
