@@ -62,8 +62,9 @@ GameObject.prototype.parse_line = function(line)
       // we should have 12 tokens
       switch(token_pos) {
         case 0: // item number
-        this.item = token_translate(token).base;
-        this.variant = token_translate(token).variant;
+        var tmp = token_translate(token);
+        this.item = tmp.base;
+        this.variant = tmp.variant;
         break;
         case 1: // item function
         this.func = token_translate(token).num;
@@ -112,16 +113,17 @@ function ObjectsRepository() {
 ObjectsRepository.prototype.load = function()
 {
   var data = load_file_text("data/GameData/items.dat");
-  var lines = data.split("\n");
+  var lines = data.split("\n");  
   
   this.repo = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
+
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameObject();
       obj.parse_line(tline);
       
-      if(!(this.repo[obj.item].isArray()))
+      if(this.repo[obj.item] === undefined)
         this.repo[obj.item] = Array();
       
       this.repo[obj.item][obj.variant] = obj;

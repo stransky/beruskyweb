@@ -215,8 +215,7 @@ function TokenItem(base, offset, num) {
   this.num = num;
 }
 
-function token_translate(token)
-{ 
+function token_translate(token) { 
   // split by "+"
   var items = token.split("+");
   var ret = 0;
@@ -228,10 +227,9 @@ function token_translate(token)
       ret += parseInt(item);
     }
     else {      
-      base = parser_table[item];
-      ret += ret;
+      ret = base = parser_table[item];
     }
   }
   
-  return(TokenItem(base, ret - base, ret));
+  return(new TokenItem(base, ret - base, ret));
 }

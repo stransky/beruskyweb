@@ -37,7 +37,7 @@
   var repo = new ObjectsRepository();
   repo.load();
 
-  
+  level.render();
 
   document.body.appendChild(graph.get_renderer().view);
   requestAnimFrame(gameLoop);

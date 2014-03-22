@@ -135,18 +135,13 @@ Level.prototype.load = function(file) {
 
 // Render the level on screen
 Level.prototype.render = function() {
-  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
-    for(var x = 0; y < LEVEL_CELLS_X; x++) {
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {  
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {      
       var item = this.floor[level_index(x, y, LAYER_ITEM)];
-      var variant = this.floor[level_index(x, y, LAYER_VARIANT)];
-      
+      var variant = this.floor[level_index(x, y, LAYER_VARIANT)];    
       
       
       //graph.draw = function(spr, x, y) 
     }
   }
 }
-
-var LAYER_ITEM                = 0
-var LAYER_VARIANT             = 1
-var LAYER_ROTATION            = 2
