@@ -134,3 +134,9 @@ var ROT_SHIFT                 = 10000
 var LAYER_ITEM                = 0
 var LAYER_VARIANT             = 1
 var LAYER_ROTATION            = 2
+
+var GAME_RESOLUTION_X         = 640
+var GAME_RESOLUTION_Y         = 480
+
+var CELL_SIZE_X               = 20
+var CELL_SIZE_Y               = 20

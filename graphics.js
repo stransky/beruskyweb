@@ -125,9 +125,6 @@ Graph.prototype.load = function()
   console.log("Loaded sprites " + i);
 }
 
-var GAME_RESOLUTION_X = 640
-var GAME_RESOLUTION_Y = 480
-
 Graph.prototype.init = function()
 {
 	this.stage = new PIXI.Stage(0x000000);

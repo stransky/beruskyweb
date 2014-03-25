@@ -113,9 +113,9 @@ level_load_callback = function() {
   }  
   
   // Skip rezerved[100]  
-  loaded_level.floor = new Uint16Array(data, 137, 6720);
-  loaded_level.level = new Uint16Array(data, 137 + 6720, 6720);
-  loaded_level.players = new Uint16Array(data, 137 + 6720 + 6720, 672);
+  loaded_level.floor = new Uint16Array(this.response, 137, 6720);
+  loaded_level.level = new Uint16Array(this.response, 137 + 6720, 6720);
+  loaded_level.players = new Uint16Array(this.response, 137 + 6720 + 6720, 672);
 
   console.log("Level " + loaded_level.name + " loaded.");
 
@@ -134,14 +134,20 @@ Level.prototype.load = function(file) {
 }
 
 // Render the level on screen
-Level.prototype.render = function() {
+Level.prototype.render = function(repository) {
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {  
     for(var x = 0; x < LEVEL_CELLS_X; x++) {      
       var item = this.floor[level_index(x, y, LAYER_ITEM)];
       var variant = this.floor[level_index(x, y, LAYER_VARIANT)];    
       
+      var sprite = repository.get_sprite(item, variant);
+      graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
+
+      var item = this.level[level_index(x, y, LAYER_ITEM)];
+      var variant = this.level[level_index(x, y, LAYER_VARIANT)];
       
-      //graph.draw = function(spr, x, y) 
+      var sprite = repository.get_sprite(item, variant);
+      graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
     }
   }
 }

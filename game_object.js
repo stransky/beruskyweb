@@ -64,7 +64,7 @@ GameObject.prototype.parse_line = function(line)
         case 0: // item number
         var tmp = token_translate(token);
         this.item = tmp.base;
-        this.variant = tmp.variant;
+        this.variant = tmp.offset;
         break;
         case 1: // item function
         this.func = token_translate(token).num;
@@ -105,6 +105,14 @@ GameObject.prototype.parse_line = function(line)
   }  
 }
 
+GameObject.prototype.print = function()
+{
+  console.log("GameObject item = " + this.item);
+  console.log("  variant:  " + this.variant);
+  console.log("  function: " + this.func);
+  console.log("  sprite:   " + this.sprite);
+}
+
 function ObjectsRepository() {
   // Two dimensional arrays of GameObjects
   this.repo = Array();
@@ -113,7 +121,8 @@ function ObjectsRepository() {
 ObjectsRepository.prototype.load = function()
 {
   var data = load_file_text("data/GameData/items.dat");
-  var lines = data.split("\n");  
+  var lines = data.split("\n");
+  var loaded = 0;
   
   this.repo = Array();
   for(var i = 0; i < lines.length; i++) {
@@ -127,8 +136,23 @@ ObjectsRepository.prototype.load = function()
         this.repo[obj.item] = Array();
       
       this.repo[obj.item][obj.variant] = obj;
+      loaded++;
     }
   }
   
-  console.log("Repository objects loaded = " + this.repo.length);
+  console.log("Repository objects loaded = " + loaded);
+}
+
+ObjectsRepository.prototype.get_object = function(item, variant)
+{
+  if(this.repo[item][variant] === undefined) {
+    console.log("Undefined object repository - item = " + item + " variant = " + variant);
+  }
+  return this.repo[item][variant];
+}
+
+ObjectsRepository.prototype.get_sprite = function(item, variant)
+{
+  var obj = this.get_object(item, variant);
+  return obj.sprite;
 }
