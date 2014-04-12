@@ -29,6 +29,14 @@ var H_LEVEL    = "Level 3 (C) Anakreon 1999"
 var LEVEL_SIZE = 28361
 var LEVEL_CELLS_X = 32
 var LEVEL_CELLS_Y = 21
+
+var LEVEL_LAYER_SIZE = (LEVEL_CELLS_X*LEVEL_CELLS_Y)
+
+// Floor and Level layers have 10 cells for every level tile
+var LEVEL_FLOOR_SIZE = (LEVEL_LAYER_SIZE*10)
+var LEVEL_LEVEL_SIZE = (LEVEL_LAYER_SIZE*10)
+var LEVEL_PLAYER_SIZE = (LEVEL_LAYER_SIZE)
+
 var loaded_level = {};
 
 /* Level structure (packed)
@@ -77,6 +85,7 @@ function Level() {
       [10]
       [10]
 */
+
 function level_index(x, y, layer)
 {
   return(y * (LEVEL_CELLS_X*10) + x * (10) + layer);
@@ -98,7 +107,7 @@ level_load_callback = function() {
   // Check level size and signature
   if(data.length != LEVEL_SIZE)
     return;
-  
+
   for(var i = 0; i < H_LEVEL.length; i++) {
     if(String.fromCharCode(data[i]) != H_LEVEL[i])
       return;
@@ -110,12 +119,27 @@ level_load_callback = function() {
   loaded_level.rotation = Array();
   for(var i = 0; i < 5; i++) {
     loaded_level.rotation[i] = data[32+i];
-  }  
-  
-  // Skip rezerved[100]  
-  loaded_level.floor = new Uint16Array(this.response, 137, 6720);
-  loaded_level.level = new Uint16Array(this.response, 137 + 6720, 6720);
-  loaded_level.players = new Uint16Array(this.response, 137 + 6720 + 6720, 672);
+  }
+
+  // Skip rezerved[100]
+  // We have to multiply the sizes by 2 
+  // because all cells are stored as unsigned int16 
+  var level = new DataView(this.response, 137, 
+                           LEVEL_FLOOR_SIZE*2 + 
+                           LEVEL_LEVEL_SIZE*2 + 
+                           LEVEL_PLAYER_SIZE*2);
+
+  loaded_level.floor = Uint16Array(LEVEL_FLOOR_SIZE);
+  loaded_level.level = Uint16Array(LEVEL_LEVEL_SIZE);
+  loaded_level.players = Uint16Array(LEVEL_PLAYER_SIZE);
+
+  for(var i = 0; i < LEVEL_FLOOR_SIZE; i++)
+    loaded_level.floor[i] = level.getUint16(i*2, true);
+  for(var i = 0; i < LEVEL_LEVEL_SIZE; i++)
+    loaded_level.level[i] = level.getUint16(LEVEL_FLOOR_SIZE*2 + i*2, true);
+  for(var i = 0; i < LEVEL_PLAYER_SIZE; i++)
+    loaded_level.players[i] = level.getUint16(LEVEL_FLOOR_SIZE*2 + 
+                                              LEVEL_LEVEL_SIZE*2 + i*2, true);
 
   console.log("Level " + loaded_level.name + " loaded.");
 
