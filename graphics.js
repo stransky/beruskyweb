@@ -61,7 +61,7 @@ Graph.prototype.sprite_insert = function(file, position)
                                      parseInt(r[2]), 
                                      parseInt(r[3]));
 
-      this.sprites[position] = new PIXI.Texture(base_text, base_rect);
+      this.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
       position++;
     }
     else {
@@ -75,8 +75,8 @@ Graph.prototype.sprite_insert = function(file, position)
         base_rect.y += parseInt(l[1]);
         base_rect.width += parseInt(l[2]);
         base_rect.height += parseInt(l[3]);
-        
-        this.sprites[position] = new PIXI.Texture(base_text, base_rect);
+
+        this.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
         position++;
       }
     }

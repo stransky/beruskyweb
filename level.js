@@ -159,19 +159,21 @@ Level.prototype.load = function(file) {
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
-  for(var y = 0; y < LEVEL_CELLS_Y; y++) {  
-    for(var x = 0; x < LEVEL_CELLS_X; x++) {      
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var item = this.floor[level_index(x, y, LAYER_ITEM)];
-      var variant = this.floor[level_index(x, y, LAYER_VARIANT)];    
-      
-      var sprite = repository.get_sprite(item, variant);
-      graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
+      if(item != NO_ITEM) {
+        var variant = this.floor[level_index(x, y, LAYER_VARIANT)];
+        var sprite = repository.get_sprite(item, variant);
+        graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
+      }
 
       var item = this.level[level_index(x, y, LAYER_ITEM)];
-      var variant = this.level[level_index(x, y, LAYER_VARIANT)];
-      
-      var sprite = repository.get_sprite(item, variant);
-      graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
+      if(item != NO_ITEM && item != P_GROUND) {
+        var variant = this.level[level_index(x, y, LAYER_VARIANT)];
+        var sprite = repository.get_sprite(item, variant);
+        graph.draw(sprite, x*CELL_SIZE_X, y*CELL_SIZE_Y);
+      }
     }
   }
 }

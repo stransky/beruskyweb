@@ -26,6 +26,8 @@
  */
 
 /* Main game items */
+var NO_ITEM                  = 65535 // -1 by uint16
+
 var P_GROUND                 = 0
 var P_PLAYER_1               = 1
 var P_PLAYER_2               = 2
