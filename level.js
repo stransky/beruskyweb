@@ -159,6 +159,8 @@ Level.prototype.load = function(file) {
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
+  
+
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var item = this.floor[level_index(x, y, LAYER_ITEM)];

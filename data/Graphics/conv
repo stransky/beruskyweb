@@ -1,0 +1,13 @@
+#!/bin/bash
+# Usage conv file.name
+
+TRANSPARENT_COLOR='#a56a6a'
+
+while [ "$#" != "0" ]; do
+	FILENAME=$1
+	echo "Converting $FILENAME"
+	convert $FILENAME -transparent $TRANSPARENT_COLOR $FILENAME
+	shift
+done
+
+
