@@ -125,6 +125,13 @@ Graph.prototype.load = function()
   console.log("Loaded sprites " + i);
 }
 
+Graph.prototype.load_background = function(background)
+{
+  background = background+1;
+  var back = this.sprite_insert("data/Graphics/background" + background + ".spr", FIRST_BACKGROUND);
+  console.log("Loaded background(" + background + ") result = " + back);
+}
+
 Graph.prototype.init = function()
 {
 	this.stage = new PIXI.Stage(0x000000);

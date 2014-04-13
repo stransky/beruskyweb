@@ -142,3 +142,6 @@ var GAME_RESOLUTION_Y         = 480
 
 var CELL_SIZE_X               = 20
 var CELL_SIZE_Y               = 20
+
+var LEVEL_SCREEN_START_X      = 0
+var LEVEL_SCREEN_START_Y      = 40

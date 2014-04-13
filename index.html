@@ -37,6 +37,10 @@
   var repo = new ObjectsRepository();
   repo.load();
 
+  // TODO - wait until level data is loaded
+  graph.load_background(level.background);
+
+  // TODO - wait until all data is loaded
   level.render(repo);
 
   document.body.appendChild(graph.get_renderer().view);
