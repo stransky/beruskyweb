@@ -152,32 +152,44 @@ level_load_callback = function() {
 Level.prototype.load = function(file) {
   this.name = file;
   console.log("Loading " + this.name);
-  
+
   level_load_callback_set_level(this);
   load_file_binary(file, level_load_callback);
 }
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
-  
-  graph.draw(FIRST_BACKGROUND, LEVEL_SCREEN_START_X, LEVEL_SCREEN_START_Y);
+
+  graph.draw(FIRST_BACKGROUND,
+             LEVEL_SCREEN_START_X,
+             LEVEL_SCREEN_START_Y);
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var item = this.floor[level_index(x, y, LAYER_ITEM)];
       if(item != NO_ITEM) {
         var variant = this.floor[level_index(x, y, LAYER_VARIANT)];
+        var rotation = this.floor[level_index(x, y, LAYER_ROTATION)];
         var sprite = repository.get_sprite(item, variant);
         graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
+                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
       }
 
       var item = this.level[level_index(x, y, LAYER_ITEM)];
       if(item != NO_ITEM && item != P_GROUND) {
         var variant = this.level[level_index(x, y, LAYER_VARIANT)];
+        var rotation = this.level[level_index(x, y, LAYER_ROTATION)];
         var sprite = repository.get_sprite(item, variant);
         graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
+                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
+      }
+
+      var player = this.players[player_index(x, y)];
+      if(player != NO_ITEM) {
+        var sprite = FIRST_PLAYER+player;
+        graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y,
+                           loaded_level.rotation[player]);
       }
     }
   }

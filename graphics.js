@@ -51,7 +51,6 @@ Graph.prototype.sprite_insert = function(file, position)
     var line = sprites[i];
     if(line[0] == "s") {
       // s x y dx dy scale
-      
       var sprite_file = file.replace(".spr",".png");      
       base_text = PIXI.Texture.fromImage(sprite_file).baseTexture;
 
@@ -65,8 +64,7 @@ Graph.prototype.sprite_insert = function(file, position)
       position++;
     }
     else {
-      //f offset_x offset_y offset_dx offset_dy num 
-
+      //f offset_x offset_y offset_dx offset_dy num
       var l = line.slice(2).split(" ");
       var num = parseInt(l[4]);
 
@@ -85,11 +83,16 @@ Graph.prototype.sprite_insert = function(file, position)
   return(position - position_base);
 }
 
-Graph.prototype.draw = function(spr, x, y) 
+Graph.prototype.draw = function(spr, x, y, rotation)
 {  
-  var sprite = new PIXI.Sprite(this.sprites[spr])  
-  sprite.position.x = x;
-  sprite.position.y = y;
+  var sprite = new PIXI.Sprite(this.sprites[spr]);
+
+  sprite.position.x = x+(sprite.width/2);
+  sprite.position.y = y+(sprite.height/2);
+  sprite.anchor.x = 0.5;
+  sprite.anchor.y = 0.5;
+  sprite.rotation = (Math.PI/2)*(rotation || 0);
+
   this.stage.addChild(sprite);
 }
 
@@ -98,29 +101,11 @@ Graph.prototype.load = function()
   var i;
 
   i  = this.sprite_insert("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
-  i += this.sprite_insert("data/Graphics/global2.spr", FIRST_GLOBAL_LEVEL + ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/global3.spr", FIRST_GLOBAL_LEVEL + 2 * ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/global4.spr", FIRST_GLOBAL_LEVEL + 3 * ROT_SHIFT);
-
   i += this.sprite_insert("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
-  i += this.sprite_insert("data/Graphics/klasik2.spr", FIRST_CLASSIC_LEVEL + ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/klasik3.spr", FIRST_CLASSIC_LEVEL + 2 * ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/klasik4.spr", FIRST_CLASSIC_LEVEL + 3 * ROT_SHIFT);
-
-  i += this.sprite_insert("data/Graphics/kyber1.spr", FIRST_CYBER_LEVEL);
-  i += this.sprite_insert("data/Graphics/kyber2.spr", FIRST_CYBER_LEVEL + ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/kyber3.spr", FIRST_CYBER_LEVEL + 2 * ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/kyber4.spr", FIRST_CYBER_LEVEL + 3 * ROT_SHIFT);
-
+  i += this.sprite_insert("data/Graphics/kyber1.spr",  FIRST_CYBER_LEVEL);
   i += this.sprite_insert("data/Graphics/herni1.spr",  FIRST_OTHER);
-  i += this.sprite_insert("data/Graphics/herni2.spr",  FIRST_OTHER + ROT_SHIFT);
-
-  i += this.sprite_insert("data/Graphics/game_cur.spr", FIRST_CURSOR);
-
-  i += this.sprite_insert("data/Graphics/hraci1.spr", FIRST_PLAYER);
-  i += this.sprite_insert("data/Graphics/hraci2.spr", FIRST_PLAYER + ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/hraci3.spr", FIRST_PLAYER + 2 * ROT_SHIFT);
-  i += this.sprite_insert("data/Graphics/hraci4.spr", FIRST_PLAYER + 3 * ROT_SHIFT);
+  i += this.sprite_insert("data/Graphics/game_cur.spr",FIRST_CURSOR);
+  i += this.sprite_insert("data/Graphics/hraci1.spr",  FIRST_PLAYER);
 
   console.log("Loaded sprites " + i);
 }

@@ -131,7 +131,6 @@ var FIRST_PLAYER              = 600
 var FIRST_MENU                = 700
 var FIRST_LOGO                = 800
 var FIRST_FONT                = 1000
-var ROT_SHIFT                 = 10000
 
 var LAYER_ITEM                = 0
 var LAYER_VARIANT             = 1
