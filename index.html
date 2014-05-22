@@ -48,6 +48,17 @@
     document.body.appendChild(graph.get_renderer().view);
     requestAnimFrame(gameLoop);
 */    
+  function gameLoop() {
+      requestAnimFrame(gameLoop);
+      game.game_loop();
+  }
+
+  var game = new Game();
+  
+  game.level_load("data/Levels/j01.lv3");
+  game.level_run();
+  
+  requestAnimFrame(gameLoop);
   </script>
 
 </body>

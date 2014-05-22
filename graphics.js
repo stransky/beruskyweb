@@ -34,7 +34,7 @@ Graph.prototype.render = function() {
   this.renderer.render(this.stage);
 }
 
-Graph.prototype.get_renderer = function() {  
+Graph.prototype.get_renderer = function() {
   return(this.renderer);
 }
 
@@ -96,7 +96,7 @@ Graph.prototype.draw = function(spr, x, y, rotation)
   this.stage.addChild(sprite);
 }
 
-Graph.prototype.load = function()
+Graph.prototype.sprites_load = function()
 {
   var i;
 
@@ -110,7 +110,7 @@ Graph.prototype.load = function()
   console.log("Loaded sprites " + i);
 }
 
-Graph.prototype.load_background = function(background)
+Graph.prototype.background_load = function(background)
 {
   background = background+1;
   var back = this.sprite_insert("data/Graphics/background" + background + ".spr", FIRST_BACKGROUND);
@@ -119,7 +119,7 @@ Graph.prototype.load_background = function(background)
 
 Graph.prototype.init = function()
 {
-	this.stage = new PIXI.Stage(0x000000);
-	this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
-  this.load();
+  this.stage = new PIXI.Stage(0x000000);
+  this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
+  this.sprites_load();
 }

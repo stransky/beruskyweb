@@ -24,38 +24,36 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/*
-    function gameLoop() {
-        requestAnimFrame(gameLoop);
-        graph.render();
-    }
-
-    // TODO - wait until all data is loaded
-    level.render(repo);
-  
-    document.body.appendChild(graph.get_renderer().view);
-    requestAnimFrame(gameLoop);
-*/
 
 function Game() {
   this.graph = new Graph();
-  graph.init();
-  
+  this.graph.init();
+
+  document.body.appendChild(this.graph.get_renderer().view);
+
   this.repo = new ObjectsRepository();
-  repo.load();
+  this.repo.load();
+
+  this.level = new Level(this.graph);
 }
+
+Game.prototype.game_loop = function() {
+
+    if(!this.repo.is_loaded())
+      return;
+    if(!this.level.is_loaded())
+      return;
+
+    this.graph.render();
+}
+
 
 // Load the game
 Game.prototype.level_load = function(name) {
-  this.level = new Level();
   this.level.load(name);
-
-  // TODO - wait until level data is loaded
-  graph.load_background(level.background);
 }
 
 // Run the game
 Game.prototype.level_run = function() {
-
-
+  this.level.render(this.repo);
 }

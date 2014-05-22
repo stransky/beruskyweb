@@ -116,6 +116,11 @@ GameObject.prototype.print = function()
 function ObjectsRepository() {
   // Two dimensional arrays of GameObjects
   this.repo = Array();
+  this.loaded = false;
+}
+
+ObjectsRepository.prototype.is_loaded = function() {
+  return(this.loaded);
 }
 
 ObjectsRepository.prototype.load = function()
@@ -141,6 +146,7 @@ ObjectsRepository.prototype.load = function()
   }
   
   console.log("Repository objects loaded = " + loaded);
+  this.loaded = true;
 }
 
 ObjectsRepository.prototype.get_object = function(item, variant)

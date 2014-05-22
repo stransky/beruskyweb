@@ -119,22 +119,22 @@ level_load_callback = function() {
   // Skip rezerved[100]
   // We have to multiply the sizes by 2 
   // because all cells are stored as unsigned int16 
-  var level = new DataView(this.response, 137, 
-                           LEVEL_FLOOR_SIZE*2 + 
-                           LEVEL_LEVEL_SIZE*2 + 
-                           LEVEL_PLAYER_SIZE*2);
+  var level_data = new DataView(this.response, 137,
+                                LEVEL_FLOOR_SIZE*2 +
+                                LEVEL_LEVEL_SIZE*2 +
+                                LEVEL_PLAYER_SIZE*2);
 
   var floor = Uint16Array(LEVEL_FLOOR_SIZE);
   var level = Uint16Array(LEVEL_LEVEL_SIZE);
   var players = Uint16Array(LEVEL_PLAYER_SIZE);
 
   for(var i = 0; i < LEVEL_FLOOR_SIZE; i++)
-    floor[i] = level.getUint16(i*2, true);
+    floor[i] = level_data.getUint16(i*2, true);
   for(var i = 0; i < LEVEL_LEVEL_SIZE; i++)
-    level[i] = level.getUint16(LEVEL_FLOOR_SIZE*2 + i*2, true);
+    level[i] = level_data.getUint16(LEVEL_FLOOR_SIZE*2 + i*2, true);
   for(var i = 0; i < LEVEL_PLAYER_SIZE; i++)
-    players[i] = level.getUint16(LEVEL_FLOOR_SIZE*2 +
-                                 LEVEL_LEVEL_SIZE*2 + i*2, true);
+    players[i] = level_data.getUint16(LEVEL_FLOOR_SIZE*2 +
+                                      LEVEL_LEVEL_SIZE*2 + i*2, true);
 
   // Convert to game level structure
   loaded_level.floor = Array();
@@ -146,26 +146,28 @@ level_load_callback = function() {
       var cell = new LevelItem();
       cell.item = floor[level_disk_index(x, y, LAYER_ITEM)];
       if(cell.item != NO_ITEM) {
-        cell.variant = this.floor[level_disk_index(x, y, LAYER_VARIANT)];
-        cell.rotation = this.floor[level_disk_index(x, y, LAYER_ROTATION)];
+        cell.variant = floor[level_disk_index(x, y, LAYER_VARIANT)];
+        cell.rotation = floor[level_disk_index(x, y, LAYER_ROTATION)];
       }
       loaded_level.floor[level_index] = cell;
 
-      cell.item = this.level[level_disk_index(x, y, LAYER_ITEM)];
+      cell.item = level[level_disk_index(x, y, LAYER_ITEM)];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
-        cell.variant = this.level[level_disk_index(x, y, LAYER_VARIANT)];
-        cell.rotation = this.level[level_disk_index(x, y, LAYER_ROTATION)];
+        cell.variant = level[level_disk_index(x, y, LAYER_VARIANT)];
+        cell.rotation = level[level_disk_index(x, y, LAYER_ROTATION)];
       }
       loaded_level.level[level_index] = cell;
 
-      cell.item = this.players[level_index(x, y)];
+      cell.item = players[level_index(x, y)];
       loaded_level.players[level_index] = cell;
     }
   }
 
   console.log("Level " + loaded_level.name + " loaded.");
-
   loaded_level.loaded = true;
+
+  // Load background for this level
+  loaded_level.graph.background_load(loaded_level.background);
 }
 
 function LevelItem(item, variant, rotation) {
@@ -174,9 +176,15 @@ function LevelItem(item, variant, rotation) {
   this.rotation = rotation;
 }
 
-function Level() {
+function Level(graph) {
+  this.graph = graph;
   this.name = "a.lv3";
-  this.loaded = false;  
+  this.loaded = false;
+  this.background_loaded = false;
+}
+
+Level.prototype.is_loaded = function() {
+  return(this.loaded && this.background_loaded);
 }
 
 // Load binary level data from original lv3 files
@@ -195,10 +203,9 @@ Level.prototype.item_is_empty = function(x,y) {
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
-
-  graph.draw(FIRST_BACKGROUND,
-             LEVEL_SCREEN_START_X,
-             LEVEL_SCREEN_START_Y);
+  this.graph.draw(FIRST_BACKGROUND,
+                  LEVEL_SCREEN_START_X,
+                  LEVEL_SCREEN_START_Y);
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
@@ -207,8 +214,8 @@ Level.prototype.render = function(repository) {
         var variant = this.floor[level_disk_index(x, y, LAYER_VARIANT)];
         var rotation = this.floor[level_disk_index(x, y, LAYER_ROTATION)];
         var sprite = repository.get_sprite(item, variant);
-        graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
+        this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
       }
 
       var item = this.level[level_disk_index(x, y, LAYER_ITEM)];
@@ -216,16 +223,16 @@ Level.prototype.render = function(repository) {
         var variant = this.level[level_disk_index(x, y, LAYER_VARIANT)];
         var rotation = this.level[level_disk_index(x, y, LAYER_ROTATION)];
         var sprite = repository.get_sprite(item, variant);
-        graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
+        this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
       }
 
       var player = this.players[level_index(x, y)];
       if(player != NO_ITEM) {
         var sprite = FIRST_PLAYER+player;
-        graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                           LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y,
-                           loaded_level.rotation[player]);
+        this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y,
+                                loaded_level.rotation[player]);
       }
     }
   }
