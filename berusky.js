@@ -41,8 +41,13 @@ Game.prototype.game_loop = function() {
 
     if(!this.repo.is_loaded())
       return;
-    if(!this.level.is_loaded())
+    if(!this.level.is_loaded()) {
+      console.log("Loading...");
       return;
+    }
+    if(!this.level.is_rendered()) {
+      this.level.render(this.repo);
+    }
 
     this.graph.render();
 }
@@ -50,10 +55,9 @@ Game.prototype.game_loop = function() {
 
 // Load the game
 Game.prototype.level_load = function(name) {
-  this.level.load(name);
+  this.level.load(name);  
 }
 
 // Run the game
 Game.prototype.level_run = function() {
-  this.level.render(this.repo);
 }

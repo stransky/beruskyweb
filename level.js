@@ -80,7 +80,7 @@ array memory layout
       [10]
 */
 
-function level_disk_index(x, y, layer)
+function level_index_disk(x, y, layer)
 {
   return(y * (LEVEL_CELLS_X*10) + x * (10) + layer);
 }
@@ -142,24 +142,21 @@ level_load_callback = function() {
   loaded_level.players = Array();
   
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
-    for(var x = 0; x < LEVEL_CELLS_X; x++) {
-      var cell = new LevelItem();
-      cell.item = floor[level_disk_index(x, y, LAYER_ITEM)];
-      if(cell.item != NO_ITEM) {
-        cell.variant = floor[level_disk_index(x, y, LAYER_VARIANT)];
-        cell.rotation = floor[level_disk_index(x, y, LAYER_ROTATION)];
-      }
-      loaded_level.floor[level_index] = cell;
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {      
+      var index = level_index(x,y);
 
-      cell.item = level[level_disk_index(x, y, LAYER_ITEM)];
-      if(cell.item != NO_ITEM && cell.item != P_GROUND) {
-        cell.variant = level[level_disk_index(x, y, LAYER_VARIANT)];
-        cell.rotation = level[level_disk_index(x, y, LAYER_ROTATION)];
-      }
-      loaded_level.level[level_index] = cell;
+      loaded_level.floor[index] = new LevelItem();
+      loaded_level.floor[index].item = floor[level_index_disk(x, y, LAYER_ITEM)];
+      loaded_level.floor[index].variant = floor[level_index_disk(x, y, LAYER_VARIANT)];
+      loaded_level.floor[index].rotation = floor[level_index_disk(x, y, LAYER_ROTATION)];
 
-      cell.item = players[level_index(x, y)];
-      loaded_level.players[level_index] = cell;
+      loaded_level.level[index] = new LevelItem();
+      loaded_level.level[index].item = level[level_index_disk(x, y, LAYER_ITEM)];
+      loaded_level.level[index].variant = level[level_index_disk(x, y, LAYER_VARIANT)];
+      loaded_level.level[index].rotation = level[level_index_disk(x, y, LAYER_ROTATION)];
+      
+      loaded_level.players[index] = new LevelItem();
+      loaded_level.players[index].item = players[level_index(x, y)];
     }
   }
 
@@ -168,6 +165,7 @@ level_load_callback = function() {
 
   // Load background for this level
   loaded_level.graph.background_load(loaded_level.background);
+  loaded_level.background_loaded = true;
 }
 
 function LevelItem(item, variant, rotation) {
@@ -181,6 +179,7 @@ function Level(graph) {
   this.name = "a.lv3";
   this.loaded = false;
   this.background_loaded = false;
+  this.rendered = false;
 }
 
 Level.prototype.is_loaded = function() {
@@ -209,31 +208,35 @@ Level.prototype.render = function(repository) {
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
-      var item = this.floor[level_disk_index(x, y, LAYER_ITEM)];
-      if(item != NO_ITEM) {
-        var variant = this.floor[level_disk_index(x, y, LAYER_VARIANT)];
-        var rotation = this.floor[level_disk_index(x, y, LAYER_ROTATION)];
-        var sprite = repository.get_sprite(item, variant);
+      var index = level_index(x,y);      
+    
+      var cell = this.floor[index];      
+      if(cell.item != NO_ITEM) {
+        var sprite = repository.get_sprite(cell.item, cell.variant);
         this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
+                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
 
-      var item = this.level[level_disk_index(x, y, LAYER_ITEM)];
-      if(item != NO_ITEM && item != P_GROUND) {
-        var variant = this.level[level_disk_index(x, y, LAYER_VARIANT)];
-        var rotation = this.level[level_disk_index(x, y, LAYER_ROTATION)];
-        var sprite = repository.get_sprite(item, variant);
+      cell = this.level[index];
+      if(cell.item != NO_ITEM && cell.item != P_GROUND) {
+        var sprite = repository.get_sprite(cell.item, cell.variant);
         this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, rotation);
+                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
 
-      var player = this.players[level_index(x, y)];
-      if(player != NO_ITEM) {
-        var sprite = FIRST_PLAYER+player;
+      cell = this.players[index];
+      if(cell.item != NO_ITEM) {
+        var sprite = FIRST_PLAYER+cell.item;
         this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                                 LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y,
-                                loaded_level.rotation[player]);
+                                loaded_level.rotation[cell.item]);
       }
     }
   }
+
+  this.rendered = true;
+}
+
+Level.prototype.is_rendered = function() {
+  return(this.rendered);
 }
