@@ -25,70 +25,47 @@
  *
  */
 
-function Game() {
-  this.graph = new Graph();
-  this.graph.init();
+/*
+  Game input handler
+*/
+var input_object;
+var MOVE_NONE = 0;
 
-  document.body.appendChild(this.graph.get_renderer().view);
-
-  this.repo = new ObjectsRepository();
-  this.repo.load();
-
-  this.level = new Level(this.graph);
-  this.input = new Input(this);
-
-  this.loaded = false;
+function Input(game)
+{
+  this.bug_movement = MOVE_NONE;
+  this.game = game;
+  input_object = this;
+  
+  document.onkeydown = handleKeyDown;
+  document.onkeyup = handleKeyUp;
 }
 
-Game.prototype.game_load = function() 
+Input.prototype.key_input = function(event)
 {
-  // Load game repo
-  if(!this.repo.is_loaded())
-    return;
+  switch(event.keyCode) {
+    case KeyEvent.DOM_VK_UP:
+      this.bug_movement = MOVE_UP;
+      break;
+    case KeyEvent.DOM_VK_DOWN:
+      this.bug_movement = MOVE_DOWN;
+      break;
+    case KeyEvent.DOM_VK_RIGHT:
+      this.bug_movement = MOVE_RIGHT;
+      break;
+    case KeyEvent.DOM_VK_LEFT:
+      this.bug_movement = MOVE_LEFT;
+      break;
+  }
+  this.game.bug_move(this.bug_movement);
+}
+
+function handleKeyDown(event)
+{
+  input_object.key_input(event);
+}
+
+function handleKeyUp(event)
+{
     
-  // Load game level
-  if(!this.level.is_loaded()) {    
-    return;
-  }
-  // ...  
-  // Render already loaded level
-  if(!this.level.is_rendered()) {
-    this.level.render(this.repo);    
-  }
-  this.loaded = true;
-}
-
-Game.prototype.game_play = function() 
-{
-
-
-}
-
-Game.prototype.game_loop = function() 
-{
-  if(!this.loaded) {
-    this.game_load();
-    return;
-  }
-  
-  this.game_play();
-  
-  this.graph.render();
-}
-
-// Load the game
-Game.prototype.level_load = function(name) 
-{
-  this.level.load(name);  
-}
-
-// Player control
-var MOVE_UP     = 1
-var MOVE_DOWN   = 2
-var MOVE_LEFT   = 3
-var MOVE_RIGHT  = 4
-
-Game.prototype.bug_move = function(direction)
-{
-  alert("bug_move");
 }
