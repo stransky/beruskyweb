@@ -83,6 +83,7 @@ Game.prototype.level_load = function(name)
 }
 
 // Player control
+var MOVE_NONE   = 0
 var MOVE_UP     = 1
 var MOVE_DOWN   = 2
 var MOVE_LEFT   = 3
@@ -90,5 +91,10 @@ var MOVE_RIGHT  = 4
 
 Game.prototype.bug_move = function(direction)
 {
-  alert("bug_move");
+  alert("bug_move " + direction);
+}
+
+Game.prototype.bug_switch = function(number)
+{
+  alert("bug_switch " + number);
 }

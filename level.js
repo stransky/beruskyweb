@@ -111,9 +111,9 @@ level_load_callback = function() {
   loaded_level.background = data[30];
   loaded_level.music = data[31];
 
-  loaded_level.rotation = Array();
+  var player_rotations = Array();
   for(var i = 0; i < 5; i++) {
-    loaded_level.rotation[i] = data[32+i];
+    player_rotations[i] = data[32+i];
   }
 
   // Skip rezerved[100]
@@ -157,6 +157,14 @@ level_load_callback = function() {
       
       loaded_level.players[index] = new LevelItem();
       loaded_level.players[index].item = players[level_index(x, y)];
+      
+      if(loaded_level.players[index].item != NO_ITEM) {
+        loaded_level.players[index].rotation = player_rotations[loaded_level.players[index].item];
+        if(loaded_level.players[index].item < loaded_level.player_active.number) {
+          loaded_level.player_active.x = x;
+          loaded_level.player_active.y = y;
+        }
+      }
     }
   }
 
@@ -168,10 +176,17 @@ level_load_callback = function() {
   loaded_level.background_loaded = true;
 }
 
+// Active player info
+function Player() {
+  this.x = 0;
+  this.y = 0;
+}
+
 function LevelItem(item, variant, rotation) {
   this.item = item;
   this.variant = variant;
-  this.rotation = rotation;
+  this.rotation = rotation;  
+  this.sprite = 0;
 }
 
 function Level(graph) {
@@ -180,6 +195,7 @@ function Level(graph) {
   this.loaded = false;
   this.background_loaded = false;
   this.rendered = false;
+  this.player_active = new Player();
 }
 
 Level.prototype.is_loaded = function() {
@@ -220,21 +236,39 @@ Level.prototype.render = function(repository) {
       cell = this.level[index];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
         var sprite = repository.get_sprite(cell.item, cell.variant);
-        this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
+        cell.sprite = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                      LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
 
       cell = this.players[index];
       if(cell.item != NO_ITEM) {
         var sprite = FIRST_PLAYER+cell.item;
-        this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y,
-                                loaded_level.rotation[cell.item]);
+        cell.sprite = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                      LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
     }
   }
 
   this.rendered = true;
+}
+
+// Remove specified LevelItem from level, 
+// unregister sprite and so
+Level.prototype.item_remove(x, y)
+{
+
+}
+
+// 1. Remove a LevelItem at (nx,ny)
+// 2. Move LevelItem from (ox,oy) to (nx,ny)
+Level.prototype.item_move(ox, oy, nx, ny)
+{
+
+}
+
+Level.prototype.player_move(nx, ny)
+{
+
 }
 
 Level.prototype.is_rendered = function() {

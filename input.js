@@ -29,11 +29,9 @@
   Game input handler
 */
 var input_object;
-var MOVE_NONE = 0;
 
 function Input(game)
 {
-  this.bug_movement = MOVE_NONE;
   this.game = game;
   input_object = this;
   
@@ -42,22 +40,31 @@ function Input(game)
 }
 
 Input.prototype.key_input = function(event)
-{
+{  
   switch(event.keyCode) {
     case KeyEvent.DOM_VK_UP:
-      this.bug_movement = MOVE_UP;
+      this.game.bug_move(MOVE_UP);
       break;
     case KeyEvent.DOM_VK_DOWN:
-      this.bug_movement = MOVE_DOWN;
+      this.game.bug_move(MOVE_DOWN);
       break;
     case KeyEvent.DOM_VK_RIGHT:
-      this.bug_movement = MOVE_RIGHT;
+      this.game.bug_move(MOVE_RIGHT);
       break;
     case KeyEvent.DOM_VK_LEFT:
-      this.bug_movement = MOVE_LEFT;
+      this.game.bug_move(MOVE_LEFT);
+      break;
+    case KeyEvent.DOM_VK_TAB:
+      this.game.bug_switch();
+      break;
+    case KeyEvent.DOM_VK_1:
+    case KeyEvent.DOM_VK_2:
+    case KeyEvent.DOM_VK_3:
+    case KeyEvent.DOM_VK_4:
+    case KeyEvent.DOM_VK_5:
+      this.game.bug_switch(event.keyCode-KeyEvent.DOM_VK_1);
       break;
   }
-  this.game.bug_move(this.bug_movement);
 }
 
 function handleKeyDown(event)

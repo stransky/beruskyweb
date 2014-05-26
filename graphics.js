@@ -83,6 +83,8 @@ Graph.prototype.sprite_insert = function(file, position)
   return(position - position_base);
 }
 
+// Draws sprite at specified location and returns handle to 
+// displayed object
 Graph.prototype.draw = function(spr, x, y, rotation)
 {  
   var sprite = new PIXI.Sprite(this.sprites[spr]);
@@ -94,6 +96,8 @@ Graph.prototype.draw = function(spr, x, y, rotation)
   sprite.rotation = (Math.PI/2)*(rotation || 0);
 
   this.stage.addChild(sprite);
+  
+  return(sprite);
 }
 
 Graph.prototype.sprites_load = function()
