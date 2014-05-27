@@ -182,11 +182,26 @@ function Player() {
   this.y = 0;
 }
 
+function LevelItem() {
+  this.item = NO_ITEM;
+  this.variant = 0;
+  this.rotation = 0;  
+  this.sprite_handle = 0;
+}
+
 function LevelItem(item, variant, rotation) {
   this.item = item;
   this.variant = variant;
   this.rotation = rotation;  
-  this.sprite = 0;
+  this.sprite_handle = 0;
+}
+
+LevelItem.prototype.copy = function(template)
+{
+  this.item = template.item;
+  this.variant = template.variant;
+  this.rotation = template.rotation;  
+  this.sprite_handle = template.sprite_handle;
 }
 
 function Level(graph) {
@@ -236,15 +251,15 @@ Level.prototype.render = function(repository) {
       cell = this.level[index];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
         var sprite = repository.get_sprite(cell.item, cell.variant);
-        cell.sprite = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                      LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
+        cell.sprite_handle = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                             LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
 
       cell = this.players[index];
       if(cell.item != NO_ITEM) {
         var sprite = FIRST_PLAYER+cell.item;
-        cell.sprite = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
-                                      LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
+        cell.sprite_handle = this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                                             LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y, cell.rotation);
       }
     }
   }
@@ -254,23 +269,42 @@ Level.prototype.render = function(repository) {
 
 // Remove specified LevelItem from level, 
 // unregister sprite and so
-Level.prototype.item_remove(x, y)
+Level.prototype.item_remove = function(x, y)
 {
-
+  var cell = this.level[level_index(x,y)];
+  if(cell.item != NO_ITEM) {
+    cell.item = NO_ITEM;
+    this.graph.remove(cell.sprite_handle);
+  }
 }
 
 // 1. Remove a LevelItem at (nx,ny)
 // 2. Move LevelItem from (ox,oy) to (nx,ny)
-Level.prototype.item_move(ox, oy, nx, ny)
+Level.prototype.item_move = function(ox, oy, nx, ny)
 {
-
+  this.item_remove(nx, ny);
+  
+  var cell_old = this.level[level_index(ox,oy)];
+  if(cell_old.item != NO_ITEM) {
+    var cell_new = this.level[level_index(nx,ny)];
+    cell_new.copy(cell_old);
+    cell_new.sprite_handle.x = LEVEL_SCREEN_START_X + x*CELL_SIZE_X;
+    cell_new.sprite_handle.y = LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y;
+  }
 }
 
-Level.prototype.player_move(nx, ny)
+Level.prototype.player_move = function(ox, oy, nx, ny)
 {
-
+  var cell_old = this.players[level_index(ox,oy)];
+  if(cell_old.item != NO_ITEM) {
+    var cell_new = this.players[level_index(nx,ny)];
+    cell_new.copy(cell_old);
+    cell_new.sprite_handle.x = LEVEL_SCREEN_START_X + x*CELL_SIZE_X;
+    cell_new.sprite_handle.y = LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y;
+  }
 }
 
-Level.prototype.is_rendered = function() {
+Level.prototype.is_rendered = function() 
+{
   return(this.rendered);
 }

@@ -25,6 +25,14 @@
  *
  */
 
+// Player control
+var MOVE_NONE   = 0
+var MOVE_UP     = 1
+var MOVE_DOWN   = 2
+var MOVE_LEFT   = 3
+var MOVE_RIGHT  = 4
+
+
 function Game() {
   this.graph = new Graph();
   this.graph.init();
@@ -82,16 +90,38 @@ Game.prototype.level_load = function(name)
   this.level.load(name);  
 }
 
-// Player control
-var MOVE_NONE   = 0
-var MOVE_UP     = 1
-var MOVE_DOWN   = 2
-var MOVE_LEFT   = 3
-var MOVE_RIGHT  = 4
+Game.prototype.can_move = function(x, y, nx, ny)
+{
+  return(true);
+}
 
+// Get an active player
+// Check if we can move
+// Move it
 Game.prototype.bug_move = function(direction)
 {
-  alert("bug_move " + direction);
+  var player = this.level.player_active;
+  var nx = player.x;
+  var ny = player.y;
+
+  switch(direction) {
+    case MOVE_UP:
+      ny--;
+      break;
+    case MOVE_DOWN:
+      ny++;
+      break;
+    case MOVE_LEFT:
+      nx--;
+      break;
+    case MOVE_RIGHT:
+      nx++;
+      break;
+  }
+
+  if(this.can_move(player.x, player.y, nx, ny)) {
+    this.level.player_move(player.x, player.y, nx, ny);
+  }
 }
 
 Game.prototype.bug_switch = function(number)

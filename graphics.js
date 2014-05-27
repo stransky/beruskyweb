@@ -100,6 +100,11 @@ Graph.prototype.draw = function(spr, x, y, rotation)
   return(sprite);
 }
 
+Graph.prototype.remove = function(sprite_handle)
+{  
+  this.stage.removeChild(sprite_handle);
+}
+
 Graph.prototype.sprites_load = function()
 {
   var i;
