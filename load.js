@@ -111,11 +111,11 @@ var parser_table =
   PP_RIGHT_JAMB_Z: PP_RIGHT_JAMB_Z,
   PP_TOP_JAMB_Z: PP_TOP_JAMB_Z,
   PP_BOTTOM_JAMB_Z: PP_BOTTOM_JAMB_Z,
-/*
+
   ANIM_TRIGGER_MOVE: ANIM_TRIGGER_MOVE,
   ANIM_TRIGGER_ERASE: ANIM_TRIGGER_ERASE,
   ANIM_TRIGGER_INSERT: ANIM_TRIGGER_INSERT,
-*/
+
   FIRST_GLOBAL_LEVEL: FIRST_GLOBAL_LEVEL,
   FIRST_CLASSIC_LEVEL: FIRST_CLASSIC_LEVEL,
   FIRST_CYBER_LEVEL: FIRST_CYBER_LEVEL,
@@ -153,7 +153,7 @@ var parser_table =
   SPRITE_STATIC: SPRITE_STATIC,
   SPRITE_DYNAMIC: SPRITE_DYNAMIC,
   SPRITE_NO_ROTATE: SPRITE_NO_ROTATE,
-/*
+
   ANIM_PLAYER_1_FAST: ANIM_PLAYER_1_FAST,
   ANIM_PLAYER_2_FAST: ANIM_PLAYER_2_FAST,
   ANIM_PLAYER_3_FAST: ANIM_PLAYER_3_FAST,
@@ -206,7 +206,6 @@ var parser_table =
   ANIM_DOOR_ID_V:    ANIM_DOOR_ID_V,
   ANIM_DOOR_DV_H:    ANIM_DOOR_DV_H,
   ANIM_DOOR_DV_V:    ANIM_DOOR_DV_V
-*/  
 };
 
 function TokenItem(base, offset, num) {
@@ -215,21 +214,26 @@ function TokenItem(base, offset, num) {
   this.num = num;
 }
 
-function token_translate(token) { 
-  // split by "+"
-  var items = token.split("+");
+function token_translate(token) {
+  // Split by | or +  
+  var items = (token.replace("|","+")).split("+");
   var ret = 0;
   var base = 0;
-  
+
   for(var i = 0; i < items.length; i++) {
     var item = items[i].trim();
     if(is_number(item)) {
       ret += parseInt(item);
     }
-    else {      
-      ret = base = parser_table[item];
+    else {
+      if(!base) {
+        ret = base = parser_table[item];
+      }
+      else {
+        ret = ret|parser_table[item];
+      }
     }
   }
-  
+
   return(new TokenItem(base, ret - base, ret));
 }

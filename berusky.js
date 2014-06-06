@@ -42,6 +42,9 @@ function Game() {
   this.repo = new ObjectsRepository();
   this.repo.load();
 
+  this.anim_templates = new GameAnimTemplateRepository();
+  this.anim_templates.load();
+
   this.level = new Level(this.graph);
   this.input = new Input(this);
 
@@ -90,11 +93,6 @@ Game.prototype.level_load = function(name)
   this.level.load(name);  
 }
 
-Game.prototype.can_move = function(x, y, nx, ny)
-{
-  return(true);
-}
-
 // Get an active player
 // Check if we can move
 // Move it
@@ -119,8 +117,33 @@ Game.prototype.bug_move = function(direction)
       break;
   }
 
-  if(this.can_move(player.x, player.y, nx, ny)) {
-    this.level.player_move(player.x, player.y, nx, ny);
+  var cell = this.level.item_get(nx, ny);
+  switch(cell.item) {
+    case NO_ITEM:
+      // free space - do the movement
+      this.level.player_move(player.x, player.y, nx, ny);
+      player.x = nx; player.y = ny;
+      break;
+    case P_BOX:
+      break;
+    case P_TNT:
+      break;
+    case P_EXIT:
+      break;
+    case P_STONE:
+      break;
+    case P_KEY:
+      break;
+    case P_MATTOCK:
+      break;
+    case P_KEY1:
+    case P_KEY2:
+    case P_KEY3:
+    case P_KEY4:
+    case P_KEY5:    
+      break;
+    default:
+      break;
   }
 }
 

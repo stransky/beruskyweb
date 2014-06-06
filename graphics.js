@@ -100,6 +100,13 @@ Graph.prototype.draw = function(spr, x, y, rotation)
   return(sprite);
 }
 
+Graph.prototype.sprite_move = function(sprite_handle, x, y)
+{  
+  sprite_handle.position.x = x+(sprite_handle.width/2);
+  sprite_handle.position.y = y+(sprite_handle.height/2);  
+  return(sprite_handle);
+}
+
 Graph.prototype.remove = function(sprite_handle)
 {  
   this.stage.removeChild(sprite_handle);

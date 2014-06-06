@@ -25,6 +25,8 @@
  *
  */
 
+/* Game item data
+*/
 var GAME_REPO_FILE = "data/GameData/items.dat"
 
 function GameObject() {
@@ -48,8 +50,6 @@ function GameObject() {
   
   this.sub_objects = []; // two sub-objects
 }
-
-var REC_NUM = 12
 
 GameObject.prototype.parse_line = function(line)
 {
@@ -125,7 +125,7 @@ ObjectsRepository.prototype.is_loaded = function() {
 
 ObjectsRepository.prototype.load = function()
 {
-  var data = load_file_text("data/GameData/items.dat");
+  var data = load_file_text(GAME_REPO_FILE);
   var lines = data.split("\n");
   var loaded = 0;
   
@@ -161,4 +161,123 @@ ObjectsRepository.prototype.get_sprite = function(item, variant)
 {
   var obj = this.get_object(item, variant);
   return obj.sprite;
+}
+
+/* Item animation data
+*/
+
+var GAME_ANIM_FILE = "data/GameData/anim.dat"
+
+function GameAnimTemplate() {
+
+  this.template_handle = 0;
+
+  this.flag = 0;
+
+  this.frame_num = 0;
+  this.frame_correction = 0;
+
+  this.dx = 0;
+  this.dy = 0;
+
+  this.sprite_first = 0;
+  this.sprite_num = 0;
+  this.sprite_step = 0;
+}
+
+GameAnimTemplate.prototype.parse_line = function(line)
+{
+  var token_pos = 0;
+  
+  tokens = line.split("\t");
+  for(var i = 0; i < tokens.length; i++) {
+    var token = tokens[i];
+    if(token.length != 0) {
+      switch(token_pos) {
+        case 0: // template handle
+        this.template_handle = token_translate(token).num;
+        break;
+        case 1: // flags
+        this.flags = token_translate(token).num;
+        break;
+        case 2: // frame_num
+        this.frame_num = token_translate(token).num;
+        break;
+        case 3: // dx
+        this.dx = parseInt(token).num;
+        break;
+        case 4: // dy
+        this.dy = parseInt(token).num;
+        break;
+        case 5: // sprite_first
+        this.sprite_first = token_translate(token).num;
+        break;
+        case 6: // sprite_num
+        this.sprite_num = token_translate(token).num;
+        break;
+        case 7: // sprite_step
+        this.sprite_step = parseInt(token).num;
+        break;
+        case 8: // frame_correction
+        this.frame_correction = parseInt(token).num;
+        break;
+        default:
+        break;
+      }
+      token_pos++;
+    }
+  }  
+}
+
+GameAnimTemplate.prototype.print = function()
+{
+  console.log("GameAnimTemplate handle = " + this.template_handle);
+  console.log("  frame_num:    " + this.frame_num);
+  console.log("  sprite_first: " + this.sprite_first);
+  console.log("  sprite_num:   " + this.sprite_num);
+  console.log("  sprite_step:  " + this.sprite_step);
+}
+
+function GameAnimTemplateRepository() {
+  // Two dimensional arrays of GameObjects
+  this.anim_template = Array();
+  this.loaded = false;
+}
+
+GameAnimTemplateRepository.prototype.is_loaded = function() {
+  return(this.loaded);
+}
+
+GameAnimTemplateRepository.prototype.load = function()
+{
+  var data = load_file_text(GAME_ANIM_FILE);
+  var lines = data.split("\n");
+  var loaded = 0;
+  
+  this.anim_template = Array();
+  for(var i = 0; i < lines.length; i++) {
+    var tline = lines[i].trim();
+
+    if(tline[0] != '#' && tline.length != 0) {
+      var obj = new GameAnimTemplate();
+      obj.parse_line(tline);
+      
+      if(this.anim_template[obj.template_handle] === undefined)
+        this.anim_template[obj.template_handle] = Array();
+      
+      this.anim_template[obj.template_handle] = obj;
+      loaded++;
+    }
+  }
+  
+  console.log("Repository objects loaded = " + loaded);
+  this.loaded = true;
+}
+
+GameAnimTemplateRepository.prototype.get_object = function(anim_template)
+{
+  if(this.anim_template[anim_template] === undefined) {
+    console.log("Undefined object repository - anim_template = " + anim_template);
+  }
+  return this.anim_template[anim_template];
 }

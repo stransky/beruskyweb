@@ -128,6 +128,11 @@ var FIRST_BACKGROUND          = 400
 var FIRST_OTHER               = 410
 var FIRST_CURSOR              = 590
 var FIRST_PLAYER              = 600
+var FIRST_PLAYER_1            = 600
+var FIRST_PLAYER_2            = 610
+var FIRST_PLAYER_3            = 620
+var FIRST_PLAYER_4            = 630
+var FIRST_PLAYER_5            = 640
 var FIRST_MENU                = 700
 var FIRST_LOGO                = 800
 var FIRST_FONT                = 1000
@@ -144,3 +149,67 @@ var CELL_SIZE_Y               = 20
 
 var LEVEL_SCREEN_START_X      = 0
 var LEVEL_SCREEN_START_Y      = 40
+
+// -------------------------------------------------------
+// Animation definition - predefined
+// -------------------------------------------------------
+var ANIM_PLAYER_1             = 0
+var ANIM_PLAYER_2             = 1
+var ANIM_PLAYER_3             = 2
+var ANIM_PLAYER_4             = 3
+var ANIM_PLAYER_5             = 4
+
+var ANIM_MOVE_FRAMES          = 9
+
+var ANIM_MOVE_UP              = 5
+var ANUM_MOVE_DOWN            = 7
+var ANIM_MOVE_LEFT            = 6
+var ANIM_MOVE_RIGHT           = 8
+
+var ANIM_STONE_1              = 9
+var ANIM_STONE_2              = 10
+
+var ANIM_EXIT_1               = 11
+
+var ANIM_BLAST                = 14
+
+var ANIM_DOOR_ID_H            = 0
+var ANIM_DOOR_ID_V            = 1
+var ANIM_DOOR_DV_H            = 2
+var ANIM_DOOR_DV_V            = 3
+
+var ANIM_PLAYER_1_FAST        = 15
+var ANIM_PLAYER_2_FAST        = 16
+var ANIM_PLAYER_3_FAST        = 17
+var ANIM_PLAYER_4_FAST        = 18
+var ANIM_PLAYER_5_FAST        = 19
+
+var ANIM_MOVE_UP_FAST         = 20
+var ANIM_MOVE_DOWN_FAST       = 22
+var ANIM_MOVE_LEFT_FAST       = 21
+var ANIM_MOVE_RIGHT_FAST      = 23
+
+var ANIM_MOVE_FRAMES_FAST     = 4
+
+var FAST_ANIMATION_SHIFT      = 15
+
+// -------------------------------------------------------
+// Animation flags
+// -------------------------------------------------------
+
+var  ANIM_USED                = 0x001 // animation change sprite position
+
+var  ANIM_MOVE                = 0x002 // animation change sprite position
+var  ANIM_SPRITE              = 0x004 // animation change sprite
+
+var  ANIM_INSTANT             = 0x008 // run this animation imediately after create
+var  ANIM_LOOP                = 0x010 // loop animation
+var  ANIM_ADD_INVERSE         = 0x020 // add inverted sprites to animation
+
+var  ANIM_REMOVE              = 0x100 // remove this animation from anim queue
+                                      // in next anim process
+var  ANIM_GENERATE            = 0x200 // it's generated animation
+
+var ANIM_TRIGGER_MOVE         = 0x1000
+var ANIM_TRIGGER_ERASE        = 0x2000
+var ANIM_TRIGGER_INSERT       = 0x4000

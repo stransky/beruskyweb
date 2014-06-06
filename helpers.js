@@ -25,22 +25,18 @@
  *
  */
  
-function load_file_text(file) {
+function load_file_text(file, callback) {
   var request = new XMLHttpRequest();
-  request.open('GET', file, false);
+  request.open('GET', file);
+  request.onload = callback;
   request.send();
-  return request.responseText;
-}
-
-function load_file_json(file) {
-  return JSON.parse(load_file_text(file));
 }
 
 function load_file_binary(file, callback) {
   var request = new XMLHttpRequest();
   request.open('GET', file);
   request.responseType = "arraybuffer";
-  request.onload = callback;  
+  request.onload = callback;
   request.send();
 }
 

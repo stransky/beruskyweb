@@ -141,6 +141,8 @@ level_load_callback = function() {
   loaded_level.level = Array();
   loaded_level.players = Array();
   
+  loaded_level.player_active.number = 6;
+  
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {      
       var index = level_index(x,y);
@@ -154,6 +156,8 @@ level_load_callback = function() {
       loaded_level.level[index].item = level[level_index_disk(x, y, LAYER_ITEM)];
       loaded_level.level[index].variant = level[level_index_disk(x, y, LAYER_VARIANT)];
       loaded_level.level[index].rotation = level[level_index_disk(x, y, LAYER_ROTATION)];
+      if(loaded_level.level[index].item == P_GROUND)
+        loaded_level.level[index].item = NO_ITEM;
       
       loaded_level.players[index] = new LevelItem();
       loaded_level.players[index].item = players[level_index(x, y)];
@@ -178,6 +182,7 @@ level_load_callback = function() {
 
 // Active player info
 function Player() {
+  this.number = 0;
   this.x = 0;
   this.y = 0;
 }
@@ -227,8 +232,24 @@ Level.prototype.load = function(file) {
   load_file_binary(file, level_load_callback);
 }
 
+Level.prototype.item_get = function(x, y)
+{
+  return(this.level[level_index(x,y)]);
+}
+
 Level.prototype.item_is_empty = function(x,y) {
-  return(this.item_get(x,y).item == 0);
+  return(this.item_get(x,y).item == NO_ITEM);
+}
+
+// Remove specified LevelItem from level, 
+// unregister sprite and so
+Level.prototype.item_remove = function(x, y)
+{
+  var cell = this.level[level_index(x,y)];
+  if(cell.item != NO_ITEM) {
+    cell.item = NO_ITEM;
+    this.graph.remove(cell.sprite_handle);
+  }
 }
 
 // Render the level on screen
@@ -239,9 +260,9 @@ Level.prototype.render = function(repository) {
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
-      var index = level_index(x,y);      
-    
-      var cell = this.floor[index];      
+      var index = level_index(x,y);
+
+      var cell = this.floor[index];
       if(cell.item != NO_ITEM) {
         var sprite = repository.get_sprite(cell.item, cell.variant);
         this.graph.draw(sprite, LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
@@ -267,17 +288,6 @@ Level.prototype.render = function(repository) {
   this.rendered = true;
 }
 
-// Remove specified LevelItem from level, 
-// unregister sprite and so
-Level.prototype.item_remove = function(x, y)
-{
-  var cell = this.level[level_index(x,y)];
-  if(cell.item != NO_ITEM) {
-    cell.item = NO_ITEM;
-    this.graph.remove(cell.sprite_handle);
-  }
-}
-
 // 1. Remove a LevelItem at (nx,ny)
 // 2. Move LevelItem from (ox,oy) to (nx,ny)
 Level.prototype.item_move = function(ox, oy, nx, ny)
@@ -288,8 +298,10 @@ Level.prototype.item_move = function(ox, oy, nx, ny)
   if(cell_old.item != NO_ITEM) {
     var cell_new = this.level[level_index(nx,ny)];
     cell_new.copy(cell_old);
-    cell_new.sprite_handle.x = LEVEL_SCREEN_START_X + x*CELL_SIZE_X;
-    cell_new.sprite_handle.y = LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y;
+    this.graph.sprite_move(cell_new.sprite_handle,
+                           LEVEL_SCREEN_START_X + nx*CELL_SIZE_X,
+                           LEVEL_SCREEN_START_Y + ny*CELL_SIZE_Y);
+    cell_old.item = NO_ITEM;
   }
 }
 
@@ -299,8 +311,10 @@ Level.prototype.player_move = function(ox, oy, nx, ny)
   if(cell_old.item != NO_ITEM) {
     var cell_new = this.players[level_index(nx,ny)];
     cell_new.copy(cell_old);
-    cell_new.sprite_handle.x = LEVEL_SCREEN_START_X + x*CELL_SIZE_X;
-    cell_new.sprite_handle.y = LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y;
+    this.graph.sprite_move(cell_new.sprite_handle,
+                           LEVEL_SCREEN_START_X + nx*CELL_SIZE_X,
+                           LEVEL_SCREEN_START_Y + ny*CELL_SIZE_Y);
+    cell_old.item = NO_ITEM;
   }
 }
 
