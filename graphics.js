@@ -38,12 +38,11 @@ Graph.prototype.get_renderer = function() {
   return(this.renderer);
 }
 
-// file     - sprite_file.spr
-// position - first used handle
-Graph.prototype.sprite_insert = function(file, position) 
+sprite_insert_callback = function()
 {  
-  var position_base = position;
-  var sprites = load_file_text(file).split("\n");
+  var position = this.callback_object.position;
+  var position_base = this.callback_object.position;
+  var sprites = this.responseText.split("\n");
   var base_text;
   var base_rect;
   
@@ -51,7 +50,7 @@ Graph.prototype.sprite_insert = function(file, position)
     var line = sprites[i];
     if(line[0] == "s") {
       // s x y dx dy scale
-      var sprite_file = file.replace(".spr",".png");      
+      var sprite_file = this.callback_object.file.replace(".spr",".png");      
       base_text = PIXI.Texture.fromImage(sprite_file).baseTexture;
 
       var r = line.slice(2).split(" ");
@@ -60,7 +59,7 @@ Graph.prototype.sprite_insert = function(file, position)
                                      parseInt(r[2]), 
                                      parseInt(r[3]));
 
-      this.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
+      this.callback_object.graph.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
       position++;
     }
     else {
@@ -74,13 +73,18 @@ Graph.prototype.sprite_insert = function(file, position)
         base_rect.width += parseInt(l[2]);
         base_rect.height += parseInt(l[3]);
 
-        this.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
+        this.callback_object.graph.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
         position++;
       }
     }
-  }
+  }  
+}
 
-  return(position - position_base);
+// file     - sprite_file.spr
+// position - first used handle
+Graph.prototype.sprite_insert = function(file, position) 
+{ 
+  load_file_text(file, sprite_insert_callback, { graph : this, position : position, file : file});
 }
 
 // Draws sprite at specified location and returns handle to 

@@ -123,13 +123,12 @@ ObjectsRepository.prototype.is_loaded = function() {
   return(this.loaded);
 }
 
-ObjectsRepository.prototype.load = function()
+ObjectsRepository_load_callback = function()
 {
-  var data = load_file_text(GAME_REPO_FILE);
-  var lines = data.split("\n");
+  var lines = this.responseText.split("\n");
   var loaded = 0;
   
-  this.repo = Array();
+  this.callback_object.ObjectsRepository.repo = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
 
@@ -137,16 +136,22 @@ ObjectsRepository.prototype.load = function()
       var obj = new GameObject();
       obj.parse_line(tline);
       
-      if(this.repo[obj.item] === undefined)
-        this.repo[obj.item] = Array();
+      if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
+        this.callback_object.ObjectsRepository.repo[obj.item] = Array();
       
-      this.repo[obj.item][obj.variant] = obj;
+      this.callback_object.ObjectsRepository.repo[obj.item][obj.variant] = obj;
       loaded++;
     }
   }
   
   console.log("Repository objects loaded = " + loaded);
-  this.loaded = true;
+  this.callback_object.ObjectsRepository.loaded = true;
+}
+
+ObjectsRepository.prototype.load = function()
+{
+  load_file_text(GAME_REPO_FILE, ObjectsRepository_load_callback, 
+                 { ObjectsRepository : this });
 }
 
 ObjectsRepository.prototype.get_object = function(item, variant)
@@ -248,13 +253,12 @@ GameAnimTemplateRepository.prototype.is_loaded = function() {
   return(this.loaded);
 }
 
-GameAnimTemplateRepository.prototype.load = function()
-{
-  var data = load_file_text(GAME_ANIM_FILE);
-  var lines = data.split("\n");
+GameAnimTemplateRepository_load_callback = function()
+{  
+  var lines = this.responseText.split("\n");
   var loaded = 0;
   
-  this.anim_template = Array();
+  this.callback_object.GameAnimTemplateRepository.anim_template = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
 
@@ -262,16 +266,22 @@ GameAnimTemplateRepository.prototype.load = function()
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
       
-      if(this.anim_template[obj.template_handle] === undefined)
-        this.anim_template[obj.template_handle] = Array();
+      if(this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] === undefined)
+        this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = Array();
       
-      this.anim_template[obj.template_handle] = obj;
+      this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;
     }
   }
   
   console.log("Repository objects loaded = " + loaded);
-  this.loaded = true;
+  this.callback_object.GameAnimTemplateRepository.loaded = true;
+}
+
+GameAnimTemplateRepository.prototype.load = function()
+{
+  load_file_text(GAME_ANIM_FILE, GameAnimTemplateRepository_load_callback , 
+                 { GameAnimTemplateRepository : this });
 }
 
 GameAnimTemplateRepository.prototype.get_object = function(anim_template)
