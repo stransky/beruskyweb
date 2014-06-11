@@ -37,8 +37,6 @@ var LEVEL_FLOOR_SIZE = (LEVEL_LAYER_SIZE*10)
 var LEVEL_LEVEL_SIZE = (LEVEL_LAYER_SIZE*10)
 var LEVEL_PLAYER_SIZE = (LEVEL_LAYER_SIZE)
 
-var loaded_level = {};
-
 /* Level structure (packed)
 
 #define LEVEL_CELLS_X             32
@@ -90,14 +88,9 @@ function level_index(x, y)
   return(y * (LEVEL_CELLS_X) + x);
 }
 
-function level_load_callback_set_level(level)
-{
-  loaded_level = level;
-  loaded_level.loaded = false;
-}
-
 level_load_callback = function() {
   var data = new Uint8Array(this.response);
+  var loaded_level = this.callback_object;
 
   // Check level size and signature
   if(data.length != LEVEL_SIZE)
@@ -226,10 +219,10 @@ Level.prototype.is_loaded = function() {
 // use the Blob interface
 Level.prototype.load = function(file) {
   this.name = file;
+  this.loaded = false;
   console.log("Loading " + this.name);
-
-  level_load_callback_set_level(this);
-  load_file_binary(file, level_load_callback);
+  
+  load_file_binary(file, level_load_callback, this);
 }
 
 Level.prototype.item_get = function(x, y)
