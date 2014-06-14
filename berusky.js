@@ -40,7 +40,7 @@ function Game() {
   document.body.appendChild(this.graph.get_renderer().view);
 
   this.repo = new ObjectsRepository();
-  this.repo.load();
+  this.anim = new GameAnimationEngine();
 
   this.level = new Level(this.graph);
   this.input = new Input(this);

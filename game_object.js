@@ -117,6 +117,7 @@ function ObjectsRepository() {
   // Two dimensional arrays of GameObjects
   this.repo = Array();
   this.loaded = false;
+  this.load();
 }
 
 ObjectsRepository.prototype.is_loaded = function() {
@@ -254,6 +255,7 @@ function GameAnimTemplateRepository() {
   // Two dimensional arrays of GameObjects
   this.anim_template = Array();
   this.loaded = false;
+  this.load();
 }
 
 GameAnimTemplateRepository.prototype.is_loaded = function() {

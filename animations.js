@@ -43,8 +43,6 @@ function GameAnimation(template, x, y, layer, rotation)
   this.rotation = rotation;
 }
 
-
-
 // Performs the animations
 function GameAnimationEngine() {
 
@@ -55,7 +53,6 @@ function GameAnimationEngine() {
   // Array of running animations
   this.anim_running = Array();
 }
-
 
 GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
 {  
