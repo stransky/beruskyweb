@@ -38,7 +38,7 @@ var LEVEL_LEVEL_SIZE = (LEVEL_LAYER_SIZE*10)
 var LEVEL_PLAYER_SIZE = (LEVEL_LAYER_SIZE)
 
 var LAYER_FLOOR  = 0;
-var LAYER_ITEM   = 1;
+var LAYER_LEVEL  = 1;
 var LAYER_PLAYER = 2;
 
 /* Level structure (packed)
@@ -248,11 +248,11 @@ Level.prototype.item_is_empty = function(x,y) {
 Level.prototype.cell_get = function(x, y, layer)
 {
   var cell;
-  switch (layer || LAYER_ITEM) {
+  switch (layer || LAYER_LEVEL) {
   case (LAYER_FLOOR):
     cell = this.floor[level_index(x,y)];
     break;
-  case (LAYER_ITEM):
+  case (LAYER_LEVEL):
     cell = this.level[level_index(x,y)];
     break;
   case (LAYER_PLAYER):
@@ -274,7 +274,7 @@ Level.prototype.cell_draw = function(cell, x, y)
 
 Level.prototype.item_draw = function(x, y, layer)
 {
-  var cell = cell_get(x,y,layer||LAYER_ITEM); 
+  var cell = cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     this.cell_draw(cell,x,y);
   }
@@ -284,7 +284,7 @@ Level.prototype.item_draw = function(x, y, layer)
 // unregister sprite and so
 Level.prototype.item_remove = function(x, y, layer)
 {
-  var cell = cell_get(x,y,layer||LAYER_ITEM);
+  var cell = cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
     this.graph.remove(cell.sprite_handle);
@@ -297,9 +297,9 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 {
   this.item_remove(nx, ny);
   
-  var cell_old = cell_get(ox,oy,layer||LAYER_ITEM);
+  var cell_old = cell_get(ox,oy,layer||LAYER_LEVEL);
   if(cell_old.item != NO_ITEM) {
-    var cell_new = cell_get(nx,ny,layer||LAYER_ITEM);
+    var cell_new = cell_get(nx,ny,layer||LAYER_LEVEL);
     cell_new.copy(cell_old);
     cell_old.item = NO_ITEM;
     this.cell_draw(cell_new, nx, ny);
@@ -308,7 +308,7 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 
 Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
 { 
-  var cell = cell_get(x,y,layer||LAYER_ITEM);
+  var cell = cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.diff_x = dx;
     cell.diff_y = dy;
@@ -323,10 +323,9 @@ Level.prototype.is_rendered = function()
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
-  this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND,
-                                                    LEVEL_SCREEN_START_X,
-                                                    LEVEL_SCREEN_START_Y);
-  this.graph.sprite_move(this.background_sprite, 0, 0);
+  this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND);
+  this.graph.sprite_move(this.background_sprite, LEVEL_SCREEN_START_X,
+                                                 LEVEL_SCREEN_START_Y);  
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
