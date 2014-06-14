@@ -42,9 +42,6 @@ function Game() {
   this.repo = new ObjectsRepository();
   this.repo.load();
 
-  this.anim_templates = new GameAnimTemplateRepository();
-  this.anim_templates.load();
-
   this.level = new Level(this.graph);
   this.input = new Input(this);
 
@@ -58,10 +55,13 @@ Game.prototype.game_load = function()
     return;
     
   // Load game level
-  if(!this.level.is_loaded()) {    
+  if(!this.level.is_loaded())
     return;
-  }
-  // ...  
+
+  // Game sprites
+  if(!this.graph.is_loaded())
+    return;   
+ 
   // Render already loaded level
   if(!this.level.is_rendered()) {
     this.level.render(this.repo);    
@@ -92,6 +92,13 @@ Game.prototype.level_load = function(name)
 {
   this.level.load(name);  
 }
+
+// Animate mog movement
+Game.prototype.animation_bug_move = function(direction)
+{
+
+}
+
 
 // Get an active player
 // Check if we can move

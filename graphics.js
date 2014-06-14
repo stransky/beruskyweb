@@ -28,6 +28,8 @@
 function Graph() {
   // Game sprites (a.k.a textures in PIXI terminology)
   this.sprites = Array();
+  this.sprites_to_load = 0;
+  this.sprites_loaded = 0;
 }
 
 Graph.prototype.render = function() {  
@@ -38,7 +40,7 @@ Graph.prototype.get_renderer = function() {
   return(this.renderer);
 }
 
-sprite_insert_callback = function()
+sprite_load_callback = function()
 {  
   var position = this.callback_object.position;
   var position_base = this.callback_object.position;
@@ -74,31 +76,34 @@ sprite_insert_callback = function()
         base_rect.height += parseInt(l[3]);
 
         this.callback_object.graph.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
-        position++;
+        position++;        
       }
     }
   }  
+  this.callback_object.graph.sprites_loaded++;
+  console.log(this.callback_object.graph.sprites_loaded + " : " + this.callback_object.file + " loaded...");
+}
+
+Graph.prototype.is_loaded = function()
+{
+  return(this.sprites_loaded == this.sprites_to_load);
 }
 
 // file     - sprite_file.spr
 // position - first used handle
-Graph.prototype.sprite_insert = function(file, position) 
+Graph.prototype.sprite_load = function(file, position)
 { 
-  load_file_text(file, sprite_insert_callback, { graph : this, position : position, file : file});
+  this.sprites_to_load++;
+  load_file_text(file, sprite_load_callback, { graph : this, position : position, file : file});
 }
 
 // Draws sprite at specified location and returns handle to 
 // displayed object
-Graph.prototype.draw = function(spr, x, y, rotation)
-{  
+Graph.prototype.sprite_insert = function(spr)
+{
   var sprite = new PIXI.Sprite(this.sprites[spr]);
-
-  sprite.position.x = x+(sprite.width/2);
-  sprite.position.y = y+(sprite.height/2);
   sprite.anchor.x = 0.5;
   sprite.anchor.y = 0.5;
-  sprite.rotation = (Math.PI/2)*(rotation || 0);
-
   this.stage.addChild(sprite);
   
   return(sprite);
@@ -111,30 +116,31 @@ Graph.prototype.sprite_move = function(sprite_handle, x, y)
   return(sprite_handle);
 }
 
+Graph.prototype.sprite_rotate = function(sprite_handle, rotation)
+{  
+  sprite_handle.rotation = (Math.PI/2)*rotation;
+  return(sprite_handle);
+}
+
 Graph.prototype.remove = function(sprite_handle)
 {  
   this.stage.removeChild(sprite_handle);
 }
 
 Graph.prototype.sprites_load = function()
-{
-  var i;
-
-  i  = this.sprite_insert("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
-  i += this.sprite_insert("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
-  i += this.sprite_insert("data/Graphics/kyber1.spr",  FIRST_CYBER_LEVEL);
-  i += this.sprite_insert("data/Graphics/herni1.spr",  FIRST_OTHER);
-  i += this.sprite_insert("data/Graphics/game_cur.spr",FIRST_CURSOR);
-  i += this.sprite_insert("data/Graphics/hraci1.spr",  FIRST_PLAYER);
-
-  console.log("Loaded sprites " + i);
+{  
+  this.sprite_load("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
+  this.sprite_load("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
+  this.sprite_load("data/Graphics/kyber1.spr",  FIRST_CYBER_LEVEL);
+  this.sprite_load("data/Graphics/herni1.spr",  FIRST_OTHER);
+  this.sprite_load("data/Graphics/game_cur.spr",FIRST_CURSOR);
+  this.sprite_load("data/Graphics/hraci1.spr",  FIRST_PLAYER);
 }
 
 Graph.prototype.background_load = function(background)
 {
   background = background+1;
-  var back = this.sprite_insert("data/Graphics/background" + background + ".spr", FIRST_BACKGROUND);
-  console.log("Loaded background(" + background + ") result = " + back);
+  this.sprite_load("data/Graphics/background" + background + ".spr", FIRST_BACKGROUND);
 }
 
 Graph.prototype.init = function()

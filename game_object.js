@@ -156,8 +156,8 @@ ObjectsRepository.prototype.load = function()
 
 ObjectsRepository.prototype.get_object = function(item, variant)
 {
-  if(this.repo[item][variant] === undefined) {
-    console.log("Undefined object repository - item = " + item + " variant = " + variant);
+  if(this.repo[item][variant] === undefined) {    
+    throw ("Undefined object repository - item = " + item + " variant = " + variant);
   }
   return this.repo[item][variant];
 }
@@ -233,6 +233,13 @@ GameAnimTemplate.prototype.parse_line = function(line)
     }
   }  
 }
+
+GameAnimTemplate.prototype.draw = function(line)
+{
+
+
+}
+
 
 GameAnimTemplate.prototype.print = function()
 {
