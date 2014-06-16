@@ -26,11 +26,13 @@
  */
 
 // An active game animation
-function GameAnimation(template, x, y, layer, rotation) 
+function GameAnimation(template, flags, x, y, layer, rotation) 
 {
   // GameAnimTemplate for this animation
   this.anim_template = template;
-    
+  
+  this.flags = flags;
+  
   this.frame_num = 0;
   this.frame_current = 0;
   this.frame_correction = 0;
@@ -46,9 +48,62 @@ function GameAnimation(template, x, y, layer, rotation)
   this.rotation = rotation;
 }
 
-// Performs the animations
-function GameAnimationEngine(level) {
+GameAnimation.prototype.start = function()
+{
+  frame_current = 0;
+  frame_correction = template.frame_correction;
+  position_in_animation = 0;
+}
 
+GameAnimation.prototype.process = function(level)
+{ 
+/*
+  if(flag&ANIM_REMOVE) {
+    stop(p_queue, p_events, TRUE);
+    return(true);
+  }
+*/
+  if(this.frame_current >= this.frame_num) {
+    if(this.flag&(ANIM_LOOP))
+      this.start();
+    else {
+      //this.stop(p_queue, p_events, TRUE);
+      return;
+    }
+  }
+
+  if(this.frame_correction) {
+    this.frame_correction--;
+  } else {
+    this.frame_correction = template.frame_correction;
+
+    var cell = level.cell_get(this.x, this.y, this.layer);
+
+    if(this.anim_template.flag&ANIM_SPRITE) {    
+      level.graph.sprite_remove(cell.sprite_handle);
+      var spr = this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
+      cell.sprite_handle = level.graph.sprite_insert(spr);
+  
+      if(this.rotation != NO_ROTATION) {
+        cell.rotation = this.rotation;
+      }
+    }
+
+    if(anim_template.flag&ANIM_MOVE) {
+      cell.diff_x += anim_template.dx;
+      cell.diff_y += anim_template.dy;
+    }
+
+    level.cell_draw(cell, x, y);
+
+    this.position_in_animation++;
+    this.frame_current++;
+  }
+}
+
+// Performs the animations
+function GameAnimationEngine(level) 
+{
   // Reference to level interface
   this.level = level;
 
@@ -66,75 +121,10 @@ GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
   return this.anim_running[index - 1];
 }
 
-/*
-void animation::process_sprite_animation(LEVEL_GAME *p_level)
-{
-  ANIMATION_TEMPLATE *p_template = p_repository->get(thandle);
-  spr_handle spr = 0;
-
-  if(!p_template->p_sprite_table) {
-    spr = p_template->sprite_first + p_template->sprite_step * position_in_animation;
-    assert(p_template->sprite_step * position_in_animation < p_template->sprite_num);
-  } else {
-    spr = p_template->p_sprite_table[position_in_animation];
-  }
-*/
 GameAnimationEngine.prototype.process = function()
 {
-  var anim_template = this.anim_templates[this.anim_template];
-  var cell = this.level.cell_get(this.x, this.y, this.layer);
-
-  if(anim_template.flag&ANIM_SPRITE) {
-    var spr = anim_template.sprite_first + anim_template.sprite_step * this.position_in_animation;
-    cell.sprite_handle = 
-    
-    if(this.rotation != NO_ROTATION) {
-      cell.rotation = this.rotation;
-    }
+  var anim_size = anim_running.length;
+  for (var i = 0; i < anim_size; i++) {
+     anim_running[i].process(this.level);
   }
-
-  if(anim_template.flag&ANIM_MOVE) {
-    cell.diff_x += anim_template.dx;
-    cell.diff_y += anim_template.dy;
-  }    
-  this.cell_draw(cell, x, y);
 }
-
-/*
-bool animation::process(LEVEL_GAME *p_level, LEVEL_EVENT_QUEUE *p_queue, int *p_events)
-{ 
-
-  if(flag&ANIM_REMOVE) {
-    stop(p_queue, p_events, TRUE);
-    return(true);
-  }
-
-  if(frame_current >= frame_num) {
-    if(flag&(ANIM_LOOP))
-      start();
-    else {
-      stop(p_queue, p_events, TRUE);
-      return(true);
-    }
-  }
-
-  if(frame_correction) {
-    frame_correction--;
-  } else {
-    frame_correction = p_repository->get_frame_correction(thandle,position_in_animation);
-  
-    if(flag&ANIM_SPRITE) {
-      process_sprite_animation(p_level);
-    }
-
-    if(flag&ANIM_MOVE) {
-      process_move_animation(p_level);
-    }    
-  
-    position_in_animation++;
-    frame_current++;
-  }  
-
-  return(false);
-}
-*/

@@ -73,7 +73,6 @@ Game.prototype.game_load = function()
 Game.prototype.game_play = function() 
 {
 
-
 }
 
 Game.prototype.game_loop = function() 
@@ -82,6 +81,9 @@ Game.prototype.game_loop = function()
     this.game_load();
     return;
   }
+  
+  // Update all running animations
+  this.anim.process();
   
   this.game_play();
   

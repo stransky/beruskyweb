@@ -213,3 +213,5 @@ var  ANIM_GENERATE            = 0x200 // it's generated animation
 var ANIM_TRIGGER_MOVE         = 0x1000
 var ANIM_TRIGGER_ERASE        = 0x2000
 var ANIM_TRIGGER_INSERT       = 0x4000
+
+var NO_ROTATION               = (-1)

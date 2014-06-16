@@ -105,7 +105,6 @@ Graph.prototype.sprite_insert = function(spr)
   sprite.anchor.x = 0.5;
   sprite.anchor.y = 0.5;
   this.stage.addChild(sprite);
-  
   return(sprite);
 }
 
@@ -120,6 +119,22 @@ Graph.prototype.sprite_rotate = function(sprite_handle, rotation)
 {  
   sprite_handle.rotation = (Math.PI/2)*rotation;
   return(sprite_handle);
+}
+
+Graph.prototype.sprite_insert = function(spr, x, y, rotation)
+{
+  var sprite = new PIXI.Sprite(this.sprites[spr]);
+  
+  sprite.anchor.x = 0.5;
+  sprite.anchor.y = 0.5;
+  
+  sprite.position.x = x+(sprite.width/2);
+  sprite.position.y = y+(sprite.height/2);  
+  
+  sprite.rotation = (Math.PI/2)*rotation;
+  
+  this.stage.addChild(sprite);
+  return(sprite);
 }
 
 Graph.prototype.remove = function(sprite_handle)
