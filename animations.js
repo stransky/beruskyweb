@@ -26,12 +26,10 @@
  */
 
 // An active game animation
-function GameAnimation(template, flags, x, y, layer, rotation) 
+function GameAnimation(template, x, y, layer, rotation)
 {
   // GameAnimTemplate for this animation
   this.anim_template = template;
-  
-  this.flags = flags;
     
   this.frame_current = 0;
   this.frame_correction = 0;
@@ -70,7 +68,7 @@ GameAnimation.prototype.process = function(level)
       return;
     }
   }
-  
+
   if(this.frame_correction) {
     this.frame_correction--;
   } else {
@@ -78,17 +76,17 @@ GameAnimation.prototype.process = function(level)
 
     var cell = level.cell_get(this.x, this.y, this.layer);
 
-    if(this.anim_template.flag&ANIM_SPRITE) {    
+    if(this.anim_template.flags&ANIM_SPRITE) {
       level.graph.sprite_remove(cell.sprite_handle);
       var spr = this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
       cell.sprite_handle = level.graph.sprite_insert(spr);
-  
+
       if(this.rotation != NO_ROTATION) {
         cell.rotation = this.rotation;
       }
     }
 
-    if(this.anim_template.flag&ANIM_MOVE) {
+    if(this.anim_template.flags&ANIM_MOVE) {
       cell.diff_x += this.anim_template.dx;
       cell.diff_y += this.anim_template.dy;
     }
@@ -119,7 +117,7 @@ function GameAnimationEngine(level)
 GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
 {  
   var index = this.anim_running.push(new GameAnimation(this.anim_templates.anim_template[template],
-                                                       0, x, y, layer, rotation));
+                                                       x, y, layer, rotation));
   console.log("Creating anim " + index);
   return this.anim_running[index - 1];
 }

@@ -178,7 +178,7 @@ function GameAnimTemplate() {
 
   this.template_handle = 0;
 
-  this.flag = 0;
+  this.flags = 0;
 
   this.frame_num = 0;
   this.frame_correction = 0;
