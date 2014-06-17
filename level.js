@@ -138,7 +138,7 @@ level_load_callback = function() {
   loaded_level.player_active.number = 6;
   
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
-    for(var x = 0; x < LEVEL_CELLS_X; x++) {      
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var index = level_index(x,y);
 
       loaded_level.floor[index] = new LevelItem();
@@ -152,13 +152,14 @@ level_load_callback = function() {
       loaded_level.level[index].rotation = level[level_index_disk(x, y, LAYER_ROTATION)];
       if(loaded_level.level[index].item == P_GROUND)
         loaded_level.level[index].item = NO_ITEM;
-      
+
       loaded_level.players[index] = new LevelItem();
       loaded_level.players[index].item = players[level_index(x, y)];
-      
+
       if(loaded_level.players[index].item != NO_ITEM) {
         loaded_level.players[index].rotation = player_rotations[loaded_level.players[index].item];
         if(loaded_level.players[index].item < loaded_level.player_active.number) {
+          loaded_level.player_active.number = loaded_level.players[index].item;
           loaded_level.player_active.x = x;
           loaded_level.player_active.y = y;
         }

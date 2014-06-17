@@ -121,7 +121,7 @@ Graph.prototype.sprite_rotate = function(sprite_handle, rotation)
   return(sprite_handle);
 }
 
-Graph.prototype.remove = function(sprite_handle)
+Graph.prototype.sprite_remove = function(sprite_handle)
 {  
   this.stage.removeChild(sprite_handle);
 }

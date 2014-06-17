@@ -95,8 +95,6 @@ GameAnimation.prototype.process = function(level)
 
     this.position_in_animation++;
     this.frame_current++;
-    
-    console.log(this.frame_current + " of " + this.anim_template.frame_num);
   }
 }
 
@@ -118,7 +116,6 @@ GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
 {  
   var index = this.anim_running.push(new GameAnimation(this.anim_templates.anim_template[template],
                                                        x, y, layer, rotation));
-  console.log("Creating anim " + index);
   return this.anim_running[index - 1];
 }
 
