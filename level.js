@@ -37,9 +37,6 @@ var LEVEL_FLOOR_SIZE = (LEVEL_LAYER_SIZE*10)
 var LEVEL_LEVEL_SIZE = (LEVEL_LAYER_SIZE*10)
 var LEVEL_PLAYER_SIZE = (LEVEL_LAYER_SIZE)
 
-var LAYER_FLOOR  = 0;
-var LAYER_LEVEL  = 1;
-var LAYER_PLAYER = 2;
 
 /* Level structure (packed)
 
@@ -256,10 +253,10 @@ Level.prototype.cell_get = function(x, y, layer)
     cell = this.level[level_index(x,y)];
     break;
   case (LAYER_PLAYER):
-    cell = this.player[level_index(x,y)];
+    cell = this.players[level_index(x,y)];
     break;
   default:
-    alert("Unknown layer!");
+    throw "Unknown layer!";
   }
   return(cell);
 }

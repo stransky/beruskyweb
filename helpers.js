@@ -43,5 +43,5 @@ function load_file_binary(file, callback, callback_object) {
 }
 
 function is_number(value) {
-  return !isNaN(parseInt(value));
+  return !isNaN(parseInt(value, 10));
 }

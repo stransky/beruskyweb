@@ -162,7 +162,7 @@ var ANIM_PLAYER_5             = 4
 var ANIM_MOVE_FRAMES          = 9
 
 var ANIM_MOVE_UP              = 5
-var ANUM_MOVE_DOWN            = 7
+var ANIM_MOVE_DOWN            = 7
 var ANIM_MOVE_LEFT            = 6
 var ANIM_MOVE_RIGHT           = 8
 
@@ -215,3 +215,12 @@ var ANIM_TRIGGER_ERASE        = 0x2000
 var ANIM_TRIGGER_INSERT       = 0x4000
 
 var NO_ROTATION               = (-1)
+
+var ROTATION_UP               = 0
+var ROTATION_RIGHT            = 1
+var ROTATION_DOWN             = 2
+var ROTATION_LEFT             = 3
+
+var LAYER_FLOOR               = 0;
+var LAYER_LEVEL               = 1;
+var LAYER_PLAYER              = 2;

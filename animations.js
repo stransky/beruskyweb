@@ -32,8 +32,7 @@ function GameAnimation(template, flags, x, y, layer, rotation)
   this.anim_template = template;
   
   this.flags = flags;
-  
-  this.frame_num = 0;
+    
   this.frame_current = 0;
   this.frame_correction = 0;
 
@@ -50,9 +49,9 @@ function GameAnimation(template, flags, x, y, layer, rotation)
 
 GameAnimation.prototype.start = function()
 {
-  frame_current = 0;
-  frame_correction = template.frame_correction;
-  position_in_animation = 0;
+  this.frame_current = 0;
+  this.frame_correction = this.anim_template.frame_correction;
+  this.position_in_animation = 0;
 }
 
 GameAnimation.prototype.process = function(level)
@@ -63,19 +62,19 @@ GameAnimation.prototype.process = function(level)
     return(true);
   }
 */
-  if(this.frame_current >= this.frame_num) {
+  if(this.frame_current >= this.anim_template.frame_num) {
     if(this.flag&(ANIM_LOOP))
       this.start();
     else {
-      //this.stop(p_queue, p_events, TRUE);
+      //this.stop(p_queue, p_events, TRUE);      
       return;
     }
   }
-
+  
   if(this.frame_correction) {
     this.frame_correction--;
   } else {
-    this.frame_correction = template.frame_correction;
+    this.frame_correction = this.anim_template.frame_correction;
 
     var cell = level.cell_get(this.x, this.y, this.layer);
 
@@ -89,15 +88,17 @@ GameAnimation.prototype.process = function(level)
       }
     }
 
-    if(anim_template.flag&ANIM_MOVE) {
-      cell.diff_x += anim_template.dx;
-      cell.diff_y += anim_template.dy;
+    if(this.anim_template.flag&ANIM_MOVE) {
+      cell.diff_x += this.anim_template.dx;
+      cell.diff_y += this.anim_template.dy;
     }
 
-    level.cell_draw(cell, x, y);
+    level.cell_draw(cell, this.x, this.y);
 
     this.position_in_animation++;
     this.frame_current++;
+    
+    console.log(this.frame_current + " of " + this.anim_template.frame_num);
   }
 }
 
@@ -116,15 +117,17 @@ function GameAnimationEngine(level)
 }
 
 GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
-{
-  var index = this.anim_running.push(new GameAnimation(template, x, y, layer, rotation));
+{  
+  var index = this.anim_running.push(new GameAnimation(this.anim_templates.anim_template[template],
+                                                       0, x, y, layer, rotation));
+  console.log("Creating anim " + index);
   return this.anim_running[index - 1];
 }
 
 GameAnimationEngine.prototype.process = function()
 {
-  var anim_size = anim_running.length;
+  var anim_size = this.anim_running.length;
   for (var i = 0; i < anim_size; i++) {
-     anim_running[i].process(this.level);
+    this.anim_running[i].process(this.level);
   }
 }

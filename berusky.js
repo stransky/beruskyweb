@@ -99,15 +99,43 @@ Game.prototype.level_load = function(name)
 // Animate mog movement
 Game.prototype.animation_bug_move = function(direction)
 {
+  var player = this.level.player_active;
+  var x = player.x;
+  var y = player.y;
 
+  var anim = 0;
+  var rotation = 0;
+
+  switch(direction) {
+    case MOVE_UP:
+      anim = ANIM_MOVE_UP;
+      rotation = ROTATION_UP;
+      break;
+    case MOVE_DOWN:
+      anim = ANIM_MOVE_DOWN;
+      rotation = ROTATION_DOWN;
+      break;
+    case MOVE_LEFT:
+      anim = ANIM_MOVE_LEFT;
+      rotation = ROTATION_LEFT;
+      break;
+    case MOVE_RIGHT:
+      anim = ANIM_MOVE_RIGHT;
+      rotation = ROTATION_RIGHT;
+      break;
+  }
+
+  this.anim.create(anim, x, y, LAYER_PLAYER, rotation);
+  this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
 }
-
 
 // Get an active player
 // Check if we can move
 // Move it
 Game.prototype.bug_move = function(direction)
 {
+  this.animation_bug_move(direction);
+/*
   var player = this.level.player_active;
   var nx = player.x;
   var ny = player.y;
@@ -130,9 +158,10 @@ Game.prototype.bug_move = function(direction)
   var cell = this.level.item_get(nx, ny);
   switch(cell.item) {
     case NO_ITEM:
-      // free space - do the movement
-      this.level.player_move(player.x, player.y, nx, ny);
-      player.x = nx; player.y = ny;
+      // free space - do the movement      
+      this.animation_bug_move(direction);
+      //this.level.player_move(player.x, player.y, nx, ny);
+      //player.x = nx; player.y = ny;
       break;
     case P_BOX:
       break;
@@ -155,6 +184,7 @@ Game.prototype.bug_move = function(direction)
     default:
       break;
   }
+*/
 }
 
 Game.prototype.bug_switch = function(number)

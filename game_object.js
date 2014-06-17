@@ -73,16 +73,16 @@ GameObject.prototype.parse_line = function(line)
         this.flags = token_translate(token).num;
         break;
         case 3: // minus_x
-        this.minus_x = parseInt(token).num;
+        this.minus_x = parseInt(token, 10);
         break;
         case 4: // plus_x
-        this.plus_x = parseInt(token).num;
+        this.plus_x = parseInt(token, 10);
         break;
         case 5: // x_cor
-        this.x_cor = parseInt(token).num;
+        this.x_cor = parseInt(token, 10);
         break;
         case 6: // y_cor
-        this.y_cor = parseInt(token).num;
+        this.y_cor = parseInt(token, 10);
         break;
         case 7: // sprite
         this.sprite = token_translate(token).num;
@@ -210,10 +210,10 @@ GameAnimTemplate.prototype.parse_line = function(line)
         this.frame_num = token_translate(token).num;
         break;
         case 3: // dx
-        this.dx = parseInt(token).num;
+        this.dx = parseInt(token, 10);
         break;
         case 4: // dy
-        this.dy = parseInt(token).num;
+        this.dy = parseInt(token, 10);
         break;
         case 5: // sprite_first
         this.sprite_first = token_translate(token).num;
@@ -222,10 +222,10 @@ GameAnimTemplate.prototype.parse_line = function(line)
         this.sprite_num = token_translate(token).num;
         break;
         case 7: // sprite_step
-        this.sprite_step = parseInt(token).num;
+        this.sprite_step = parseInt(token, 10);
         break;
         case 8: // frame_correction
-        this.frame_correction = parseInt(token).num;
+        this.frame_correction = parseInt(token, 10);
         break;
         default:
         break;
@@ -235,20 +235,17 @@ GameAnimTemplate.prototype.parse_line = function(line)
   }  
 }
 
-GameAnimTemplate.prototype.draw = function(line)
-{
-
-
-}
-
-
 GameAnimTemplate.prototype.print = function()
 {
   console.log("GameAnimTemplate handle = " + this.template_handle);
+  console.log("  flags:        " + this.flags);
   console.log("  frame_num:    " + this.frame_num);
+  console.log("  dx:           " + this.dx);
+  console.log("  dy:           " + this.dy);
   console.log("  sprite_first: " + this.sprite_first);
   console.log("  sprite_num:   " + this.sprite_num);
   console.log("  sprite_step:  " + this.sprite_step);
+  console.log("  frame_correction:" + this.frame_correction);
 }
 
 function GameAnimTemplateRepository() {
@@ -274,10 +271,8 @@ GameAnimTemplateRepository_load_callback = function()
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
-      
-      if(this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] === undefined)
-        this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = Array();
-      
+      obj.print();
+
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;
     }

@@ -175,7 +175,7 @@ var parser_table =
   ANIM_MOVE_RIGHT_FAST:ANIM_MOVE_RIGHT_FAST,
 
   ANIM_MOVE_UP:   ANIM_MOVE_UP,
-  ANIM_MOVE_DOWN: ANUM_MOVE_DOWN,
+  ANIM_MOVE_DOWN: ANIM_MOVE_DOWN,
   ANIM_MOVE_LEFT: ANIM_MOVE_LEFT,
   ANIM_MOVE_RIGHT:ANIM_MOVE_RIGHT,
 
@@ -223,7 +223,7 @@ function token_translate(token) {
   for(var i = 0; i < items.length; i++) {
     var item = items[i].trim();
     if(is_number(item)) {
-      ret += parseInt(item);
+      ret += parseInt(item, 10);
     }
     else {
       if(!base) {
