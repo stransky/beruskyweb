@@ -271,7 +271,7 @@ GameAnimTemplateRepository_load_callback = function()
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
-      obj.print();
+      //obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;

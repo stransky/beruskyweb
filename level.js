@@ -282,7 +282,7 @@ Level.prototype.item_draw = function(x, y, layer)
 // unregister sprite and so
 Level.prototype.item_remove = function(x, y, layer)
 {
-  var cell = cell_get(x,y,layer||LAYER_LEVEL);
+  var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
     this.graph.remove(cell.sprite_handle);
@@ -295,9 +295,9 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 {
   this.item_remove(nx, ny);
   
-  var cell_old = cell_get(ox,oy,layer||LAYER_LEVEL);
+  var cell_old = this.cell_get(ox,oy,layer||LAYER_LEVEL);
   if(cell_old.item != NO_ITEM) {
-    var cell_new = cell_get(nx,ny,layer||LAYER_LEVEL);
+    var cell_new = this.cell_get(nx,ny,layer||LAYER_LEVEL);
     cell_new.copy(cell_old);
     cell_old.item = NO_ITEM;
     this.cell_draw(cell_new, nx, ny);
@@ -306,7 +306,7 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 
 Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
 { 
-  var cell = cell_get(x,y,layer||LAYER_LEVEL);
+  var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.diff_x = dx;
     cell.diff_y = dy;

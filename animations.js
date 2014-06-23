@@ -26,11 +26,11 @@
  */
 
 // An active game animation
-function GameAnimation(template, x, y, layer, rotation)
+function GameAnimation(template, x, y, layer, rotation, callback, callback_param)
 {
   // GameAnimTemplate for this animation
   this.anim_template = template;
-    
+
   this.frame_current = 0;
   this.frame_correction = 0;
 
@@ -40,9 +40,13 @@ function GameAnimation(template, x, y, layer, rotation)
   this.x = x;
   this.y = y;
   this.layer = layer;
-  
+
   // rotation of the rendered item
   this.rotation = rotation;
+  
+  // callback functions at animation end
+  this.callback = callback;
+  this.callback_param = callback_param;
 }
 
 GameAnimation.prototype.start = function()
@@ -50,6 +54,13 @@ GameAnimation.prototype.start = function()
   this.frame_current = 0;
   this.frame_correction = this.anim_template.frame_correction;
   this.position_in_animation = 0;
+}
+
+GameAnimation.prototype.stop = function()
+{
+  if (this.callback != undefined) {
+    this.callback(this.callback_param);
+  }
 }
 
 GameAnimation.prototype.process = function(level)
@@ -64,7 +75,7 @@ GameAnimation.prototype.process = function(level)
     if(this.flag&(ANIM_LOOP))
       this.start();
     else {
-      //this.stop(p_queue, p_events, TRUE);      
+      this.stop();
       return;
     }
   }
@@ -112,10 +123,12 @@ function GameAnimationEngine(level)
   this.anim_running = Array();
 }
 
-GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation)
+GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation, 
+                                                callback, callback_param)
 {  
   var index = this.anim_running.push(new GameAnimation(this.anim_templates.anim_template[template],
-                                                       x, y, layer, rotation));
+                                                       x, y, layer, rotation, 
+                                                       callback, callback_param));
   return this.anim_running[index - 1];
 }
 
