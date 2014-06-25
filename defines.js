@@ -137,6 +137,10 @@ var FIRST_MENU                = 700
 var FIRST_LOGO                = 800
 var FIRST_FONT                = 1000
 
+var FONT_NUM                  = 3
+var FONT_STEP                 = 100
+var FONT_SPRITES              = 61
+
 var LAYER_ITEM                = 0
 var LAYER_VARIANT             = 1
 var LAYER_ROTATION            = 2

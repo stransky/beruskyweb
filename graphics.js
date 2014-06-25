@@ -148,3 +148,45 @@ Graph.prototype.init = function()
   this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
   this.sprites_load();
 }
+
+Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
+{
+  this.sprite_load("data/Graphics/font" + font_num + ".spr",  sprite_first);
+  font_sprite_first = first;
+  font_sprite_num = num;
+
+  return(ftable.load(change_tail(tmp,".tab")));
+  FontTable.prototype.load = function(file)
+}
+
+function FontTable() {
+  this.position = Array();
+  this.loaded = false;
+}
+
+FontTable_load_callback = function() 
+{
+
+}
+
+FontTable.prototype.load = function(file)
+{
+  load_file_text(file, FontTable_load_callback, this);
+}
+
+bool font_lookup_table::load(char *p_file)
+{  
+  FHANDLE f = file_open(surface::graphics_dir_get(),p_file,"r");
+  
+  memset(position,0,sizeof(position));
+  
+  int pos = 0;
+  char line[10];
+  while(fgets(line,10,f)) {
+    position[toupper(line[0])] = position[tolower(line[0])] = pos;
+    pos++;
+  }
+
+  fclose(f);
+  return(TRUE);
+}
