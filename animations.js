@@ -65,18 +65,12 @@ GameAnimation.prototype.stop = function()
 
 GameAnimation.prototype.process = function(level)
 { 
-/*
-  if(flag&ANIM_REMOVE) {
-    stop(p_queue, p_events, TRUE);
-    return(true);
-  }
-*/
   if(this.frame_current >= this.anim_template.frame_num) {
     if(this.flag&(ANIM_LOOP))
       this.start();
     else {
       this.stop();
-      return;
+      return(false);
     }
   }
 
@@ -107,6 +101,8 @@ GameAnimation.prototype.process = function(level)
     this.position_in_animation++;
     this.frame_current++;
   }
+
+  return(true);
 }
 
 // Performs the animations
@@ -135,7 +131,12 @@ GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation,
 GameAnimationEngine.prototype.process = function()
 {
   var anim_size = this.anim_running.length;
-  for (var i = 0; i < anim_size; i++) {
-    this.anim_running[i].process(this.level);
+  for(var i = 0; i < anim_size; i++) {
+    if(this.anim_running[i] != undefined) {
+      var ret = this.anim_running[i].process(this.level);
+      if(!ret) {
+        this.anim_running.splice(i, 1);
+      }
+    }
   }
 }

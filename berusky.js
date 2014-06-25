@@ -96,10 +96,13 @@ Game.prototype.level_load = function(name)
   this.level.load(name);  
 }
 
-// Animate mog movement
+// Animate bug movement
 Game.prototype.animation_bug_move = function(direction, nx, ny)
 {
   var player = this.level.player_active;
+  if(player.is_moving)
+    return;
+
   var x = player.x;
   var y = player.y;
 
@@ -124,10 +127,12 @@ Game.prototype.animation_bug_move = function(direction, nx, ny)
       rotation = ROTATION_RIGHT;
       break;
   }
-  
+
   var data = { game:this, x:x, y:y, nx:nx, ny:ny };
   this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
   this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
+
+  player.is_moving = true;
 }
 
 Game.prototype.animation_bug_move_end = function(data)
@@ -135,9 +140,42 @@ Game.prototype.animation_bug_move_end = function(data)
   data.game.level.item_diff_set(data.x, data.y, 0, 0, LAYER_PLAYER);
   data.game.level.item_diff_set(data.nx, data.ny, 0, 0, LAYER_PLAYER);
   data.game.level.item_move(data.x, data.y, data.nx, data.ny, LAYER_PLAYER);
-  
+
   var player = data.game.level.player_active;
   player.x = data.nx; player.y = data.ny;
+
+  player.is_moving = false;
+}
+
+// Animate box movement
+Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
+{
+  var anim = 0;
+
+  switch(direction) {
+    case MOVE_UP:
+      anim = ANIM_MOVE_UP;
+      break;
+    case MOVE_DOWN:
+      anim = ANIM_MOVE_DOWN;
+      break;
+    case MOVE_LEFT:
+      anim = ANIM_MOVE_LEFT;
+      break;
+    case MOVE_RIGHT:
+      anim = ANIM_MOVE_RIGHT;
+      break;
+  }
+
+  var data = { game:this, x:x, y:y, nx:nx, ny:ny };
+  this.anim.create(anim, x, y, LAYER_LEVEL, NO_ROTATION, this.animation_box_move_end, data);
+}
+
+Game.prototype.animation_box_move_end = function(data)
+{
+  data.game.level.item_diff_set(data.x, data.y, 0, 0, LAYER_LEVEL);
+  data.game.level.item_diff_set(data.nx, data.ny, 0, 0, LAYER_LEVEL);
+  data.game.level.item_move(data.x, data.y, data.nx, data.ny, LAYER_LEVEL);
 }
 
 // Get an active player
@@ -146,39 +184,63 @@ Game.prototype.animation_bug_move_end = function(data)
 Game.prototype.bug_move = function(direction)
 {
   var player = this.level.player_active;
+  if(player.is_moving)
+    return;
+
   var nx = player.x;
   var ny = player.y;
+  var nnx = nx;
+  var nny = ny;
 
   switch(direction) {
     case MOVE_UP:
       ny--;
+      nny -= 2;
       break;
     case MOVE_DOWN:
       ny++;
+      nny += 2;
       break;
     case MOVE_LEFT:
       nx--;
+      nnx -= 2;
       break;
     case MOVE_RIGHT:
       nx++;
+      nnx += 2;
       break;
   }
 
   var cell = this.level.item_get(nx, ny);
+  var cell_next = this.level.item_get(nnx, nny);
+
   switch(cell.item) {
     case NO_ITEM:
-      // free space - do the movement      
       this.animation_bug_move(direction, nx, ny);
       break;
     case P_BOX:
+      if(cell_next.item == NO_ITEM) {
+        this.animation_bug_move(direction, nx, ny);
+        this.animation_box_move(direction, nx, ny, nnx, nny);
+      }
       break;
     case P_TNT:
+      if(cell_next.item == NO_ITEM) {
+        this.animation_bug_move(direction, nx, ny);
+        this.animation_box_move(direction, nx, ny, nnx, nny);
+      } else if(cell_next.item == P_BOX) {
+
+      }
       break;
     case P_EXIT:
       break;
     case P_STONE:
       break;
     case P_KEY:
+      if(player.keys_final < 5) {
+        this.animation_bug_move(direction, nx, ny);
+        player.keys_final++;
+      }
       break;
     case P_MATTOCK:
       break;

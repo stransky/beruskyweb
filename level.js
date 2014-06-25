@@ -177,6 +177,9 @@ level_load_callback = function() {
 
 // Active player info
 function Player() {
+  this.is_moving = false; // there's a running player animation
+  this.keys_final = 0;
+  this.key_color = 0;
   this.number = 0;
   this.x = 0;
   this.y = 0;
@@ -285,7 +288,7 @@ Level.prototype.item_remove = function(x, y, layer)
   var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
-    this.graph.remove(cell.sprite_handle);
+    this.graph.sprite_remove(cell.sprite_handle);
   }
 }
 
@@ -293,7 +296,7 @@ Level.prototype.item_remove = function(x, y, layer)
 // 2. Move LevelItem from (ox,oy) to (nx,ny)
 Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 {
-  this.item_remove(nx, ny);
+  this.item_remove(nx, ny, layer);
   
   var cell_old = this.cell_get(ox,oy,layer||LAYER_LEVEL);
   if(cell_old.item != NO_ITEM) {
