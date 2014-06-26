@@ -1,1 +1,2 @@
 - item_diff_set (level manipulation) - draw after all changes
+- key input array loaded in animation frame (don't use ondown)

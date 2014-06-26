@@ -100,9 +100,6 @@ Game.prototype.level_load = function(name)
 Game.prototype.animation_bug_move = function(direction, nx, ny)
 {
   var player = this.level.player_active;
-  if(player.is_moving)
-    return;
-
   var x = player.x;
   var y = player.y;
 
@@ -131,8 +128,6 @@ Game.prototype.animation_bug_move = function(direction, nx, ny)
   var data = { game:this, x:x, y:y, nx:nx, ny:ny };
   this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
   this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
-
-  player.is_moving = true;
 }
 
 Game.prototype.animation_bug_move_end = function(data)
@@ -185,7 +180,10 @@ Game.prototype.bug_move = function(direction)
 {
   var player = this.level.player_active;
   if(player.is_moving)
-    return;
+    return;    
+  player.is_moving = true;
+
+  console.log("Bug move");
 
   var nx = player.x;
   var ny = player.y;
@@ -217,17 +215,19 @@ Game.prototype.bug_move = function(direction)
   switch(cell.item) {
     case NO_ITEM:
       this.animation_bug_move(direction, nx, ny);
-      break;
+      return;
     case P_BOX:
       if(cell_next.item == NO_ITEM) {
         this.animation_bug_move(direction, nx, ny);
         this.animation_box_move(direction, nx, ny, nnx, nny);
+        return;
       }
       break;
     case P_TNT:
       if(cell_next.item == NO_ITEM) {
         this.animation_bug_move(direction, nx, ny);
         this.animation_box_move(direction, nx, ny, nnx, nny);
+        return;
       } else if(cell_next.item == P_BOX) {
 
       }
@@ -240,6 +240,7 @@ Game.prototype.bug_move = function(direction)
       if(player.keys_final < 5) {
         this.animation_bug_move(direction, nx, ny);
         player.keys_final++;
+        return;
       }
       break;
     case P_MATTOCK:
@@ -253,6 +254,8 @@ Game.prototype.bug_move = function(direction)
     default:
       break;
   }
+    
+  player.is_moving = false;
 }
 
 Game.prototype.bug_switch = function(number)
