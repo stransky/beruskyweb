@@ -72,7 +72,28 @@ Game.prototype.game_load = function()
 
 Game.prototype.game_play = function() 
 {
+  if(this.input.key_get(KeyEvent.DOM_VK_UP))
+    this.game.bug_move(MOVE_UP);
 
+  if(this.input.key_get(KeyEvent.DOM_VK_DOWN))
+    this.game.bug_move(MOVE_DOWN);
+
+  if(this.input.key_get(KeyEvent.DOM_VK_RIGHT))
+    this.game.bug_move(MOVE_RIGHT);
+
+  if(this.input.key_get(KeyEvent.DOM_VK_LEFT))
+    this.game.bug_move(MOVE_LEFT);
+
+/*
+    case KeyEvent.DOM_VK_TAB:
+      this.game.bug_switch();
+    case KeyEvent.DOM_VK_1:
+    case KeyEvent.DOM_VK_2:
+    case KeyEvent.DOM_VK_3:
+    case KeyEvent.DOM_VK_4:
+    case KeyEvent.DOM_VK_5:
+      this.game.bug_switch(event.keyCode-KeyEvent.DOM_VK_1);
+*/
 }
 
 Game.prototype.game_loop = function() 
@@ -84,9 +105,7 @@ Game.prototype.game_loop = function()
   
   // Update all running animations
   this.anim.process();
-  
   this.game_play();
-  
   this.graph.render();
 }
 

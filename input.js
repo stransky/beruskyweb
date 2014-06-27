@@ -56,38 +56,6 @@ Input.prototype.key_get = function(keyCode)
   return(this.key[keyCode] != undefined && this.key[keyCode]);
 }
 
-/*
-Input.prototype.key_input = function(event)
-{  
-  this.key[event.keyCode] = true;
-  
-  switch() {
-    case KeyEvent.DOM_VK_UP:
-      this.game.bug_move(MOVE_UP);
-      break;
-    case KeyEvent.DOM_VK_DOWN:
-      this.game.bug_move(MOVE_DOWN);
-      break;
-    case KeyEvent.DOM_VK_RIGHT:
-      this.game.bug_move(MOVE_RIGHT);
-      break;
-    case KeyEvent.DOM_VK_LEFT:
-      this.game.bug_move(MOVE_LEFT);
-      break;
-    case KeyEvent.DOM_VK_TAB:
-      this.game.bug_switch();
-      break;
-    case KeyEvent.DOM_VK_1:
-    case KeyEvent.DOM_VK_2:
-    case KeyEvent.DOM_VK_3:
-    case KeyEvent.DOM_VK_4:
-    case KeyEvent.DOM_VK_5:
-      this.game.bug_switch(event.keyCode-KeyEvent.DOM_VK_1);
-      break;
-  }
-}
-*/
-
 function handleKeyDown(event)
 {
   input_object.key[event.keyCode] = true;

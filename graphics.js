@@ -164,29 +164,19 @@ function FontTable() {
   this.loaded = false;
 }
 
-FontTable_load_callback = function() 
+FontTable_load_callback = function(font_table)
 {
-
+  var chars = this.responseText.split("\n");
+  
+  for (i = 0; i < chars.length; i++) {
+    var c = chars[i];
+    font_table.position[(c.toLowerCase())[0]] = i;
+    font_table.position[(c.toUpperCase())[0]] = i;
+  }
+  this.loaded = true;
 }
 
 FontTable.prototype.load = function(file)
 {
   load_file_text(file, FontTable_load_callback, this);
-}
-
-bool font_lookup_table::load(char *p_file)
-{  
-  FHANDLE f = file_open(surface::graphics_dir_get(),p_file,"r");
-  
-  memset(position,0,sizeof(position));
-  
-  int pos = 0;
-  char line[10];
-  while(fgets(line,10,f)) {
-    position[toupper(line[0])] = position[tolower(line[0])] = pos;
-    pos++;
-  }
-
-  fclose(f);
-  return(TRUE);
 }
