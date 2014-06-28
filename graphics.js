@@ -29,7 +29,8 @@ function Graph() {
   // Game sprites (a.k.a textures in PIXI terminology)
   this.sprites = Array();
   this.sprites_to_load = 0;
-  this.sprites_loaded = 0;
+  this.sprites_loaded = 0;  
+  this.font_table = Array();
 }
 
 Graph.prototype.render = function() {  
@@ -147,27 +148,34 @@ Graph.prototype.init = function()
   this.stage = new PIXI.Stage(0x000000);
   this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
   this.sprites_load();
+
+  for(var i = 0; i < FONT_NUM; i++) {
+    this.load_font(i, FIRST_FONT + i*FONT_STEP, FONT_SPRITES);
+  }
 }
 
 Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
 {
   this.sprite_load("data/Graphics/font" + font_num + ".spr",  sprite_first);
-  font_sprite_first = first;
-  font_sprite_num = num;
 
-  return(ftable.load(change_tail(tmp,".tab")));
-  FontTable.prototype.load = function(file)
+  var font = this.font_table[font_num] = new FontTable();
+  font.sprite_first = sprite_first;
+  font.sprite_num = sprite_num;
+  font.load("data/Graphics/font" + font_num + ".tab");
 }
 
 function FontTable() {
   this.position = Array();
   this.loaded = false;
+  this.sprite_first = 0;
+  this.sprite_num = 0;
 }
 
-FontTable_load_callback = function(font_table)
+FontTable_load_callback = function()
 {
+  var font_table = this.callback_object;
   var chars = this.responseText.split("\n");
-  
+
   for (i = 0; i < chars.length; i++) {
     var c = chars[i];
     font_table.position[(c.toLowerCase())[0]] = i;

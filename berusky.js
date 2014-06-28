@@ -72,21 +72,22 @@ Game.prototype.game_load = function()
 
 Game.prototype.game_play = function() 
 {
-  if(this.input.key_get(KeyEvent.DOM_VK_UP))
-    this.game.bug_move(MOVE_UP);
+  if(this.input.key_get(BUG_MOVE_UP))
+    this.bug_move(MOVE_UP);
 
-  if(this.input.key_get(KeyEvent.DOM_VK_DOWN))
-    this.game.bug_move(MOVE_DOWN);
+  if(this.input.key_get(BUG_MOVE_DOWN))
+    this.bug_move(MOVE_DOWN);
 
-  if(this.input.key_get(KeyEvent.DOM_VK_RIGHT))
-    this.game.bug_move(MOVE_RIGHT);
+  if(this.input.key_get(BUG_MOVE_RIGHT))
+    this.bug_move(MOVE_RIGHT);
 
-  if(this.input.key_get(KeyEvent.DOM_VK_LEFT))
-    this.game.bug_move(MOVE_LEFT);
+  if(this.input.key_get(BUG_MOVE_LEFT))
+    this.bug_move(MOVE_LEFT);
+
+  if(this.input.key_get(BUG_SWITCH))
+    this.bug_switch();
 
 /*
-    case KeyEvent.DOM_VK_TAB:
-      this.game.bug_switch();
     case KeyEvent.DOM_VK_1:
     case KeyEvent.DOM_VK_2:
     case KeyEvent.DOM_VK_3:

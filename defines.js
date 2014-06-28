@@ -225,6 +225,6 @@ var ROTATION_RIGHT            = 1
 var ROTATION_DOWN             = 2
 var ROTATION_LEFT             = 3
 
-var LAYER_FLOOR               = 0;
-var LAYER_LEVEL               = 1;
-var LAYER_PLAYER              = 2;
+var LAYER_FLOOR               = 0
+var LAYER_LEVEL               = 1
+var LAYER_PLAYER              = 2

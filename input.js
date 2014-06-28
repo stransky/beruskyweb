@@ -28,17 +28,17 @@
 /*
   Game input handler
 */
-var BUG_MOVE_UP     KeyEvent.DOM_VK_UP;
-var BUG_MOVE_DOWN   KeyEvent.DOM_VK_DOWN;
-var BUG_MOVE_RIGHT  KeyEvent.DOM_VK_RIGHT;
-var BUG_MOVE_LEFT   KeyEvent.DOM_VK_LEFT;
-var BUG_SWITCH      KeyEvent.DOM_VK_TAB;
+var BUG_MOVE_UP    = KeyEvent.DOM_VK_UP
+var BUG_MOVE_DOWN  = KeyEvent.DOM_VK_DOWN
+var BUG_MOVE_RIGHT = KeyEvent.DOM_VK_RIGHT
+var BUG_MOVE_LEFT  = KeyEvent.DOM_VK_LEFT
+var BUG_SWITCH     = KeyEvent.DOM_VK_TAB
 
-var BUG_SELECT_1    KeyEvent.DOM_VK_1;
-var BUG_SELECT_2    KeyEvent.DOM_VK_2;
-var BUG_SELECT_3    KeyEvent.DOM_VK_3;
-var BUG_SELECT_4    KeyEvent.DOM_VK_4;
-var BUG_SELECT_5    KeyEvent.DOM_VK_5;
+var BUG_SELECT_1   = KeyEvent.DOM_VK_1
+var BUG_SELECT_2   = KeyEvent.DOM_VK_2
+var BUG_SELECT_3   = KeyEvent.DOM_VK_3
+var BUG_SELECT_4   = KeyEvent.DOM_VK_4
+var BUG_SELECT_5   = KeyEvent.DOM_VK_5
 
 var input_object;
 
