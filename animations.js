@@ -130,13 +130,15 @@ GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation,
 
 GameAnimationEngine.prototype.process = function()
 {
-  var anim_size = this.anim_running.length;
-  for(var i = 0; i < anim_size; i++) {
+  for(var i = 0; i < this.anim_running.length;) {
     if(this.anim_running[i] != undefined) {
       var ret = this.anim_running[i].process(this.level);
       if(!ret) {
+        // in-place remove and index movement
         this.anim_running.splice(i, 1);
+        continue;
       }
     }
+    i++;
   }
 }

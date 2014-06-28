@@ -74,14 +74,11 @@ Game.prototype.game_play = function()
 {
   if(this.input.key_get(BUG_MOVE_UP))
     this.bug_move(MOVE_UP);
-
-  if(this.input.key_get(BUG_MOVE_DOWN))
+  else if(this.input.key_get(BUG_MOVE_DOWN))
     this.bug_move(MOVE_DOWN);
-
-  if(this.input.key_get(BUG_MOVE_RIGHT))
+  else if(this.input.key_get(BUG_MOVE_RIGHT))
     this.bug_move(MOVE_RIGHT);
-
-  if(this.input.key_get(BUG_MOVE_LEFT))
+  else if(this.input.key_get(BUG_MOVE_LEFT))
     this.bug_move(MOVE_LEFT);
 
   if(this.input.key_get(BUG_SWITCH))
@@ -106,7 +103,9 @@ Game.prototype.game_loop = function()
   
   // Update all running animations
   this.anim.process();
+  
   this.game_play();
+  
   this.graph.render();
 }
 
@@ -203,7 +202,8 @@ Game.prototype.bug_move = function(direction)
     return;    
   player.is_moving = true;
 
-  console.log("Bug move");
+  if(this.anim.anim_running.length != 0)
+    throw "Animace!";
 
   var nx = player.x;
   var ny = player.y;
