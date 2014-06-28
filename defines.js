@@ -154,6 +154,9 @@ var CELL_SIZE_Y               = 20
 var LEVEL_SCREEN_START_X      = 0
 var LEVEL_SCREEN_START_Y      = 40
 
+var PLAYER_MAX_MATTLOCKS      = 9
+var PLAYER_MAX_KEYS           = 1
+
 // -------------------------------------------------------
 // Animation definition - predefined
 // -------------------------------------------------------
@@ -201,18 +204,18 @@ var FAST_ANIMATION_SHIFT      = 15
 // Animation flags
 // -------------------------------------------------------
 
-var  ANIM_USED                = 0x001 // animation change sprite position
+var ANIM_USED                 = 0x001 // animation change sprite position
 
-var  ANIM_MOVE                = 0x002 // animation change sprite position
-var  ANIM_SPRITE              = 0x004 // animation change sprite
+var ANIM_MOVE                 = 0x002 // animation change sprite position
+var ANIM_SPRITE               = 0x004 // animation change sprite
 
-var  ANIM_INSTANT             = 0x008 // run this animation imediately after create
-var  ANIM_LOOP                = 0x010 // loop animation
-var  ANIM_ADD_INVERSE         = 0x020 // add inverted sprites to animation
+var ANIM_INSTANT              = 0x008 // run this animation imediately after create
+var ANIM_LOOP                 = 0x010 // loop animation
+var ANIM_ADD_INVERSE          = 0x020 // add inverted sprites to animation
 
-var  ANIM_REMOVE              = 0x100 // remove this animation from anim queue
+var ANIM_REMOVE               = 0x100 // remove this animation from anim queue
                                       // in next anim process
-var  ANIM_GENERATE            = 0x200 // it's generated animation
+var ANIM_GENERATE             = 0x200 // it's generated animation
 
 var ANIM_TRIGGER_MOVE         = 0x1000
 var ANIM_TRIGGER_ERASE        = 0x2000

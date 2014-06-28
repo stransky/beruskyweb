@@ -180,6 +180,7 @@ function Player() {
   this.is_moving = false; // there's a running player animation
   this.keys_final = 0;
   this.key_color = 0;
+  this.matocks = 0;
   this.number = 0;
   this.x = 0;
   this.y = 0;

@@ -116,7 +116,7 @@ Game.prototype.level_load = function(name)
 }
 
 // Animate bug movement
-Game.prototype.animation_bug_move = function(direction, nx, ny)
+Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
 {
   var player = this.level.player_active;
   var x = player.x;
@@ -144,13 +144,16 @@ Game.prototype.animation_bug_move = function(direction, nx, ny)
       break;
   }
 
-  var data = { game:this, x:x, y:y, nx:nx, ny:ny };
+  var data = { game:this, x:x, y:y, nx:nx, ny:ny, remove_target : (remove_target || 0) };
   this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
   this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
 }
 
 Game.prototype.animation_bug_move_end = function(data)
 {
+  if(data.remove_target)
+    data.game.level.item_remove(data.nx, data.ny, LAYER_LEVEL);
+
   data.game.level.item_diff_set(data.x, data.y, 0, 0, LAYER_PLAYER);
   data.game.level.item_diff_set(data.nx, data.ny, 0, 0, LAYER_PLAYER);
   data.game.level.item_move(data.x, data.y, data.nx, data.ny, LAYER_PLAYER);
@@ -201,6 +204,20 @@ Game.prototype.animation_box_explosion = function(direction, nx, ny, nnx, nny)
   var data = { game:this, nx:nx, ny:ny, direction:direction };
   this.anim.create(ANIM_BLAST, nnx, nny, LAYER_LEVEL, NO_ROTATION);
   this.animation_bug_move(data.direction, data.nx, data.ny);
+}
+
+Game.prototype.animation_stone_explosion_end = function(data)
+{
+  this.level.item_remove(data.nx, data.ny, LAYER_LEVEL);
+  this.animation_bug_move(data.direction, data.nx, data.ny);
+}
+
+// Animate stone animation
+Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
+{
+  var data = { game:this, nx:nx, ny:ny, direction:direction };  
+  this.anim.create(ANIM_STONE_1+variant, nx, ny, LAYER_LEVEL, NO_ROTATION,
+                   data.animation_stone_explosion_end, data);
 }
 
 // Get an active player
@@ -262,23 +279,41 @@ Game.prototype.bug_move = function(direction)
       }
       break;
     case P_EXIT:
+      if(player.keys_final == 5) {
+        // exit
+      }
       break;
     case P_STONE:
+      if(player.matocks) {
+        this.animation_stone_explosion(cell.variant, direction, nx, ny);
+        player.matocks--;
+      }
       break;
     case P_KEY:
       if(player.keys_final < 5) {
-        this.animation_bug_move(direction, nx, ny);
+        this.animation_bug_move(direction, nx, ny, true);
         player.keys_final++;
         return;
       }
       break;
     case P_MATTOCK:
+      if(player.matocks < PLAYER_MAX_MATTLOCKS) {
+        this.animation_bug_move(direction, nx, ny, true);
+        player.matocks++;
+        return;
+      }
       break;
     case P_KEY1:
     case P_KEY2:
     case P_KEY3:
     case P_KEY4:
-    case P_KEY5:    
+    case P_KEY5:
+      if(player.number == (cell.item - P_KEY1) &&
+         player.key_color < PLAYER_MAX_KEYS) 
+      {
+        this.animation_bug_move(direction, nx, ny, true);
+        player.key_color++;
+      }
       break;
     default:
       break;
