@@ -289,6 +289,7 @@ Level.prototype.item_remove = function(x, y, layer)
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
     this.graph.sprite_remove(cell.sprite_handle);
+    cell.sprite_handle = 0;
   }
 }
 

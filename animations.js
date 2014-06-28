@@ -82,7 +82,9 @@ GameAnimation.prototype.process = function(level)
     var cell = level.cell_get(this.x, this.y, this.layer);
 
     if(this.anim_template.flags&ANIM_SPRITE) {
-      level.graph.sprite_remove(cell.sprite_handle);
+      if(cell.sprite_handle)
+        level.graph.sprite_remove(cell.sprite_handle);
+
       var spr = this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
       cell.sprite_handle = level.graph.sprite_insert(spr);
 

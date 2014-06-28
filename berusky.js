@@ -192,6 +192,17 @@ Game.prototype.animation_box_move_end = function(data)
   data.game.level.item_move(data.x, data.y, data.nx, data.ny, LAYER_LEVEL);
 }
 
+// Animate box movement
+Game.prototype.animation_box_explosion = function(direction, nx, ny, nnx, nny)
+{
+  this.level.item_remove(nx, ny, LAYER_LEVEL);
+  this.level.item_remove(nnx, nny, LAYER_LEVEL);
+
+  var data = { game:this, nx:nx, ny:ny, direction:direction };
+  this.anim.create(ANIM_BLAST, nnx, nny, LAYER_LEVEL, NO_ROTATION);
+  this.animation_bug_move(data.direction, data.nx, data.ny);
+}
+
 // Get an active player
 // Check if we can move
 // Move it
@@ -201,9 +212,6 @@ Game.prototype.bug_move = function(direction)
   if(player.is_moving)
     return;    
   player.is_moving = true;
-
-  if(this.anim.anim_running.length != 0)
-    throw "Animace!";
 
   var nx = player.x;
   var ny = player.y;
@@ -249,7 +257,8 @@ Game.prototype.bug_move = function(direction)
         this.animation_box_move(direction, nx, ny, nnx, nny);
         return;
       } else if(cell_next.item == P_BOX) {
-
+        this.animation_box_explosion(direction, nx, ny, nnx, nny);
+        return;
       }
       break;
     case P_EXIT:
