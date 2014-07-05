@@ -133,6 +133,7 @@ var FIRST_PLAYER_2            = 610
 var FIRST_PLAYER_3            = 620
 var FIRST_PLAYER_4            = 630
 var FIRST_PLAYER_5            = 640
+var FIRST_PLAYER_STEP         = 10
 var FIRST_MENU                = 700
 var FIRST_LOGO                = 800
 var FIRST_FONT                = 1000

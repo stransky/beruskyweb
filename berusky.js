@@ -83,15 +83,16 @@ Game.prototype.game_play = function()
 
   if(this.input.key_get(BUG_SWITCH))
     this.bug_switch();
-
-/*
-    case KeyEvent.DOM_VK_1:
-    case KeyEvent.DOM_VK_2:
-    case KeyEvent.DOM_VK_3:
-    case KeyEvent.DOM_VK_4:
-    case KeyEvent.DOM_VK_5:
-      this.game.bug_switch(event.keyCode-KeyEvent.DOM_VK_1);
-*/
+  else if(this.input.key_get(BUG_SELECT_1))
+    this.bug_switch(BUG_SELECT_1);
+  else if(this.input.key_get(BUG_SELECT_2))
+    this.bug_switch(BUG_SELECT_2);
+  else if(this.input.key_get(BUG_SELECT_3))
+    this.bug_switch(BUG_SELECT_3);
+  else if(this.input.key_get(BUG_SELECT_4))
+    this.bug_switch(BUG_SELECT_4);
+  else if(this.input.key_get(BUG_SELECT_5))
+    this.bug_switch(BUG_SELECT_5);
 }
 
 Game.prototype.game_loop = function() 
@@ -279,7 +280,7 @@ Game.prototype.bug_move = function(direction)
       }
       break;
     case P_EXIT:
-      if(player.keys_final == 5) {
+      if(this.level.keys_final == 5) {
         // exit
       }
       break;
@@ -290,9 +291,9 @@ Game.prototype.bug_move = function(direction)
       }
       break;
     case P_KEY:
-      if(player.keys_final < 5) {
+      if(this.level.keys_final < 5) {
         this.animation_bug_move(direction, nx, ny, true);
-        player.keys_final++;
+        this.level.keys_final++;
         return;
       }
       break;
@@ -324,5 +325,6 @@ Game.prototype.bug_move = function(direction)
 
 Game.prototype.bug_switch = function(number)
 {
-  alert("bug_switch " + number);
+  var player = number || BUG_SELECT_NEXT;  
+  this.level.player_switch(player);
 }

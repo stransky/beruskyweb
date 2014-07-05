@@ -158,10 +158,14 @@ level_load_callback = function() {
 
       if(loaded_level.players[index].item != NO_ITEM) {
         loaded_level.players[index].rotation = player_rotations[loaded_level.players[index].item];
-        if(loaded_level.players[index].item < loaded_level.player_active.number) {
-          loaded_level.player_active.number = loaded_level.players[index].item;
-          loaded_level.player_active.x = x;
-          loaded_level.player_active.y = y;
+        
+        var player_number = loaded_level.players[index].item;
+        loaded_level.player_table[player_number].active = true;
+        loaded_level.player_table[player_number].x = x;
+        loaded_level.player_table[player_number].y = y;
+        
+        if(player_number < loaded_level.player_active.number) {
+          loaded_level.player_active = loaded_level.player_table[player_number];
         }
       }
     }
@@ -177,8 +181,8 @@ level_load_callback = function() {
 
 // Active player info
 function Player() {
-  this.is_moving = false; // there's a running player animation
-  this.keys_final = 0;
+  this.active = false;
+  this.is_moving = false; // there's a running player animation  
   this.key_color = 0;
   this.matocks = 0;
   this.number = 0;
@@ -221,7 +225,15 @@ function Level(graph) {
   this.background_sprite = 0;
   this.background_loaded = false;
   this.rendered = false;
-  this.player_active = new Player();
+  this.keys_final = 0;
+  
+  this.player_table = new Array();
+  for(var i = 0; i < 5; i++) {
+    this.player_table[i] = new Player();
+    this.player_table[i].number = i;
+  }
+    
+  this.player_active = this.player_table[4];
 }
 
 Level.prototype.is_loaded = function() {
@@ -350,11 +362,16 @@ Level.prototype.render = function(repository) {
 
       cell = this.players[index];
       if(cell.item != NO_ITEM) {
-        cell.sprite_handle = this.graph.sprite_insert(FIRST_PLAYER+cell.item);
+        cell.sprite_handle = this.graph.sprite_insert(FIRST_PLAYER+cell.item*FIRST_PLAYER_STEP);
         this.cell_draw(cell, x, y);
       }
     }
   }
 
   this.rendered = true;
+}
+
+Level.prototype.player_switch = function(number)
+{
+TODO
 }
