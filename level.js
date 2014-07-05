@@ -289,8 +289,10 @@ Level.prototype.item_remove = function(x, y, layer)
   var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
-    this.graph.sprite_remove(cell.sprite_handle);
-    cell.sprite_handle = 0;
+    if(cell.sprite_handle) {
+      this.graph.sprite_remove(cell.sprite_handle);
+      cell.sprite_handle = 0;
+    }
   }
 }
 

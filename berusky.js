@@ -208,16 +208,16 @@ Game.prototype.animation_box_explosion = function(direction, nx, ny, nnx, nny)
 
 Game.prototype.animation_stone_explosion_end = function(data)
 {
-  this.level.item_remove(data.nx, data.ny, LAYER_LEVEL);
-  this.animation_bug_move(data.direction, data.nx, data.ny);
+  data.game.level.item_remove(data.nx, data.ny, LAYER_LEVEL);
+  data.game.animation_bug_move(data.direction, data.nx, data.ny);
 }
 
 // Animate stone animation
 Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
 {
-  var data = { game:this, nx:nx, ny:ny, direction:direction };  
+  var data = { game:this, nx:nx, ny:ny, direction:direction };
   this.anim.create(ANIM_STONE_1+variant, nx, ny, LAYER_LEVEL, NO_ROTATION,
-                   data.animation_stone_explosion_end, data);
+                   this.animation_stone_explosion_end, data);
 }
 
 // Get an active player

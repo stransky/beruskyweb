@@ -123,8 +123,8 @@ Graph.prototype.sprite_rotate = function(sprite_handle, rotation)
 }
 
 Graph.prototype.sprite_remove = function(sprite_handle)
-{  
-  this.stage.removeChild(sprite_handle);
+{    
+  this.stage.removeChild(sprite_handle);  
 }
 
 Graph.prototype.sprites_load = function()
