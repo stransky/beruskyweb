@@ -147,7 +147,8 @@ Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
 
   var data = { game:this, x:x, y:y, nx:nx, ny:ny, remove_target : (remove_target || 0) };
   this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
-  this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
+  this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);  
+  this.level.player_cursor_set_draw(false);
 }
 
 Game.prototype.animation_bug_move_end = function(data)
@@ -325,5 +326,5 @@ Game.prototype.bug_move = function(direction)
 
 Game.prototype.bug_switch = function(number)
 {  
-  this.level.player_switch(number);
+  this.level.player_switch(number);  
 }

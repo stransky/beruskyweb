@@ -224,6 +224,7 @@ function Level(graph) {
   this.background_loaded = false;
   this.rendered = false;
   this.keys_final = 0;
+  this.player_mark_cursor = 0;
   
   this.player_table = new Array();
   for(var i = 0; i < PLAYER_MAX; i++) {
@@ -284,6 +285,13 @@ Level.prototype.cell_draw = function(cell, x, y)
   this.graph.sprite_rotate(cell.sprite_handle, cell.rotation); 
 }
 
+Level.prototype.cell_draw_sprite = function(spr, x, y)
+{  
+  this.graph.sprite_move(spr,
+                         LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
+                         LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
+}
+
 Level.prototype.item_draw = function(x, y, layer)
 {
   var cell = cell_get(x,y,layer);
@@ -340,7 +348,7 @@ Level.prototype.is_rendered = function()
 Level.prototype.render = function(repository) {
   this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND);
   this.graph.sprite_move(this.background_sprite, LEVEL_SCREEN_START_X,
-                                                 LEVEL_SCREEN_START_Y);  
+                                                 LEVEL_SCREEN_START_Y);
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
@@ -366,7 +374,8 @@ Level.prototype.render = function(repository) {
     }
   }
 
-  this.rendered = true;
+  this.rendered = true;  
+  this.player_cursor_set_draw(true);
 }
 
 Level.prototype.player_switch = function(number)
@@ -387,6 +396,22 @@ Level.prototype.player_switch = function(number)
   }
 
   if(this.player_table[number].active) {
+    this.player_cursor_set_draw(false);
     this.player_active = this.player_table[number];
+    this.player_cursor_set_draw(true);
+  }
+}
+
+Level.prototype.player_cursor_set_draw = function(draw)
+{   
+  if(draw && !this.player_mark_cursor && this.player_active.active) {
+    this.player_mark_cursor = this.graph.sprite_insert(FIRST_CURSOR);
+    this.cell_draw_sprite(this.player_mark_cursor,
+                          this.player_active.x,
+                          this.player_active.y);
+  }
+  else if(!draw && this.player_mark_cursor) {
+    this.graph.sprite_remove(this.player_mark_cursor);
+    this.player_mark_cursor = 0;
   }
 }
