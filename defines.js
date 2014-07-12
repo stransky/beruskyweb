@@ -155,6 +155,7 @@ var CELL_SIZE_Y               = 20
 var LEVEL_SCREEN_START_X      = 0
 var LEVEL_SCREEN_START_Y      = 40
 
+var PLAYER_MAX                = 5
 var PLAYER_MAX_MATTLOCKS      = 9
 var PLAYER_MAX_KEYS           = 1
 

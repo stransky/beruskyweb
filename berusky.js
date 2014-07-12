@@ -81,18 +81,18 @@ Game.prototype.game_play = function()
   else if(this.input.key_get(BUG_MOVE_LEFT))
     this.bug_move(MOVE_LEFT);
 
-  if(this.input.key_get(BUG_SWITCH))
-    this.bug_switch();
-  else if(this.input.key_get(BUG_SELECT_1))
-    this.bug_switch(BUG_SELECT_1);
-  else if(this.input.key_get(BUG_SELECT_2))
-    this.bug_switch(BUG_SELECT_2);
-  else if(this.input.key_get(BUG_SELECT_3))
-    this.bug_switch(BUG_SELECT_3);
-  else if(this.input.key_get(BUG_SELECT_4))
-    this.bug_switch(BUG_SELECT_4);
-  else if(this.input.key_get(BUG_SELECT_5))
-    this.bug_switch(BUG_SELECT_5);
+  if(this.input.key_get(BUG_SWITCH, true))
+    this.bug_switch(BUG_SELECT_NEXT);
+  else if(this.input.key_get(BUG_SELECT_1, true))
+    this.bug_switch(0);
+  else if(this.input.key_get(BUG_SELECT_2, true))
+    this.bug_switch(1);
+  else if(this.input.key_get(BUG_SELECT_3, true))
+    this.bug_switch(2);
+  else if(this.input.key_get(BUG_SELECT_4, true))
+    this.bug_switch(3);
+  else if(this.input.key_get(BUG_SELECT_5, true))
+    this.bug_switch(4);
 }
 
 Game.prototype.game_loop = function() 
@@ -324,7 +324,6 @@ Game.prototype.bug_move = function(direction)
 }
 
 Game.prototype.bug_switch = function(number)
-{
-  var player = number || BUG_SELECT_NEXT;  
-  this.level.player_switch(player);
+{  
+  this.level.player_switch(number);
 }

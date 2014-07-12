@@ -32,7 +32,7 @@ var BUG_MOVE_UP     = KeyEvent.DOM_VK_UP
 var BUG_MOVE_DOWN   = KeyEvent.DOM_VK_DOWN
 var BUG_MOVE_RIGHT  = KeyEvent.DOM_VK_RIGHT
 var BUG_MOVE_LEFT   = KeyEvent.DOM_VK_LEFT
-var BUG_SWITCH      = KeyEvent.DOM_VK_TAB
+var BUG_SWITCH      = KeyEvent.DOM_VK_SPACE
 
 var BUG_SELECT_1    = KeyEvent.DOM_VK_1
 var BUG_SELECT_2    = KeyEvent.DOM_VK_2
@@ -52,9 +52,13 @@ function Input()
   document.onkeyup = handleKeyUp;
 }
 
-Input.prototype.key_get = function(keyCode)
+Input.prototype.key_get = function(keyCode, clear)
 {
-  return(this.key[keyCode] != undefined && this.key[keyCode]);
+  var ret = (this.key[keyCode] != undefined && this.key[keyCode]);
+  if(ret && (clear || 0)) {
+    this.key[keyCode] = false;
+  }
+  return ret;
 }
 
 function handleKeyDown(event)

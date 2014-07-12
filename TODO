@@ -1,6 +1,8 @@
 - player switch
 - active player mark
 
+- stone animation -> holt move key, bug steps back
+
 - item_diff_set (level manipulation) - draw after all changes
 - scene hierrachy - propper layer rendering (floor & etc)
 - fast animation (movement) + anim blast slow?

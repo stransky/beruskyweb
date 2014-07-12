@@ -106,7 +106,7 @@ level_load_callback = function() {
   loaded_level.music = data[31];
 
   var player_rotations = Array();
-  for(var i = 0; i < 5; i++) {
+  for(var i = 0; i < PLAYER_MAX; i++) {
     player_rotations[i] = data[32+i];
   }
 
@@ -134,8 +134,6 @@ level_load_callback = function() {
   loaded_level.floor = Array();
   loaded_level.level = Array();
   loaded_level.players = Array();
-  
-  loaded_level.player_active.number = 6;
   
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
@@ -228,7 +226,7 @@ function Level(graph) {
   this.keys_final = 0;
   
   this.player_table = new Array();
-  for(var i = 0; i < 5; i++) {
+  for(var i = 0; i < PLAYER_MAX; i++) {
     this.player_table[i] = new Player();
     this.player_table[i].number = i;
   }
@@ -262,7 +260,7 @@ Level.prototype.item_is_empty = function(x,y) {
 Level.prototype.cell_get = function(x, y, layer)
 {
   var cell;
-  switch (layer || LAYER_LEVEL) {
+  switch (layer) {
   case (LAYER_FLOOR):
     cell = this.floor[level_index(x,y)];
     break;
@@ -288,7 +286,7 @@ Level.prototype.cell_draw = function(cell, x, y)
 
 Level.prototype.item_draw = function(x, y, layer)
 {
-  var cell = cell_get(x,y,layer||LAYER_LEVEL);
+  var cell = cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     this.cell_draw(cell,x,y);
   }
@@ -298,7 +296,7 @@ Level.prototype.item_draw = function(x, y, layer)
 // unregister sprite and so
 Level.prototype.item_remove = function(x, y, layer)
 {
-  var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
+  var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
     if(cell.sprite_handle) {
@@ -313,10 +311,10 @@ Level.prototype.item_remove = function(x, y, layer)
 Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 {
   this.item_remove(nx, ny, layer);
-  
-  var cell_old = this.cell_get(ox,oy,layer||LAYER_LEVEL);
+
+  var cell_old = this.cell_get(ox,oy,layer);
   if(cell_old.item != NO_ITEM) {
-    var cell_new = this.cell_get(nx,ny,layer||LAYER_LEVEL);
+    var cell_new = this.cell_get(nx,ny,layer);
     cell_new.copy(cell_old);
     cell_old.item = NO_ITEM;
     this.cell_draw(cell_new, nx, ny);
@@ -325,7 +323,7 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 
 Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
 { 
-  var cell = this.cell_get(x,y,layer||LAYER_LEVEL);
+  var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     cell.diff_x = dx;
     cell.diff_y = dy;
@@ -373,5 +371,22 @@ Level.prototype.render = function(repository) {
 
 Level.prototype.player_switch = function(number)
 {
-TODO
+  if(number == BUG_SELECT_NEXT) {
+    var p = this.player_active.number;
+    do {
+      p = p+1;
+      if(p >= PLAYER_MAX)
+        p = 0;
+
+      if(this.player_table[p].active) {
+        number = p;
+        break;
+      }
+
+    } while(this.player_table[p].number != this.player_active.number);
+  }
+
+  if(this.player_table[number].active) {
+    this.player_active = this.player_table[number];
+  }
 }
