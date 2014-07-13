@@ -113,13 +113,14 @@ Game.prototype.game_loop = function()
 // Load the game
 Game.prototype.level_load = function(name) 
 {
-  this.level.load(name);  
+  this.level.load(name);
 }
 
 // Animate bug movement
 Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
 {
   var player = this.level.player_active;
+
   var x = player.x;
   var y = player.y;
 
@@ -229,8 +230,8 @@ Game.prototype.bug_move = function(direction)
 {
   var player = this.level.player_active;
   if(player.is_moving)
-    return;    
-  player.is_moving = true;
+    return;
+  player.is_moving = 1;
 
   var nx = player.x;
   var ny = player.y;
@@ -289,6 +290,7 @@ Game.prototype.bug_move = function(direction)
       if(player.matocks) {
         this.animation_stone_explosion(cell.variant, direction, nx, ny);
         player.matocks--;
+        return;
       }
       break;
     case P_KEY:
@@ -315,16 +317,17 @@ Game.prototype.bug_move = function(direction)
       {
         this.animation_bug_move(direction, nx, ny, true);
         player.key_color++;
+        return;
       }
       break;
     default:
       break;
   }
-    
+
   player.is_moving = false;
 }
 
 Game.prototype.bug_switch = function(number)
-{  
-  this.level.player_switch(number);  
+{
+  this.level.player_switch(number);
 }
