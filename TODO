@@ -1,7 +1,9 @@
-TODO ->FIRST_CURSOR - draw a cursor
+- implement fonts
 
-- player switch
-- active player mark
+- draw upper bug bar
+- number of steps
+
+- remove unused sprites (rotated)
 
 - stone animation -> holt move key, bug steps back
 
@@ -18,3 +20,6 @@ TODO ->FIRST_CURSOR - draw a cursor
 - fps -> 30/60?
 
 - static sprites?
+
+Implement items:
+  - exit, keys...

@@ -31,6 +31,11 @@ function Graph() {
   this.sprites_to_load = 0;
   this.sprites_loaded = 0;  
   this.font_table = Array();
+  
+  this.font_ax = 0;
+  this.font_ay = 0;
+  this.font_sx = 0;
+  this.font_sy = 0;
 }
 
 Graph.prototype.render = function() {  
@@ -162,6 +167,30 @@ Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
   font.sprite_first = sprite_first;
   font.sprite_num = sprite_num;
   font.load("data/Graphics/font" + font_num + ".tab");
+}
+
+Graph.prototype.font_string_width_get = function(string)
+{
+
+}
+
+Graph.prototype.font_start_set = function(tpos x, tpos y)
+{
+  this.font_ax = this.font_sx = x; 
+  this.font_ay = this.font_sy = y;
+  this.font_offset_x = 0;
+  this.font_offset_y = 0;
+}
+
+Graph.prototype.font_set = function(font)
+{
+
+}
+
+Graph.prototype.print = function(text)
+{
+
+
 }
 
 function FontTable() {

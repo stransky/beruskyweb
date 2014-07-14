@@ -329,5 +329,9 @@ Game.prototype.bug_move = function(direction)
 
 Game.prototype.bug_switch = function(number)
 {
+  if(this.level.player_active.is_moving) {
+    return;
+  }
+
   this.level.player_switch(number);
 }
