@@ -105,12 +105,18 @@ Graph.prototype.sprite_load = function(file, position)
 
 // Draws sprite at specified location and returns handle to 
 // displayed object
-Graph.prototype.sprite_insert = function(spr)
+Graph.prototype.sprite_insert = function(spr, x, y)
 {
   var sprite = new PIXI.Sprite(this.sprites[spr]);
   sprite.anchor.x = 0.5;
   sprite.anchor.y = 0.5;
   this.stage.addChild(sprite);
+
+  if(x !== undefined && y !== undefined) {
+    sprite.position.x = x+(sprite.width/2);
+    sprite.position.y = y+(sprite.height/2);
+  }
+
   return(sprite);
 }
 
@@ -174,7 +180,7 @@ Graph.prototype.font_string_width_get = function(string)
 
 }
 
-Graph.prototype.font_start_set = function(tpos x, tpos y)
+Graph.prototype.font_start_set = function(x, y)
 {
   this.font_ax = this.font_sx = x; 
   this.font_ay = this.font_sy = y;

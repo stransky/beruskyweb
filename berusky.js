@@ -111,7 +111,7 @@ Game.prototype.game_loop = function()
 }
 
 // Load the game
-Game.prototype.level_load = function(name) 
+Game.prototype.level_load = function(name)
 {
   this.level.load(name);
 }
@@ -297,6 +297,7 @@ Game.prototype.bug_move = function(direction)
       if(this.level.keys_final < 5) {
         this.animation_bug_move(direction, nx, ny, true);
         this.level.keys_final++;
+        this.level.panel_draw_keys();
         return;
       }
       break;

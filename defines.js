@@ -202,6 +202,23 @@ var ANIM_MOVE_FRAMES_FAST     = 4
 
 var FAST_ANIMATION_SHIFT      = 15
 
+var FIRST_KEY                 = (FIRST_OTHER+4)
+var X_KEYS_POSITION           = 550
+var Y_KEYS_POSITION           = 0
+
+var PLAYER_ITEM               = 1
+var PLAYER_HAND               = 3
+
+var PANEL_X_OFFSET            = (40 + (46 / 2))
+var PANEL_Y_OFFSET            =  2
+
+var PANEL_X_SIZE              = 29
+var PANEL_X_SIZE_2            = (2*PANEL_X_SIZE+10)
+var PANEL_Y_SIZE              = 40
+
+var PANEL_DIFF                = 100
+var PLAYER_MASK               = FIRST_OTHER+56
+
 // -------------------------------------------------------
 // Animation flags
 // -------------------------------------------------------

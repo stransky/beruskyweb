@@ -178,14 +178,77 @@ level_load_callback = function() {
 }
 
 // Active player info
-function Player() {
+function Player(num) {
   this.active = false;
   this.is_moving = false; // there's a running player animation  
   this.key_color = 0;
   this.matocks = 0;
-  this.number = 0;
+  this.number = num;
   this.x = 0;
   this.y = 0;
+  
+  this.ls = Array();
+  this.rs = Array();
+
+  switch(this.number) {
+    case 0:
+      this.ls[0] = FIRST_OTHER + 48;
+      this.ls[1] = FIRST_OTHER + 49;
+      this.ls[2] = FIRST_OTHER + 52;
+      this.ls[3] = FIRST_OTHER + 53;
+      this.rs[0] = FIRST_OTHER + 50;
+      this.rs[1] = FIRST_OTHER + 51;
+      this.rs[2] = FIRST_OTHER + 54;
+      this.rs[3] = FIRST_OTHER + 55;
+      break;
+    case 1:
+      this.ls[0] = FIRST_OTHER + 16;
+      this.ls[1] = FIRST_OTHER + 17;
+      this.ls[2] = FIRST_OTHER + 44;
+      this.ls[3] = FIRST_OTHER + 45;
+      this.rs[0] = FIRST_OTHER + 24;
+      this.rs[1] = FIRST_OTHER + 25;
+      this.rs[2] = FIRST_OTHER + 46;
+      this.rs[3] = FIRST_OTHER + 47;
+      break;
+    case 2:
+      this.ls[0] = FIRST_OTHER + 22;
+      this.ls[1] = FIRST_OTHER + 23;
+      this.ls[2] = FIRST_OTHER + 20;
+      this.ls[3] = FIRST_OTHER + 21;
+      this.rs[0] = FIRST_OTHER + 18;
+      this.rs[1] = FIRST_OTHER + 19;
+      this.rs[2] = FIRST_OTHER + 26;
+      this.rs[3] = FIRST_OTHER + 27;
+      break;
+    case 3:
+      this.ls[0] = FIRST_OTHER + 36;
+      this.ls[1] = FIRST_OTHER + 37;
+      this.ls[2] = FIRST_OTHER + 40;
+      this.ls[3] = FIRST_OTHER + 41;
+      this.rs[0] = FIRST_OTHER + 38;
+      this.rs[1] = FIRST_OTHER + 39;
+      this.rs[2] = FIRST_OTHER + 42;
+      this.rs[3] = FIRST_OTHER + 43;
+      break;
+    case 4:
+      this.ls[0] = FIRST_OTHER + 28;
+      this.ls[1] = FIRST_OTHER + 29;
+      this.ls[2] = FIRST_OTHER + 32;
+      this.ls[3] = FIRST_OTHER + 33;
+      this.rs[0] = FIRST_OTHER + 30;
+      this.rs[1] = FIRST_OTHER + 31;
+      this.rs[2] = FIRST_OTHER + 34;
+      this.rs[3] = FIRST_OTHER + 35;
+      break;
+  }
+
+  this.a_ls = PLAYER_HAND;
+  this.a_rs = PLAYER_HAND;
+  
+  this.sprite_ls = false;
+  this.sprite_rs = false;
+  this.sprite_mask = false;
 }
 
 function LevelItem() {
@@ -228,11 +291,11 @@ function Level(graph) {
   
   this.player_table = new Array();
   for(var i = 0; i < PLAYER_MAX; i++) {
-    this.player_table[i] = new Player();
-    this.player_table[i].number = i;
+    this.player_table[i] = new Player(i);
   }
     
-  this.player_active = this.player_table[4];
+  this.player_active = this.player_table[4];  
+  this.sprite_key = false;
 }
 
 Level.prototype.is_loaded = function() {
@@ -346,9 +409,9 @@ Level.prototype.is_rendered = function()
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
-  this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND);
-  this.graph.sprite_move(this.background_sprite, LEVEL_SCREEN_START_X,
-                                                 LEVEL_SCREEN_START_Y);
+  this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND,
+                                                    LEVEL_SCREEN_START_X,
+                                                    LEVEL_SCREEN_START_Y);
 
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
@@ -376,10 +439,13 @@ Level.prototype.render = function(repository) {
 
   this.rendered = true;  
   this.player_cursor_set_draw(true);
+  this.panel_draw();
 }
 
 Level.prototype.player_switch = function(number)
 {
+  var player_old = this.player_active.number;
+
   if(number == BUG_SELECT_NEXT) {
     var p = this.player_active.number;
     do {
@@ -395,10 +461,15 @@ Level.prototype.player_switch = function(number)
     } while(this.player_table[p].number != this.player_active.number);
   }
 
-  if(this.player_table[number].active) {
-    this.player_cursor_set_draw(false);
-    this.player_active = this.player_table[number];
-    this.player_cursor_set_draw(true);
+  if(player_old != number) {
+    if(this.player_table[number].active) {
+      this.player_cursor_set_draw(false);
+      this.player_active = this.player_table[number];
+      this.player_cursor_set_draw(true);
+    }
+
+    this.panel_draw_player(player_old);
+    this.panel_draw_player(number);
   }
 }
 
@@ -413,5 +484,61 @@ Level.prototype.player_cursor_set_draw = function(draw)
   else if(!draw && this.player_mark_cursor) {
     this.graph.sprite_remove(this.player_mark_cursor);
     this.player_mark_cursor = 0;
+  }
+}
+
+Level.prototype.panel_draw_player = function(num)
+{
+  var player = this.player_table[num];
+
+  var x = PANEL_X_OFFSET + (num * PANEL_DIFF);
+
+  var s1 = player.a_ls;
+  var s2 = player.a_rs;
+
+  var active = (num == this.player_active.number);
+
+  // Draw selected player
+  if(active) {
+    s1--;
+    s2--;
+  }
+
+  var sx = x - PANEL_X_SIZE;
+  var sy = 0;
+  var dx = PANEL_X_SIZE_2;
+  var dy = PANEL_Y_SIZE;
+
+  if(player.sprite_ls)
+    this.graph.sprite_remove(player.sprite_ls);
+  if(player.sprite_rs)
+    this.graph.sprite_remove(player.sprite_rs);
+
+  player.sprite_ls = this.graph.sprite_insert(player.ls[s1], sx, 0);
+  player.sprite_rs = this.graph.sprite_insert(player.rs[s2], x, 0);
+
+  if(player.sprite_mask) {
+    this.graph.sprite_remove(player.sprite_rs);
+    player.sprite_mask = false;
+  }
+  if(!player.active) {
+    player.sprite_mask = this.graph.sprite_insert(PLAYER_MASK, x - 23, 2);
+  }
+}
+
+Level.prototype.panel_draw = function()
+{
+  for(var i = 0; i < PLAYER_MAX; i++) {
+    this.panel_draw_player(i);
+  }
+}
+
+Level.prototype.panel_draw_keys = function()
+{
+  if(this.keys_final > 0 && this.keys_final <= 5) {
+    if(this.sprite_key)
+      this.graph.sprite_remove(this.sprite_key);
+  
+    this.sprite_key = this.graph.sprite_insert(FIRST_KEY + this.keys_final, X_KEYS_POSITION, Y_KEYS_POSITION);
   }
 }
