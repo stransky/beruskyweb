@@ -251,6 +251,38 @@ function Player(num) {
   this.sprite_mask = false;
 }
 
+Player.prototype.key_color_add = function()
+{
+  this.key_color++;
+  this.a_rs = PLAYER_ITEM;
+  return(this.key_color == 1);
+}
+
+Player.prototype.key_color_remove = function()
+{
+  this.key_color--;
+  if(!this.key_color) {
+    this.a_rs = PLAYER_HAND;
+    return(true);
+  }
+}
+
+Player.prototype.mattock_add = function()
+{
+  this.matocks++;
+  this.a_ls = PLAYER_ITEM;
+  return(this.matocks == 1);
+}
+
+Player.prototype.mattock_remove = function()
+{
+  this.matocks--;
+  if(!this.matocks) {
+    this.a_ls = PLAYER_HAND;
+    return(true);
+  }
+}
+
 function LevelItem() {
   this.item = NO_ITEM;
   this.variant = 0;

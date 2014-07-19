@@ -289,7 +289,9 @@ Game.prototype.bug_move = function(direction)
     case P_STONE:
       if(player.matocks) {
         this.animation_stone_explosion(cell.variant, direction, nx, ny);
-        player.matocks--;
+        if(player.mattock_remove()) {
+          this.level.panel_draw_player(player.number);
+        }
         return;
       }
       break;
@@ -304,7 +306,9 @@ Game.prototype.bug_move = function(direction)
     case P_MATTOCK:
       if(player.matocks < PLAYER_MAX_MATTLOCKS) {
         this.animation_bug_move(direction, nx, ny, true);
-        player.matocks++;
+        if(player.mattock_add()) {
+          this.level.panel_draw_player(player.number);
+        }
         return;
       }
       break;
@@ -317,7 +321,9 @@ Game.prototype.bug_move = function(direction)
          player.key_color < PLAYER_MAX_KEYS) 
       {
         this.animation_bug_move(direction, nx, ny, true);
-        player.key_color++;
+        if(player.key_color_add()) {
+          this.level.panel_draw_player(player.number);
+        }
         return;
       }
       break;
