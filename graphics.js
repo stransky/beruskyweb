@@ -123,7 +123,7 @@ Graph.prototype.sprite_insert = function(spr, x, y)
 Graph.prototype.sprite_move = function(sprite_handle, x, y)
 {  
   sprite_handle.position.x = x+(sprite_handle.width/2);
-  sprite_handle.position.y = y+(sprite_handle.height/2);  
+  sprite_handle.position.y = y+(sprite_handle.height/2);
   return(sprite_handle);
 }
 
@@ -163,6 +163,7 @@ Graph.prototype.init = function()
   for(var i = 0; i < FONT_NUM; i++) {
     this.load_font(i, FIRST_FONT + i*FONT_STEP, FONT_SPRITES);
   }
+  this.font_set(0);
 }
 
 Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
@@ -175,11 +176,6 @@ Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
   font.load("data/Graphics/font" + font_num + ".tab");
 }
 
-Graph.prototype.font_string_width_get = function(string)
-{
-
-}
-
 Graph.prototype.font_start_set = function(x, y)
 {
   this.font_ax = this.font_sx = x; 
@@ -190,18 +186,45 @@ Graph.prototype.font_start_set = function(x, y)
 
 Graph.prototype.font_set = function(font)
 {
-
+  this.font = this.font_table[font];
 }
 
 Graph.prototype.print = function(text)
 {
+  // font_ax, font_ax - start of the string
+  // text - chars to print
+  // returns pointer to the first char (sprite)  
+  var sprite_first;
+  var local_x = 0;
+  var local_y = 0;
 
-
+  for(var i = 0; i < text.length; i++) {
+    var spr = this.sprite_insert(this.font.sprite_char_get(text[i]));
+    
+    if(!i) {
+      this.sprite_move(spr, this.font_ax, this.font_ay);
+      sprite_first = spr;
+      local_x -= spr.anchor.x*spr.width;
+      local_y -= spr.anchor.y*spr.height;
+    }
+    else {
+      this.sprite_move(spr, local_x, local_y);
+      sprite_first.addChild(spr);
+    }
+    
+    this.font_ax += spr.width;
+    local_x += spr.width;
+  }
+  
+  return(sprite_first);
 }
 
-function FontTable() {
+function FontTable(graph) {
+  this.graph = graph;
+  
   this.position = Array();
   this.loaded = false;
+  
   this.sprite_first = 0;
   this.sprite_num = 0;
 }
@@ -222,4 +245,9 @@ FontTable_load_callback = function()
 FontTable.prototype.load = function(file)
 {
   load_file_text(file, FontTable_load_callback, this);
+}
+
+FontTable.prototype.sprite_char_get = function(c)
+{  
+  return(this.sprite_first + this.position[c]);
 }

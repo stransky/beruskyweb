@@ -1,7 +1,11 @@
 #!/bin/bash
 # Usage conv file.name
 
-TRANSPARENT_COLOR='#a56a6a'
+# for in-game sprites
+#TRANSPARENT_COLOR='#a56a6a'
+
+# Font sprites
+TRANSPARENT_COLOR='#ffffff'
 
 while [ "$#" != "0" ]; do
 	FILENAME=$1

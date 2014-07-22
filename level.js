@@ -486,6 +486,8 @@ Level.prototype.render = function(repository) {
   this.rendered = true;  
   this.player_cursor_set_draw(true);
   this.panel_draw();
+  
+  this.graph.print("Hello!");
 }
 
 Level.prototype.player_switch = function(number)
