@@ -1,8 +1,7 @@
 - interactive - set na false pro sprity!!
-- implement fonts
+  + interactive support for players, upper panel
 
 - number of steps
-
 - remove unused sprites (rotated)
 
 - stone animation -> holt move key, bug steps back
