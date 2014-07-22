@@ -441,6 +441,8 @@ Level.prototype.is_rendered = function()
 
 // Render the level on screen
 Level.prototype.render = function(repository) {
+  /* We need to render the level layer to keep correct order of sprites
+  */
   this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND,
                                                     LEVEL_SCREEN_START_X,
                                                     LEVEL_SCREEN_START_Y);
@@ -454,14 +456,26 @@ Level.prototype.render = function(repository) {
         cell.sprite_handle = this.graph.sprite_insert(repository.get_sprite(cell.item, cell.variant));
         this.cell_draw(cell, x, y);
       }
+    }
+  }
 
-      cell = this.level[index];
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
+      var index = level_index(x,y);
+      
+      var cell = this.level[index];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
         cell.sprite_handle = this.graph.sprite_insert(repository.get_sprite(cell.item, cell.variant));
         this.cell_draw(cell, x, y);
       }
-
-      cell = this.players[index];
+    }
+  }
+  
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
+      var index = level_index(x,y);
+      
+      var cell = this.players[index];
       if(cell.item != NO_ITEM) {
         cell.sprite_handle = this.graph.sprite_insert(FIRST_PLAYER+cell.item*FIRST_PLAYER_STEP);
         this.cell_draw(cell, x, y);
