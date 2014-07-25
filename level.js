@@ -462,7 +462,7 @@ Level.prototype.render = function(repository) {
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var index = level_index(x,y);
-      
+
       var cell = this.level[index];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
         cell.sprite_handle = this.graph.sprite_insert(repository.get_sprite(cell.item, cell.variant));
@@ -470,11 +470,11 @@ Level.prototype.render = function(repository) {
       }
     }
   }
-  
+
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var index = level_index(x,y);
-      
+
       var cell = this.players[index];
       if(cell.item != NO_ITEM) {
         cell.sprite_handle = this.graph.sprite_insert(FIRST_PLAYER+cell.item*FIRST_PLAYER_STEP);
@@ -483,11 +483,9 @@ Level.prototype.render = function(repository) {
     }
   }
 
-  this.rendered = true;  
+  this.rendered = true;
   this.player_cursor_set_draw(true);
   this.panel_draw();
-  
-  this.graph.print("Hello!");
 }
 
 Level.prototype.player_switch = function(number)

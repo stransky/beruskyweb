@@ -25,6 +25,18 @@
  *
  */
 
+var GAME_RESOLUTION_X        = 640
+var GAME_RESOLUTION_Y        = 480
+
+var LEVEL_SCREEN_START_X     = 0
+var LEVEL_SCREEN_START_Y     = 40
+
+var LEVEL_RESOLUTION_X       = 640
+var LEVEL_RESOLUTION_Y       = 420
+
+var CELL_SIZE_X              = 20
+var CELL_SIZE_Y              = 20
+
 /* Main game items */
 var NO_ITEM                  = 65535 // -1 by uint16
 
@@ -218,6 +230,8 @@ var PANEL_Y_SIZE              = 40
 
 var PANEL_DIFF                = 100
 var PLAYER_MASK               = FIRST_OTHER+56
+
+var SPRITE_MATOCK             = (FIRST_GLOBAL_LEVEL+6)
 
 // -------------------------------------------------------
 // Animation flags

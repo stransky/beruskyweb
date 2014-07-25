@@ -32,6 +32,48 @@ var MOVE_DOWN   = 2
 var MOVE_LEFT   = 3
 var MOVE_RIGHT  = 4
 
+function StepStatus() {
+  this.steps = 0;
+  this.sprites = 0;
+}
+
+StepStatus.prototype.add = function()
+{
+  this.steps++;
+  
+}
+
+var LOW_PANEL_MAT_X    = 0
+var LOW_PANEL_MAT_Y    = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
+var LOW_PANEL_MAT_DX   = (GAME_RESOLUTION_X / 2)
+var LOW_PANEL_MAT_DY   = 20
+
+function MattockStatus(graph) {
+  this.graph = graph;
+  this.mattocks = 0;
+  this.sprites = Array();
+}
+
+MattockStatus.prototype.update = function(player)
+{
+  if(this.mattocks != player.matocks) {
+    if(this.mattocks < player.matocks) {
+      // Add someone
+      for(var i = this.mattocks; i < player.matocks; i++) {
+        this.sprites[i] = this.graph.sprite_insert(SPRITE_MATOCK,
+                                                   LOW_PANEL_MAT_X+i*CELL_SIZE_X,
+                                                   LOW_PANEL_MAT_Y);
+      }
+    }
+    else {
+      // Remove someone
+      for(var i = player.matocks; i < this.mattocks; i++) {
+        this.graph.sprite_remove(this.sprites[i]);
+      }
+    }
+    this.mattocks = player.matocks;
+  }
+}
 
 function Game() {
   this.graph = new Graph();
@@ -45,6 +87,8 @@ function Game() {
   this.input = new Input(this);
   
   this.anim = new GameAnimationEngine(this.level);
+
+  this.mattock_panel = new MattockStatus(this.graph);
 
   this.loaded = false;
 }
@@ -292,6 +336,7 @@ Game.prototype.bug_move = function(direction)
         if(player.mattock_remove()) {
           this.level.panel_draw_player(player.number);
         }
+        this.mattock_panel.update(player);
         return;
       }
       break;
@@ -309,6 +354,7 @@ Game.prototype.bug_move = function(direction)
         if(player.mattock_add()) {
           this.level.panel_draw_player(player.number);
         }
+        this.mattock_panel.update(player);
         return;
       }
       break;
@@ -341,4 +387,5 @@ Game.prototype.bug_switch = function(number)
   }
 
   this.level.player_switch(number);
+  this.mattock_panel.update(this.level.player_active);
 }

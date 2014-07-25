@@ -1,6 +1,10 @@
 - interactive - set na false pro sprity!!
   + interactive support for players, upper panel
 
+  this.graph.print("Hello!");
+
+- draw line od mattock on bottom side
+
 - number of steps
 - remove unused sprites (rotated)
 
@@ -15,6 +19,7 @@
 - stone animation, keys....
 
 - Add a key animations? (New)
+
 
 - fps -> 30/60?
 
