@@ -32,7 +32,11 @@ var MOVE_DOWN   = 2
 var MOVE_LEFT   = 3
 var MOVE_RIGHT  = 4
 
-function StepStatus() {
+var LOW_PANEL_STP_X_TEXT = (GAME_RESOLUTION_X - 5)
+var LOW_PANEL_STP_Y      = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
+
+function StepStatus(graph) {
+  this.graph = graph;
   this.steps = 0;
   this.sprites = 0;
 }
@@ -41,12 +45,16 @@ StepStatus.prototype.add = function()
 {
   this.steps++;
   
+  this.graph.font_start_set(LOW_PANEL_STP_X_TEXT, LOW_PANEL_STP_Y);
+  this.graph.font_align_set(ALIGN_RIGHT);
+  if(this.sprites) {
+    this.graph.sprite_remove(this.sprites);
+  }
+  this.sprites = this.graph.print("steps: " + this.steps);
 }
 
 var LOW_PANEL_MAT_X    = 0
 var LOW_PANEL_MAT_Y    = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
-var LOW_PANEL_MAT_DX   = (GAME_RESOLUTION_X / 2)
-var LOW_PANEL_MAT_DY   = 20
 
 function MattockStatus(graph) {
   this.graph = graph;
@@ -89,6 +97,7 @@ function Game() {
   this.anim = new GameAnimationEngine(this.level);
 
   this.mattock_panel = new MattockStatus(this.graph);
+  this.steps_panel = new StepStatus(this.graph);
 
   this.loaded = false;
 }
@@ -194,6 +203,7 @@ Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
   this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
   this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);  
   this.level.player_cursor_set_draw(false);
+  this.steps_panel.add();
 }
 
 Game.prototype.animation_bug_move_end = function(data)

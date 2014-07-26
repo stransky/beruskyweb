@@ -25,6 +25,13 @@
  *
  */
 
+function Rect() {
+  this.x = 0;
+  this.y = 0;
+  this.width = 0;
+  this.height = 0;
+}
+
 function Graph() {
   // Game sprites (a.k.a textures in PIXI terminology)
   this.sprites = Array();
@@ -34,8 +41,7 @@ function Graph() {
   
   this.font_ax = 0;
   this.font_ay = 0;
-  this.font_sx = 0;
-  this.font_sy = 0;
+  this.font_align = ALIGN_LEFT;
 }
 
 Graph.prototype.render = function() {  
@@ -178,10 +184,8 @@ Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
 
 Graph.prototype.font_start_set = function(x, y)
 {
-  this.font_ax = this.font_sx = x; 
-  this.font_ay = this.font_sy = y;
-  this.font_offset_x = 0;
-  this.font_offset_y = 0;
+  this.font_ax = x; 
+  this.font_ay = y;
 }
 
 Graph.prototype.font_set = function(font)
@@ -189,20 +193,43 @@ Graph.prototype.font_set = function(font)
   this.font = this.font_table[font];
 }
 
+Graph.prototype.font_align_set = function(align)
+{
+  this.font_align = align;
+}
+
+Graph.prototype.text_size_get = function(text)
+{
+  var r = new Rect();
+
+  r.height = this.sprites[this.font.sprite_char_get(text[0])].height;
+  for(var i = 0; i < text.length; i++) {
+    r.width += this.sprites[this.font.sprite_char_get(text[i])].width;
+  }
+
+  return(r);
+}
+
 Graph.prototype.print = function(text)
 {
-  // font_ax, font_ax - start of the string
-  // text - chars to print
-  // returns pointer to the first char (sprite)  
+  var font_ax = this.font_ax;
+  var font_ay = this.font_ay;
+
+  if(this.font_align = ALIGN_RIGHT) {
+    font_ax -= this.text_size_get(text).width;
+  } else if(this.font_align = ALIGN_CENTER) {
+  
+  }
+
   var sprite_first;
   var local_x = 0;
   var local_y = 0;
 
   for(var i = 0; i < text.length; i++) {
     var spr = this.sprite_insert(this.font.sprite_char_get(text[i]));
-    
+
     if(!i) {
-      this.sprite_move(spr, this.font_ax, this.font_ay);
+      this.sprite_move(spr, font_ax, font_ay);
       sprite_first = spr;
       local_x -= spr.anchor.x*spr.width;
       local_y -= spr.anchor.y*spr.height;
@@ -211,11 +238,10 @@ Graph.prototype.print = function(text)
       this.sprite_move(spr, local_x, local_y);
       sprite_first.addChild(spr);
     }
-    
-    this.font_ax += spr.width;
+
     local_x += spr.width;
   }
-  
+
   return(sprite_first);
 }
 

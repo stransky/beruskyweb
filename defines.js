@@ -233,6 +233,10 @@ var PLAYER_MASK               = FIRST_OTHER+56
 
 var SPRITE_MATOCK             = (FIRST_GLOBAL_LEVEL+6)
 
+var ALIGN_LEFT                = 0
+var ALIGN_RIGHT               = 1
+var ALIGN_CENTER              = 2
+
 // -------------------------------------------------------
 // Animation flags
 // -------------------------------------------------------
