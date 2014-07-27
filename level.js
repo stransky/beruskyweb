@@ -311,8 +311,9 @@ LevelItem.prototype.copy = function(template)
   this.diff_y = template.diff_y;
 }
 
-function Level(graph) {
+function Level(graph, repo) {
   this.graph = graph;
+  this.repo = repo;
   this.name = "a.lv3";
   this.loaded = false;
   this.background_sprite = 0;
@@ -372,8 +373,12 @@ Level.prototype.cell_get = function(x, y, layer)
   return(cell);
 }
 
-Level.prototype.cell_draw = function(cell, x, y)
+Level.prototype.cell_draw = function(cell, x, y, reset_sprite)
 {  
+  if(reset_sprite != undefined && reset_sprite) {
+    cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item, 
+                                                                  cell.variant));
+  }
   this.graph.sprite_move(cell.sprite_handle,
                          cell.diff_x + LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                          cell.diff_y + LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
@@ -440,7 +445,7 @@ Level.prototype.is_rendered = function()
 }
 
 // Render the level on screen
-Level.prototype.render = function(repository) {
+Level.prototype.render = function() {
   /* We need to render the level layer to keep correct order of sprites
   */
   this.background_sprite = this.graph.sprite_insert(FIRST_BACKGROUND,
@@ -453,7 +458,7 @@ Level.prototype.render = function(repository) {
 
       var cell = this.floor[index];
       if(cell.item != NO_ITEM) {        
-        cell.sprite_handle = this.graph.sprite_insert(repository.get_sprite(cell.item, cell.variant));
+        cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item, cell.variant));
         this.cell_draw(cell, x, y);
       }
     }
@@ -465,7 +470,7 @@ Level.prototype.render = function(repository) {
 
       var cell = this.level[index];
       if(cell.item != NO_ITEM && cell.item != P_GROUND) {
-        cell.sprite_handle = this.graph.sprite_insert(repository.get_sprite(cell.item, cell.variant));
+        cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item, cell.variant));
         this.cell_draw(cell, x, y);
       }
     }

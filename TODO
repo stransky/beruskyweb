@@ -1,17 +1,13 @@
+Implement items:
+  - exit, keys...
+  - doors
+
 - interactive - set na false pro sprity!!
-  + interactive support for players, upper panel
+  + interactive support for players, upper panel  
 
-  this.graph.print("Hello!");
-
-- draw line od mattock on bottom side
-
-- number of steps
 - remove unused sprites (rotated)
 
-- stone animation -> holt move key, bug steps back
-
 - item_diff_set (level manipulation) - draw after all changes
-- scene hierrachy - propper layer rendering (floor & etc)
 - fast animation (movement) + anim blast slow?
 - game menu & co - web elements
 
@@ -24,6 +20,3 @@
 - fps -> 30/60?
 
 - static sprites?
-
-Implement items:
-  - exit, keys...

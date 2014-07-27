@@ -91,7 +91,7 @@ function Game() {
 
   this.repo = new ObjectsRepository();
 
-  this.level = new Level(this.graph);
+  this.level = new Level(this.graph, this.repo);
   this.input = new Input(this);
   
   this.anim = new GameAnimationEngine(this.level);
@@ -217,9 +217,49 @@ Game.prototype.animation_bug_move_end = function(data)
 
   var player = data.game.level.player_active;
   player.x = data.nx; player.y = data.ny;
+  
+  // Handle doors
+  var cell = data.game.level.item_get(data.x, data.y);
+  switch(cell.item) {   
+    // Opened one-pass door
+    case P_DV_H_O:      
+      cell.item = P_DV_H_Z;
+      data.game.level.cell_draw(cell, data.x, data.y, true);
+      break;
+    case P_DV_V_O:
+      cell.item = P_DV_V_Z;
+      data.game.level.cell_draw(cell, data.x, data.y, true);
+      break;
+    default:
+      break;
+  }
 
   player.is_moving = false;
 }
+
+/*
+    // One-pass doors
+    case P_DV_H_O:
+      if(dx) {
+        if(p_level->cell_get_variation(px, py, LAYER_ITEMS) == DOOR_VARIATION_CYBER) {
+          event_num += anim_generate(events+event_num, ANIM_DOOR_DV_H, px, py);
+        }
+        event_num += item_set(events+event_num,px,py,LAYER_ITEMS,
+                              P_DV_H_Z,TRUE,TRUE);
+      }
+      break;
+        
+    case P_DV_V_O:
+      if(dy) {
+        if(p_level->cell_get_variation(px, py, LAYER_ITEMS) == DOOR_VARIATION_CYBER) {
+          event_num += anim_generate(events+event_num, ANIM_DOOR_DV_V, px, py);
+        }
+        event_num += item_set(events+event_num,px,py,LAYER_ITEMS,
+                              P_DV_V_Z,TRUE,TRUE);
+      }
+      break;
+
+*/   
 
 // Animate box movement
 Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
@@ -315,7 +355,12 @@ Game.prototype.bug_move = function(direction)
   var cell_next = this.level.item_get(nnx, nny);
 
   switch(cell.item) {
+    // Empty cell
     case NO_ITEM:
+    
+    // Opened one-pass door
+    case P_DV_H_O:
+    case P_DV_V_O:
       this.animation_bug_move(direction, nx, ny);
       return;
     case P_BOX:
