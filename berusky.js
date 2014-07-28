@@ -317,6 +317,32 @@ Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
                    this.animation_stone_explosion_end, data);
 }
 
+Game.prototype.exit_animate = function()
+{
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
+      var cell = this.level.level[level_index(x,y)];
+      if(cell.item == P_EXIT) {
+        if(cell.variant == ANIM_EXIT) {
+        
+        } else {
+          cell.variant = (cell.variant == REV_EXIT) ? cell.variant-1 : cell.variant+1;
+          this.level.cell_draw(cell, x, y, true);
+        }
+      }
+    }
+  }
+}
+
+/*
+if(variant == ANIM_EXIT) {
+  event_num += exit_animate(events+event_num, px, py, LAYER_ITEMS, 0);
+} else {  
+  variant = (variant == REV_EXIT) ? variant-1 : variant+1;
+  event_num += item_variation_set(events+event_num, px, py, LAYER_ITEMS, variant, TRUE);
+}
+*/
+
 // Get an active player
 // Check if we can move
 // Move it
@@ -400,6 +426,9 @@ Game.prototype.bug_move = function(direction)
         this.animation_bug_move(direction, nx, ny, true);
         this.level.keys_final++;
         this.level.panel_draw_keys();
+        if(this.level.keys_final == 5) {
+          this.exit_animate();
+        }
         return;
       }
       break;

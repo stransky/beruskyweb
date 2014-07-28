@@ -237,6 +237,9 @@ var ALIGN_LEFT                = 0
 var ALIGN_RIGHT               = 1
 var ALIGN_CENTER              = 2
 
+var ANIM_EXIT                 = 6
+var REV_EXIT                  = 8
+
 // -------------------------------------------------------
 // Animation flags
 // -------------------------------------------------------
