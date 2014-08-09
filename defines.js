@@ -37,6 +37,9 @@ var LEVEL_RESOLUTION_Y       = 420
 var CELL_SIZE_X              = 20
 var CELL_SIZE_Y              = 20
 
+var LEVEL_CELLS_X            = 32
+var LEVEL_CELLS_Y            = 21
+
 /* Main game items */
 var NO_ITEM                  = 65535 // -1 by uint16
 
@@ -239,6 +242,11 @@ var ALIGN_CENTER              = 2
 
 var ANIM_EXIT                 = 6
 var REV_EXIT                  = 8
+
+var DOOR_VARIATION_CLASSIC    = 0
+var DOOR_VARIATION_CYBER      = 1
+
+var DOOR_FRAMES               = 10
 
 // -------------------------------------------------------
 // Animation flags

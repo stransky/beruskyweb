@@ -27,8 +27,6 @@
 
 var H_LEVEL    = "Level 3 (C) Anakreon 1999"
 var LEVEL_SIZE = 28361
-var LEVEL_CELLS_X = 32
-var LEVEL_CELLS_Y = 21
 
 var LEVEL_LAYER_SIZE = (LEVEL_CELLS_X*LEVEL_CELLS_Y)
 

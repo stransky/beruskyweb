@@ -28,6 +28,7 @@
 /* Game item data
 */
 var GAME_REPO_FILE = "data/GameData/items.dat"
+var GAME_REPO_ANIM_FILE = "data/GameData/items_animation.dat"
 
 function GameObject() {
 
@@ -105,23 +106,54 @@ GameObject.prototype.parse_line = function(line)
   }  
 }
 
+GameObject.prototype.parse_anim_line = function(line)
+{
+  var token_pos = 0;
+  
+  tokens = line.split("\t");
+  for(var i = 0; i < tokens.length; i++) {
+    var token = tokens[i];
+    if(token.length != 0) {
+      // we should have 12 tokens
+      switch(token_pos) {
+        case 0: // item number
+        var tmp = token_translate(token);
+        this.item = tmp.base;
+        this.variant = tmp.offset;
+        break;
+        case 1: // animation
+        this.animation = token_translate(token).num;
+        break;
+        case 2: // animation flags
+        this.flags = token_translate(token).num;
+        break;
+        default:
+        break;
+      }
+      token_pos++;
+    }
+  }  
+}
+
 GameObject.prototype.print = function()
 {
   console.log("GameObject item = " + this.item);
   console.log("  variant:  " + this.variant);
   console.log("  function: " + this.func);
   console.log("  sprite:   " + this.sprite);
+  console.log("  flags:    " + this.flags);
+  console.log("  animation:" + this.animation);
 }
 
 function ObjectsRepository() {
   // Two dimensional arrays of GameObjects
   this.repo = Array();
-  this.loaded = false;
+  this.loaded = 0;
   this.load();
 }
 
 ObjectsRepository.prototype.is_loaded = function() {
-  return(this.loaded);
+  return(this.loaded == 2);
 }
 
 ObjectsRepository_load_callback = function()
@@ -136,6 +168,8 @@ ObjectsRepository_load_callback = function()
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameObject();
       obj.parse_line(tline);
+      // Debug print
+      // obj.print();
       
       if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
         this.callback_object.ObjectsRepository.repo[obj.item] = Array();
@@ -146,12 +180,48 @@ ObjectsRepository_load_callback = function()
   }
   
   console.log("Repository objects loaded = " + loaded);
-  this.callback_object.ObjectsRepository.loaded = true;
+  this.callback_object.ObjectsRepository.loaded++;
+}
+
+ObjectsRepository_load_anim_callback = function()
+{
+  var lines = this.responseText.split("\n");
+  var loaded = 0;
+
+  for(var i = 0; i < lines.length; i++) {
+    var tline = lines[i].trim();
+
+    console.log(tline);
+    if(tline[0] != '#' && tline.length != 0) {
+      var obj = new GameObject();
+      obj.parse_anim_line(tline);
+      // Debug print
+      obj.print();
+      
+      if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
+        throw "ObjectsRepository_load_anim_callback - obj.item is undefined!";
+      
+      if(this.callback_object.ObjectsRepository.repo[obj.item][obj.variant] === undefined)
+        throw "ObjectsRepository_load_anim_callback - obj.variant is undefined!";
+        
+      var tmp = this.callback_object.ObjectsRepository.repo[obj.item][obj.variant];
+      
+      tmp.flags = obj.flags;
+      tmp.animation = obj.animation;
+      
+      loaded++;
+    }
+  }
+  
+  console.log("Repository anim objects loaded = " + loaded);
+  this.callback_object.ObjectsRepository.loaded++;
 }
 
 ObjectsRepository.prototype.load = function()
 {
   load_file_text(GAME_REPO_FILE, ObjectsRepository_load_callback, 
+                 { ObjectsRepository : this });
+  load_file_text(GAME_REPO_ANIM_FILE, ObjectsRepository_load_anim_callback, 
                  { ObjectsRepository : this });
 }
 
@@ -174,13 +244,13 @@ ObjectsRepository.prototype.get_sprite = function(item, variant)
 
 var GAME_ANIM_FILE = "data/GameData/anim.dat"
 
-function GameAnimTemplate() {
+function GameAnimTemplate(flags, frames) {
 
   this.template_handle = 0;
-
-  this.flags = 0;
-
-  this.frame_num = 0;
+  
+  this.flags = (flags == undefined) ? 0 : flags;
+  
+  this.frame_num = (frames == undefined) ? 0 : frames;
   this.frame_correction = 0;
 
   this.dx = 0;
@@ -189,6 +259,27 @@ function GameAnimTemplate() {
   this.sprite_first = 0;
   this.sprite_num = 0;
   this.sprite_step = 0;
+  
+  this.sprite_table = 0;
+  this.delay_table = 0;
+}
+
+GameAnimTemplate.prototype.create_sprite_table = function(frame_num, sprite_table, delay_table)
+
+{
+  this.frame_num = frame_num;
+  this.sprite_table = sprite_table;
+  this.delay_table = delay_table;
+
+  this.sprite_step = 0;
+  this.sprite_first = 0;
+}
+
+GameAnimTemplate.prototype.get_frame_correction = function(position_in_animation)
+{
+  return(GameAnimTemplate.prototype.delay_table ? 
+             GameAnimTemplate.prototype.delay_table[position_in_animation] : 
+             GameAnimTemplate.prototype.frame_correction);
 }
 
 GameAnimTemplate.prototype.parse_line = function(line)
@@ -271,6 +362,7 @@ GameAnimTemplateRepository_load_callback = function()
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
+      // Debug print
       //obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
@@ -286,6 +378,14 @@ GameAnimTemplateRepository.prototype.load = function()
 {
   load_file_text(GAME_ANIM_FILE, GameAnimTemplateRepository_load_callback , 
                  { GameAnimTemplateRepository : this });
+}
+
+GameAnimTemplateRepository.prototype.insert = function(handle, anim)
+{
+  if(this.anim_template[handle] != undefined) {
+    throw "The anim slot is not empty!"
+  }
+  this.anim_template[handle] = anim;  
 }
 
 GameAnimTemplateRepository.prototype.get_object = function(anim_template)

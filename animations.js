@@ -52,7 +52,7 @@ function GameAnimation(template, x, y, layer, rotation, callback, callback_param
 GameAnimation.prototype.start = function()
 {
   this.frame_current = 0;
-  this.frame_correction = this.anim_template.frame_correction;
+  this.frame_correction = this.anim_template.get_frame_correction(0);
   this.position_in_animation = 0;
 }
 
@@ -77,7 +77,7 @@ GameAnimation.prototype.process = function(level)
   if(this.frame_correction) {
     this.frame_correction--;
   } else {
-    this.frame_correction = this.anim_template.frame_correction;
+    this.frame_correction = this.anim_template.get_frame_correction(this.position_in_animation);
 
     var cell = level.cell_get(this.x, this.y, this.layer);
 
@@ -85,7 +85,8 @@ GameAnimation.prototype.process = function(level)
       if(cell.sprite_handle)
         level.graph.sprite_remove(cell.sprite_handle);
 
-      var spr = this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
+      var spr = (this.anim_template.sprite_table) ? this.anim_template.sprite_table[this.position_in_animation] :
+                                                    this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
       cell.sprite_handle = level.graph.sprite_insert(spr);
 
       if(this.rotation != NO_ROTATION) {
@@ -121,13 +122,20 @@ function GameAnimationEngine(level)
   this.anim_running = Array();
 }
 
-GameAnimationEngine.prototype.create = function(template, x, y, layer, rotation, 
-                                                callback, callback_param)
+GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation,
+                                                     callback, callback_param)
 {  
-  var index = this.anim_running.push(new GameAnimation(this.anim_templates.anim_template[template],
+  var index = this.anim_running.push(new GameAnimation(anim,
                                                        x, y, layer, rotation, 
                                                        callback, callback_param));
   return this.anim_running[index - 1];
+}
+
+GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rotation,
+                                                     callback, callback_param)
+{  
+  return(this.create_anim(this.anim_templates.anim_template[template],
+                          x, y, layer, rotation, callback, callback_param));
 }
 
 GameAnimationEngine.prototype.process = function()
@@ -143,4 +151,42 @@ GameAnimationEngine.prototype.process = function()
     }
     i++;
   }
+}
+
+GameAnimationEngine.prototype.generate_anim = function(type)
+{
+  var temp = new GameAnimTemplate(ANIM_SPRITE|ANIM_LOOP, DOOR_FRAMES);
+  
+  var spr_array = Array();
+  var time_array = Array();
+
+  switch(type) {
+    case ANIM_DOOR_ID_H:
+      spr_array[0] = FIRST_CYBER_LEVEL+39;
+      spr_array[1] = FIRST_CYBER_LEVEL+97;
+      break;
+    case ANIM_DOOR_ID_V:
+      spr_array[0] = FIRST_CYBER_LEVEL+30;
+      spr_array[1] = FIRST_CYBER_LEVEL+60;
+      break;
+    case ANIM_DOOR_DV_H:
+      spr_array[0] = FIRST_CYBER_LEVEL+79;
+      spr_array[1] = FIRST_CYBER_LEVEL+76;
+      break;
+    case ANIM_DOOR_DV_V:
+      spr_array[0] = FIRST_CYBER_LEVEL+73;
+      spr_array[1] = FIRST_CYBER_LEVEL+70;
+      break;
+  }
+  
+  for(var i = 3; i < DOOR_FRAMES; i += 2) {
+    spr_array[i-1] = spr_array[i-3];
+    spr_array[i] = spr_array[i-2];
+  }
+  for(var i = 0; i < DOOR_FRAMES; i++) {
+    time_array[i] = (Math.random()*30)+1;
+  }
+
+  temp.create_sprite_table(DOOR_FRAMES, spr_array, time_array);
+  return(temp);
 }

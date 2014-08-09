@@ -118,7 +118,8 @@ Game.prototype.game_load = function()
  
   // Render already loaded level
   if(!this.level.is_rendered()) {
-    this.level.render(this.repo);    
+    this.level.render(this.repo);
+    this.level_animate();
   }
   this.loaded = true;
 }
@@ -200,8 +201,8 @@ Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
   }
 
   var data = { game:this, x:x, y:y, nx:nx, ny:ny, remove_target : (remove_target || 0) };
-  this.anim.create(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
-  this.anim.create(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);  
+  this.anim.create_temp(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
+  this.anim.create_temp(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);  
   this.level.player_cursor_set_draw(false);
   this.steps_panel.add();
 }
@@ -225,10 +226,18 @@ Game.prototype.animation_bug_move_end = function(data)
     case P_DV_H_O:      
       cell.item = P_DV_H_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
+      if(cell.variant == DOOR_VARIATION_CYBER) {
+        data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_H), data.x, data.y,
+                                   LAYER_LEVEL, NO_ROTATION);
+      }
       break;
     case P_DV_V_O:
       cell.item = P_DV_V_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
+      if(cell.variant == DOOR_VARIATION_CYBER) {
+        data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_V), data.x, data.y,
+                                   LAYER_LEVEL, NO_ROTATION);
+      }
       break;
     default:
       break;
@@ -236,30 +245,6 @@ Game.prototype.animation_bug_move_end = function(data)
 
   player.is_moving = false;
 }
-
-/*
-    // One-pass doors
-    case P_DV_H_O:
-      if(dx) {
-        if(p_level->cell_get_variation(px, py, LAYER_ITEMS) == DOOR_VARIATION_CYBER) {
-          event_num += anim_generate(events+event_num, ANIM_DOOR_DV_H, px, py);
-        }
-        event_num += item_set(events+event_num,px,py,LAYER_ITEMS,
-                              P_DV_H_Z,TRUE,TRUE);
-      }
-      break;
-        
-    case P_DV_V_O:
-      if(dy) {
-        if(p_level->cell_get_variation(px, py, LAYER_ITEMS) == DOOR_VARIATION_CYBER) {
-          event_num += anim_generate(events+event_num, ANIM_DOOR_DV_V, px, py);
-        }
-        event_num += item_set(events+event_num,px,py,LAYER_ITEMS,
-                              P_DV_V_Z,TRUE,TRUE);
-      }
-      break;
-
-*/   
 
 // Animate box movement
 Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
@@ -282,7 +267,7 @@ Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
   }
 
   var data = { game:this, x:x, y:y, nx:nx, ny:ny };
-  this.anim.create(anim, x, y, LAYER_LEVEL, NO_ROTATION, this.animation_box_move_end, data);
+  this.anim.create_temp(anim, x, y, LAYER_LEVEL, NO_ROTATION, this.animation_box_move_end, data);
 }
 
 Game.prototype.animation_box_move_end = function(data)
@@ -299,7 +284,7 @@ Game.prototype.animation_box_explosion = function(direction, nx, ny, nnx, nny)
   this.level.item_remove(nnx, nny, LAYER_LEVEL);
 
   var data = { game:this, nx:nx, ny:ny, direction:direction };
-  this.anim.create(ANIM_BLAST, nnx, nny, LAYER_LEVEL, NO_ROTATION);
+  this.anim.create_temp(ANIM_BLAST, nnx, nny, LAYER_LEVEL, NO_ROTATION);
   this.animation_bug_move(data.direction, data.nx, data.ny);
 }
 
@@ -313,7 +298,7 @@ Game.prototype.animation_stone_explosion_end = function(data)
 Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
 {
   var data = { game:this, nx:nx, ny:ny, direction:direction };
-  this.anim.create(ANIM_STONE_1+variant, nx, ny, LAYER_LEVEL, NO_ROTATION,
+  this.anim.create_temp(ANIM_STONE_1+variant, nx, ny, LAYER_LEVEL, NO_ROTATION,
                    this.animation_stone_explosion_end, data);
 }
 
@@ -324,7 +309,7 @@ Game.prototype.exit_animate = function()
       var cell = this.level.level[level_index(x,y)];
       if(cell.item == P_EXIT) {
         if(cell.variant == ANIM_EXIT) {
-        
+          alert("Anim - Todo!");
         } else {
           cell.variant = (cell.variant == REV_EXIT) ? cell.variant-1 : cell.variant+1;
           this.level.cell_draw(cell, x, y, true);
@@ -472,4 +457,25 @@ Game.prototype.bug_switch = function(number)
 
   this.level.player_switch(number);
   this.mattock_panel.update(this.level.player_active);
+}
+
+Game.prototype.level_cell_animate = function(cell, x, y, layer)
+{
+  var obj = this.repo.get_object(cell.item, cell.variant);
+  if(obj.flags&ANIM_TRIGGER_INSERT) {
+    this.anim.create_anim(this.anim.generate_anim(obj.animation), x, y,
+                          layer, NO_ROTATION);
+  }  
+}
+
+Game.prototype.level_animate = function()
+{
+  for(var y = 0; y < LEVEL_CELLS_Y; y++) {
+    for(var x = 0; x < LEVEL_CELLS_X; x++) {
+      var cell = this.level.cell_get(x, y, LAYER_LEVEL);
+      if(cell.item != NO_ITEM) {
+        this.level_cell_animate(cell, x, y, LAYER_LEVEL);
+      }
+    }
+  }
 }
