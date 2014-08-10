@@ -224,6 +224,10 @@ Game.prototype.animation_bug_move_end = function(data)
   switch(cell.item) {
     // Opened one-pass door
     case P_DV_H_O:
+    case P_DV_H:
+      if(cell.item == P_DV_H) {
+        cell.variant = DOOR_VARIATION_CYBER;
+      }
       cell.item = P_DV_H_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
@@ -232,6 +236,10 @@ Game.prototype.animation_bug_move_end = function(data)
       }
       break;
     case P_DV_V_O:
+    case P_DV_V:
+      if(cell.item == P_DV_V) {
+        cell.variant = DOOR_VARIATION_CYBER;
+      }
       cell.item = P_DV_V_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
@@ -328,6 +336,16 @@ if(variant == ANIM_EXIT) {
 }
 */
 
+Game.prototype.check_borders = function(nx, ny)
+{
+  if(nx < 0 || nx >= LEVEL_CELLS_X)
+    return(false);
+  if(ny < 0 || ny >= LEVEL_CELLS_Y)
+    return(false);
+
+  return(true);
+}
+
 // Get an active player
 // Check if we can move
 // Move it
@@ -362,33 +380,41 @@ Game.prototype.bug_move = function(direction)
       break;
   }
 
+  if(!this.check_borders(nx, ny)) {
+    player.is_moving = false;
+    return;
+  }
+
   var cell = this.level.item_get(nx, ny);
-  var cell_next = this.level.item_get(nnx, nny);
-
   switch(cell.item) {
-    // Empty cell
-    case NO_ITEM:
-
-    // Opened one-pass door
-    case P_DV_H_O:
+    case NO_ITEM:  // Empty cell
+    case P_DV_H_O: // Opened classic one-pass door
     case P_DV_V_O:
+    case P_DV_H:   // Opened classic one-pass door (cyber)
+    case P_DV_V:
       this.animation_bug_move(direction, nx, ny);
       return;
     case P_BOX:
-      if(cell_next.item == NO_ITEM) {
-        this.animation_bug_move(direction, nx, ny);
-        this.animation_box_move(direction, nx, ny, nnx, nny);
-        return;
+      if(this.check_borders(nnx, nny)) {
+        var cell_next = this.level.item_get(nnx, nny);
+        if(cell_next.item == NO_ITEM) {
+          this.animation_bug_move(direction, nx, ny);
+          this.animation_box_move(direction, nx, ny, nnx, nny);
+          return;
+        }
       }
       break;
     case P_TNT:
-      if(cell_next.item == NO_ITEM) {
-        this.animation_bug_move(direction, nx, ny);
-        this.animation_box_move(direction, nx, ny, nnx, nny);
-        return;
-      } else if(cell_next.item == P_BOX) {
-        this.animation_box_explosion(direction, nx, ny, nnx, nny);
-        return;
+      if(this.check_borders(nnx, nny)) {
+        var cell_next = this.level.item_get(nnx, nny);
+        if(cell_next.item == NO_ITEM) {
+          this.animation_bug_move(direction, nx, ny);
+          this.animation_box_move(direction, nx, ny, nnx, nny);
+          return;
+        } else if(cell_next.item == P_BOX) {
+          this.animation_box_explosion(direction, nx, ny, nnx, nny);
+          return;
+        }
       }
       break;
     case P_EXIT:
