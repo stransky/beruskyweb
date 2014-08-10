@@ -1,8 +1,6 @@
-anim_template_handle animation_repository::template_generate(ANIM_TYPE type) -> generated animations
-
 - slow the explosions
+
 - level animations
-- one way door animations -> electric - r05.lv3
 
 Implement items:
   - exit, keys...
