@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ function Input()
 {
   this.key = Array(); // Array of keycodes
   input_object = this;
-  
+
   document.onkeydown = handleKeyDown;
   document.onkeyup = handleKeyUp;
 }
@@ -68,5 +68,5 @@ function handleKeyDown(event)
 
 function handleKeyUp(event)
 {
-  input_object.key[event.keyCode] = false;   
+  input_object.key[event.keyCode] = false;
 }

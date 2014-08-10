@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
  *
  */
 
-var parser_table = 
+var parser_table =
 {
   P_GROUND:  P_GROUND,
   P_PLAYER_1:P_PLAYER_1,
@@ -215,7 +215,7 @@ function TokenItem(base, offset, num) {
 }
 
 function token_translate(token) {
-  // Split by | or +  
+  // Split by | or +
   var items = (token.replace("|","+")).split("+");
   var ret = 0;
   var base = 0;

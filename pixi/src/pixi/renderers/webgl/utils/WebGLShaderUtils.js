@@ -4,7 +4,7 @@
 
 PIXI.initDefaultShaders = function()
 {
-   
+
   //  PIXI.stripShader = new PIXI.StripShader();
 //    PIXI.stripShader.init();
 

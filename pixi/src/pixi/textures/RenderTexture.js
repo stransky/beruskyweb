@@ -47,7 +47,7 @@ PIXI.RenderTexture = function(width, height, renderer)
     this.baseTexture._glTextures = [];
 
     this.baseTexture.hasLoaded = true;
-    
+
     // each render texture can only belong to one renderer at the moment if its webGL
     this.renderer = renderer || PIXI.defaultRenderer;
 
@@ -141,7 +141,7 @@ PIXI.RenderTexture.prototype.renderWebGL = function(displayObject, position, cle
     }
 
 
-    // 
+    //
     this.renderer.renderDisplayObject(displayObject, this.projection);
 
     displayObject.worldTransform = originalWorldTransform;

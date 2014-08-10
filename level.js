@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -109,8 +109,8 @@ level_load_callback = function() {
   }
 
   // Skip rezerved[100]
-  // We have to multiply the sizes by 2 
-  // because all cells are stored as unsigned int16 
+  // We have to multiply the sizes by 2
+  // because all cells are stored as unsigned int16
   var level_data = new DataView(this.response, 137,
                                 LEVEL_FLOOR_SIZE*2 +
                                 LEVEL_LEVEL_SIZE*2 +
@@ -132,7 +132,7 @@ level_load_callback = function() {
   loaded_level.floor = Array();
   loaded_level.level = Array();
   loaded_level.players = Array();
-  
+
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
     for(var x = 0; x < LEVEL_CELLS_X; x++) {
       var index = level_index(x,y);
@@ -154,12 +154,12 @@ level_load_callback = function() {
 
       if(loaded_level.players[index].item != NO_ITEM) {
         loaded_level.players[index].rotation = player_rotations[loaded_level.players[index].item];
-        
+
         var player_number = loaded_level.players[index].item;
         loaded_level.player_table[player_number].active = true;
         loaded_level.player_table[player_number].x = x;
         loaded_level.player_table[player_number].y = y;
-        
+
         if(player_number < loaded_level.player_active.number) {
           loaded_level.player_active = loaded_level.player_table[player_number];
         }
@@ -178,13 +178,13 @@ level_load_callback = function() {
 // Active player info
 function Player(num) {
   this.active = false;
-  this.is_moving = false; // there's a running player animation  
+  this.is_moving = false; // there's a running player animation
   this.key_color = 0;
   this.matocks = 0;
   this.number = num;
   this.x = 0;
   this.y = 0;
-  
+
   this.ls = Array();
   this.rs = Array();
 
@@ -243,7 +243,7 @@ function Player(num) {
 
   this.a_ls = PLAYER_HAND;
   this.a_rs = PLAYER_HAND;
-  
+
   this.sprite_ls = false;
   this.sprite_rs = false;
   this.sprite_mask = false;
@@ -303,7 +303,7 @@ LevelItem.prototype.copy = function(template)
 {
   this.item = template.item;
   this.variant = template.variant;
-  this.rotation = template.rotation;  
+  this.rotation = template.rotation;
   this.sprite_handle = template.sprite_handle;
   this.diff_x = template.diff_x;
   this.diff_y = template.diff_y;
@@ -319,13 +319,13 @@ function Level(graph, repo) {
   this.rendered = false;
   this.keys_final = 0;
   this.player_mark_cursor = 0;
-  
+
   this.player_table = new Array();
   for(var i = 0; i < PLAYER_MAX; i++) {
     this.player_table[i] = new Player(i);
   }
-    
-  this.player_active = this.player_table[4];  
+
+  this.player_active = this.player_table[4];
   this.sprite_key = false;
 }
 
@@ -339,7 +339,7 @@ Level.prototype.load = function(file) {
   this.name = file;
   this.loaded = false;
   console.log("Loading " + this.name);
-  
+
   load_file_binary(file, level_load_callback, this);
 }
 
@@ -372,19 +372,19 @@ Level.prototype.cell_get = function(x, y, layer)
 }
 
 Level.prototype.cell_draw = function(cell, x, y, reset_sprite)
-{  
+{
   if(reset_sprite != undefined && reset_sprite) {
-    cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item, 
+    cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item,
                                                                   cell.variant));
   }
   this.graph.sprite_move(cell.sprite_handle,
                          cell.diff_x + LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                          cell.diff_y + LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
-  this.graph.sprite_rotate(cell.sprite_handle, cell.rotation); 
+  this.graph.sprite_rotate(cell.sprite_handle, cell.rotation);
 }
 
 Level.prototype.cell_draw_sprite = function(spr, x, y)
-{  
+{
   this.graph.sprite_move(spr,
                          LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                          LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
@@ -398,7 +398,7 @@ Level.prototype.item_draw = function(x, y, layer)
   }
 }
 
-// Remove specified LevelItem from level, 
+// Remove specified LevelItem from level,
 // unregister sprite and so
 Level.prototype.item_remove = function(x, y, layer)
 {
@@ -428,7 +428,7 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
 }
 
 Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
-{ 
+{
   var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     cell.diff_x = dx;
@@ -437,7 +437,7 @@ Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
   }
 }
 
-Level.prototype.is_rendered = function() 
+Level.prototype.is_rendered = function()
 {
   return(this.rendered);
 }
@@ -455,7 +455,7 @@ Level.prototype.render = function() {
       var index = level_index(x,y);
 
       var cell = this.floor[index];
-      if(cell.item != NO_ITEM) {        
+      if(cell.item != NO_ITEM) {
         cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item, cell.variant));
         this.cell_draw(cell, x, y);
       }
@@ -523,7 +523,7 @@ Level.prototype.player_switch = function(number)
 }
 
 Level.prototype.player_cursor_set_draw = function(draw)
-{   
+{
   if(draw && !this.player_mark_cursor && this.player_active.active) {
     this.player_mark_cursor = this.graph.sprite_insert(FIRST_CURSOR);
     this.cell_draw_sprite(this.player_mark_cursor,
@@ -587,7 +587,7 @@ Level.prototype.panel_draw_keys = function()
   if(this.keys_final > 0 && this.keys_final <= 5) {
     if(this.sprite_key)
       this.graph.sprite_remove(this.sprite_key);
-  
+
     this.sprite_key = this.graph.sprite_insert(FIRST_KEY + this.keys_final, X_KEYS_POSITION, Y_KEYS_POSITION);
   }
 }

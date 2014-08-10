@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ function GameAnimation(template, x, y, layer, rotation, callback, callback_param
 
   // rotation of the rendered item
   this.rotation = rotation;
-  
+
   // callback functions at animation end
   this.callback = callback;
   this.callback_param = callback_param;
@@ -64,7 +64,7 @@ GameAnimation.prototype.stop = function()
 }
 
 GameAnimation.prototype.process = function(level)
-{ 
+{
   if(this.frame_current >= this.anim_template.frame_num) {
     if(this.anim_template.flags&ANIM_LOOP)
       this.start();
@@ -78,7 +78,7 @@ GameAnimation.prototype.process = function(level)
     this.frame_correction--;
   } else {
     this.frame_correction = this.anim_template.get_frame_correction(this.position_in_animation);
-    
+
     var cell = level.cell_get(this.x, this.y, this.layer);
 
     if(this.anim_template.flags&ANIM_SPRITE) {
@@ -109,7 +109,7 @@ GameAnimation.prototype.process = function(level)
 }
 
 // Performs the animations
-function GameAnimationEngine(level) 
+function GameAnimationEngine(level)
 {
   // Reference to level interface
   this.level = level;
@@ -117,23 +117,23 @@ function GameAnimationEngine(level)
   // Array of anim templates
   this.anim_templates = new GameAnimTemplateRepository();
   this.anim_templates.load();
-  
+
   // Array of running animations
   this.anim_running = Array();
 }
 
 GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation,
                                                      callback, callback_param)
-{  
+{
   var index = this.anim_running.push(new GameAnimation(anim,
-                                                       x, y, layer, rotation, 
+                                                       x, y, layer, rotation,
                                                        callback, callback_param));
   return this.anim_running[index - 1];
 }
 
 GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rotation,
                                                      callback, callback_param)
-{  
+{
   return(this.create_anim(this.anim_templates.anim_template[template],
                           x, y, layer, rotation, callback, callback_param));
 }
@@ -156,7 +156,7 @@ GameAnimationEngine.prototype.process = function()
 GameAnimationEngine.prototype.generate_anim = function(type)
 {
   var temp = new GameAnimTemplate(ANIM_SPRITE|ANIM_LOOP, DOOR_FRAMES);
-  
+
   var spr_array = Array();
   var time_array = Array();
 
@@ -178,13 +178,13 @@ GameAnimationEngine.prototype.generate_anim = function(type)
       spr_array[1] = FIRST_CYBER_LEVEL+70;
       break;
   }
-  
+
   for(var i = 3; i < DOOR_FRAMES; i += 2) {
     spr_array[i-1] = spr_array[i-3];
     spr_array[i] = spr_array[i-2];
   }
   for(var i = 0; i < DOOR_FRAMES; i++) {
-    time_array[i] = ((Math.random()*30)|0) + 1;    
+    time_array[i] = ((Math.random()*30)|0) + 1;
   }
 
   temp.create_sprite_table(DOOR_FRAMES, spr_array, time_array);

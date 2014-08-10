@@ -143,7 +143,7 @@ PIXI.DisplayObjectContainer.prototype.swapChildren = function(child, child2)
 
     this.children[index1] = child2;
     this.children[index2] = child;
-    
+
 };
 
 /**
@@ -212,7 +212,7 @@ PIXI.DisplayObjectContainer.prototype.getBounds = function()
     if(this.children.length === 0)return PIXI.EmptyRectangle;
 
     // TODO the bounds have already been calculated this render session so return what we have
-   
+
 
     var minX = Infinity;
     var minY = Infinity;
@@ -227,11 +227,11 @@ PIXI.DisplayObjectContainer.prototype.getBounds = function()
     for(var i=0,j=this.children.length; i<j; i++)
     {
         var child = this.children[i];
-        
+
         if(!child.visible)continue;
 
         childBounds = this.children[i].getBounds();
-     
+
         minX = minX < childBounds.x ? minX : childBounds.x;
         minY = minY < childBounds.y ? minY : childBounds.y;
 
@@ -251,7 +251,7 @@ PIXI.DisplayObjectContainer.prototype.getBounds = function()
 
     // TODO: store a refferance so that if this function gets called again in the render cycle we do not have to recacalculate
     //this._currentBounds = bounds;
-   
+
     return bounds;
 };
 
@@ -277,7 +277,7 @@ PIXI.DisplayObjectContainer.prototype.removeStageReference = function()
     }
 
     if(this._interactive)this.stage.dirty = true;
-    
+
     this.stage = null;
 };
 
@@ -312,7 +312,7 @@ PIXI.DisplayObjectContainer.prototype._renderWebGL = function(renderSession)
 
         if(this._filters)renderSession.filterManager.popFilter();
         if(this._mask)renderSession.maskManager.popMask(renderSession);
-        
+
         renderSession.spriteBatch.start();
     }
     else

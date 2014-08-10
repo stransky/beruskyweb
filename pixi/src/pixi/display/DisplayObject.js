@@ -124,7 +124,7 @@ PIXI.DisplayObject = function()
 
     /**
      * This is the curser that will be used when the mouse is over this object. To enable this the element must have interaction = true and buttonMode = true
-     * 
+     *
      * @property defaultCursor
      * @type String
      *
@@ -179,7 +179,7 @@ PIXI.DisplayObject = function()
 
     /**
     *
-    *      
+    *
     *
     */
     this._bounds = new PIXI.Rectangle(0, 0, 1, 1);

@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,10 +34,10 @@ function GameObject() {
 
   this.item = 0;  // object number
   this.variant = 0;  // object variant
-  
-  this.func = 0;  // item function  
+
+  this.func = 0;  // item function
   this.flags = 0; // sprite flags
-  
+
   // x - corrections for main item
   this.minus_x = 0;
   this.plus_x = 0;
@@ -48,14 +48,14 @@ function GameObject() {
 
   this.sprite = 0;    // sprite for this item
   this.animation = 0; // animation for this item
-  
+
   this.sub_objects = []; // two sub-objects
 }
 
 GameObject.prototype.parse_line = function(line)
 {
   var token_pos = 0;
-  
+
   tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
@@ -103,13 +103,13 @@ GameObject.prototype.parse_line = function(line)
       }
       token_pos++;
     }
-  }  
+  }
 }
 
 GameObject.prototype.parse_anim_line = function(line)
 {
   var token_pos = 0;
-  
+
   tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
@@ -132,7 +132,7 @@ GameObject.prototype.parse_anim_line = function(line)
       }
       token_pos++;
     }
-  }  
+  }
 }
 
 GameObject.prototype.print = function()
@@ -160,7 +160,7 @@ ObjectsRepository_load_callback = function()
 {
   var lines = this.responseText.split("\n");
   var loaded = 0;
-  
+
   this.callback_object.ObjectsRepository.repo = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
@@ -170,15 +170,15 @@ ObjectsRepository_load_callback = function()
       obj.parse_line(tline);
       // Debug print
       // obj.print();
-      
+
       if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
         this.callback_object.ObjectsRepository.repo[obj.item] = Array();
-      
+
       this.callback_object.ObjectsRepository.repo[obj.item][obj.variant] = obj;
       loaded++;
     }
   }
-  
+
   console.log("Repository objects loaded = " + loaded);
   this.callback_object.ObjectsRepository.loaded++;
 }
@@ -197,37 +197,37 @@ ObjectsRepository_load_anim_callback = function()
       obj.parse_anim_line(tline);
       // Debug print
       obj.print();
-      
+
       if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
         throw "ObjectsRepository_load_anim_callback - obj.item is undefined!";
-      
+
       if(this.callback_object.ObjectsRepository.repo[obj.item][obj.variant] === undefined)
         throw "ObjectsRepository_load_anim_callback - obj.variant is undefined!";
-        
+
       var tmp = this.callback_object.ObjectsRepository.repo[obj.item][obj.variant];
-      
+
       tmp.flags = obj.flags;
       tmp.animation = obj.animation;
-      
+
       loaded++;
     }
   }
-  
+
   console.log("Repository anim objects loaded = " + loaded);
   this.callback_object.ObjectsRepository.loaded++;
 }
 
 ObjectsRepository.prototype.load = function()
 {
-  load_file_text(GAME_REPO_FILE, ObjectsRepository_load_callback, 
+  load_file_text(GAME_REPO_FILE, ObjectsRepository_load_callback,
                  { ObjectsRepository : this });
-  load_file_text(GAME_REPO_ANIM_FILE, ObjectsRepository_load_anim_callback, 
+  load_file_text(GAME_REPO_ANIM_FILE, ObjectsRepository_load_anim_callback,
                  { ObjectsRepository : this });
 }
 
 ObjectsRepository.prototype.get_object = function(item, variant)
 {
-  if(this.repo[item][variant] === undefined) {    
+  if(this.repo[item][variant] === undefined) {
     throw ("Undefined object repository - item = " + item + " variant = " + variant);
   }
   return this.repo[item][variant];
@@ -247,9 +247,9 @@ var GAME_ANIM_FILE = "data/GameData/anim.dat"
 function GameAnimTemplate(flags, frames) {
 
   this.template_handle = 0;
-  
+
   this.flags = (flags == undefined) ? 0 : flags;
-  
+
   this.frame_num = (frames == undefined) ? 0 : frames;
   this.frame_correction = 0;
 
@@ -259,7 +259,7 @@ function GameAnimTemplate(flags, frames) {
   this.sprite_first = 0;
   this.sprite_num = 0;
   this.sprite_step = 0;
-  
+
   this.sprite_table = 0;
   this.delay_table = 0;
 }
@@ -277,14 +277,14 @@ GameAnimTemplate.prototype.create_sprite_table = function(frame_num, sprite_tabl
 
 GameAnimTemplate.prototype.get_frame_correction = function(position_in_animation)
 {
-  return(this.delay_table ? this.delay_table[position_in_animation] : 
+  return(this.delay_table ? this.delay_table[position_in_animation] :
                             this.frame_correction);
 }
 
 GameAnimTemplate.prototype.parse_line = function(line)
 {
   var token_pos = 0;
-  
+
   tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
@@ -322,7 +322,7 @@ GameAnimTemplate.prototype.parse_line = function(line)
       }
       token_pos++;
     }
-  }  
+  }
 }
 
 GameAnimTemplate.prototype.print = function()
@@ -350,10 +350,10 @@ GameAnimTemplateRepository.prototype.is_loaded = function() {
 }
 
 GameAnimTemplateRepository_load_callback = function()
-{  
+{
   var lines = this.responseText.split("\n");
   var loaded = 0;
-  
+
   this.callback_object.GameAnimTemplateRepository.anim_template = Array();
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
@@ -368,14 +368,14 @@ GameAnimTemplateRepository_load_callback = function()
       loaded++;
     }
   }
-  
+
   console.log("Repository objects loaded = " + loaded);
   this.callback_object.GameAnimTemplateRepository.loaded = true;
 }
 
 GameAnimTemplateRepository.prototype.load = function()
 {
-  load_file_text(GAME_ANIM_FILE, GameAnimTemplateRepository_load_callback , 
+  load_file_text(GAME_ANIM_FILE, GameAnimTemplateRepository_load_callback ,
                  { GameAnimTemplateRepository : this });
 }
 
@@ -384,7 +384,7 @@ GameAnimTemplateRepository.prototype.insert = function(handle, anim)
   if(this.anim_template[handle] != undefined) {
     throw "The anim slot is not empty!"
   }
-  this.anim_template[handle] = anim;  
+  this.anim_template[handle] = anim;
 }
 
 GameAnimTemplateRepository.prototype.get_object = function(anim_template)

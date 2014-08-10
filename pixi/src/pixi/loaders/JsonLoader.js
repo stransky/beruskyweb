@@ -110,7 +110,7 @@ PIXI.JsonLoader.prototype.onJSONLoaded = function () {
                         if (frameData[i].trimmed) {
 
                             var texture =  PIXI.TextureCache[i];
-                            
+
                             texture.trimmed = true;
 
                             var actualSize = frameData[i].sourceSize;

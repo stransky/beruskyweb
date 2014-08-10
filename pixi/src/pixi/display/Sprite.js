@@ -67,7 +67,7 @@ PIXI.Sprite = function(texture)
      * @default 0xFFFFFF
      */
     this.tint = 0xFFFFFF;// * Math.random();
-    
+
     /**
      * The blend mode to be applied to the sprite
      *
@@ -244,7 +244,7 @@ PIXI.Sprite.prototype._renderWebGL = function(renderSession)
 {
     // if the sprite is not visible or the alpha is 0 then no need to render this element
     if(this.visible === false || this.alpha === 0)return;
-    
+
     var i,j;
 
     // do a quick check to see if this element has a mask or a filter.
@@ -279,7 +279,7 @@ PIXI.Sprite.prototype._renderWebGL = function(renderSession)
 
         if(this._filters)renderSession.filterManager.popFilter();
         if(this._mask)renderSession.maskManager.popMask(renderSession);
-        
+
         spriteBatch.start();
     }
     else
@@ -293,15 +293,15 @@ PIXI.Sprite.prototype._renderWebGL = function(renderSession)
         }
     }
 
-   
-    //TODO check culling  
+
+    //TODO check culling
 };
 
 PIXI.Sprite.prototype._renderCanvas = function(renderSession)
 {
     // if the sprite is not visible or the alpha is 0 then no need to render this element
     if(this.visible === false || this.alpha === 0)return;
-    
+
     if(this._mask)
     {
         renderSession.maskManager.pushMask(this._mask, renderSession.context);
@@ -319,9 +319,9 @@ PIXI.Sprite.prototype._renderCanvas = function(renderSession)
         var transform = this.worldTransform;
 
         // alow for trimming
-       
+
         context.setTransform(transform[0], transform[3], transform[1], transform[4], transform[2], transform[5]);
-         
+
         // check blend mode
         if(this.blendMode !== renderSession.currentBlendMode)
         {
@@ -345,10 +345,10 @@ PIXI.Sprite.prototype._renderCanvas = function(renderSession)
                 if(!texture.baseTexture.hasLoaded)return;
 
                 this.cachedTint = this.tint;
-                
+
                 //TODO clean up cacheing - how to clean up the caches?
                 this.tintedTexture = PIXI.CanvasTinter.getTintedTexture(this, this.tint);
-                
+
             }
 
             context.drawImage(this.tintedTexture,
@@ -364,7 +364,7 @@ PIXI.Sprite.prototype._renderCanvas = function(renderSession)
         else
         {
 
-           
+
 
             if(texture.trimmed)
             {
@@ -382,7 +382,7 @@ PIXI.Sprite.prototype._renderCanvas = function(renderSession)
             }
             else
             {
-               
+
                 context.drawImage(this.texture.baseTexture.source,
                                frame.x,
                                frame.y,
@@ -393,7 +393,7 @@ PIXI.Sprite.prototype._renderCanvas = function(renderSession)
                                frame.width,
                                frame.height);
             }
-            
+
         }
     }
 

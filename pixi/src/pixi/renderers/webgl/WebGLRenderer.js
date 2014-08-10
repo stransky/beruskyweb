@@ -354,7 +354,7 @@ PIXI.updateWebGLTexture = function(texture, gl)
 
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
-    
+
 };
 
 /**

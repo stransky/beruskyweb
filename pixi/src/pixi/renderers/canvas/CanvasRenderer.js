@@ -24,7 +24,7 @@ PIXI.CanvasRenderer = function(width, height, view, transparent)
     if(!PIXI.blendModesCanvas)
     {
         PIXI.blendModesCanvas = [];
-        
+
         if(PIXI.canUseNewCanvasBlendModes())
         {
             PIXI.blendModesCanvas[PIXI.blendModes.NORMAL]   = "source-over";
@@ -102,7 +102,7 @@ PIXI.CanvasRenderer = function(width, height, view, transparent)
     this.renderSession = {};
     this.renderSession.context = this.context;
     this.renderSession.maskManager = this.maskManager;
-    
+
 };
 
 // constructor

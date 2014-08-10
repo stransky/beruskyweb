@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ function StepStatus(graph) {
 StepStatus.prototype.add = function()
 {
   this.steps++;
-  
+
   this.graph.font_start_set(LOW_PANEL_STP_X_TEXT, LOW_PANEL_STP_Y);
   this.graph.font_align_set(ALIGN_RIGHT);
   if(this.sprites) {
@@ -93,7 +93,7 @@ function Game() {
 
   this.level = new Level(this.graph, this.repo);
   this.input = new Input(this);
-  
+
   this.anim = new GameAnimationEngine(this.level);
 
   this.mattock_panel = new MattockStatus(this.graph);
@@ -102,20 +102,20 @@ function Game() {
   this.loaded = false;
 }
 
-Game.prototype.game_load = function() 
+Game.prototype.game_load = function()
 {
   // Load game repo
   if(!this.repo.is_loaded())
     return;
-    
+
   // Load game level
   if(!this.level.is_loaded())
     return;
 
   // Game sprites
   if(!this.graph.is_loaded())
-    return;   
- 
+    return;
+
   // Render already loaded level
   if(!this.level.is_rendered()) {
     this.level.render(this.repo);
@@ -124,7 +124,7 @@ Game.prototype.game_load = function()
   this.loaded = true;
 }
 
-Game.prototype.game_play = function() 
+Game.prototype.game_play = function()
 {
   if(this.input.key_get(BUG_MOVE_UP))
     this.bug_move(MOVE_UP);
@@ -149,18 +149,18 @@ Game.prototype.game_play = function()
     this.bug_switch(4);
 }
 
-Game.prototype.game_loop = function() 
+Game.prototype.game_loop = function()
 {
   if(!this.loaded) {
     this.game_load();
     return;
   }
-  
+
   // Update all running animations
   this.anim.process();
-  
+
   this.game_play();
-  
+
   this.graph.render();
 }
 
@@ -202,7 +202,7 @@ Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
 
   var data = { game:this, x:x, y:y, nx:nx, ny:ny, remove_target : (remove_target || 0) };
   this.anim.create_temp(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
-  this.anim.create_temp(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);  
+  this.anim.create_temp(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
   this.level.player_cursor_set_draw(false);
   this.steps_panel.add();
 }
@@ -218,12 +218,12 @@ Game.prototype.animation_bug_move_end = function(data)
 
   var player = data.game.level.player_active;
   player.x = data.nx; player.y = data.ny;
-  
+
   // Handle doors
   var cell = data.game.level.item_get(data.x, data.y);
-  switch(cell.item) {   
+  switch(cell.item) {
     // Opened one-pass door
-    case P_DV_H_O:      
+    case P_DV_H_O:
       cell.item = P_DV_H_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
@@ -322,7 +322,7 @@ Game.prototype.exit_animate = function()
 /*
 if(variant == ANIM_EXIT) {
   event_num += exit_animate(events+event_num, px, py, LAYER_ITEMS, 0);
-} else {  
+} else {
   variant = (variant == REV_EXIT) ? variant-1 : variant+1;
   event_num += item_variation_set(events+event_num, px, py, LAYER_ITEMS, variant, TRUE);
 }
@@ -368,7 +368,7 @@ Game.prototype.bug_move = function(direction)
   switch(cell.item) {
     // Empty cell
     case NO_ITEM:
-    
+
     // Opened one-pass door
     case P_DV_H_O:
     case P_DV_V_O:
@@ -433,7 +433,7 @@ Game.prototype.bug_move = function(direction)
     case P_KEY4:
     case P_KEY5:
       if(player.number == (cell.item - P_KEY1) &&
-         player.key_color < PLAYER_MAX_KEYS) 
+         player.key_color < PLAYER_MAX_KEYS)
       {
         this.animation_bug_move(direction, nx, ny, true);
         if(player.key_color_add()) {
@@ -465,7 +465,7 @@ Game.prototype.level_cell_animate = function(cell, x, y, layer)
   if(obj.flags&ANIM_TRIGGER_INSERT) {
     this.anim.create_anim(this.anim.generate_anim(obj.animation), x, y,
                           layer, NO_ROTATION);
-  }  
+  }
 }
 
 Game.prototype.level_animate = function()

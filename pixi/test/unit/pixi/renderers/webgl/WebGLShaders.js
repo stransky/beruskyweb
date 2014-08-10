@@ -4,7 +4,7 @@ describe('renderers/webgl/WebGLShaders', function () {
     var expect = chai.expect;
 
     it('Module members exist', function () {
-       
+
         expect(PIXI).to.respondTo('CompileVertexShader');
         expect(PIXI).to.respondTo('CompileFragmentShader');
         expect(PIXI).to.respondTo('_CompileShader');

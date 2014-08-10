@@ -221,7 +221,7 @@ PIXI.InteractionManager.prototype.update = function()
 
     // loop through interactive objects!
     var length = this.interactiveItems.length;
-   
+
    // return;
 
     for (i = 0; i < length; i++)
@@ -429,7 +429,7 @@ PIXI.InteractionManager.prototype.hitTest = function(item, interactionData)
     if( !item.worldVisible )return false;
 
     // temp fix for if the element is in a non visible
-   
+
     var isSprite = (item instanceof PIXI.Sprite),
         worldTransform = item.worldTransform,
         a00 = worldTransform[0], a01 = worldTransform[1], a02 = worldTransform[2],

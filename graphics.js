@@ -6,7 +6,7 @@
  *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
  *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
  *
- *    
+ *
  * Author: Martin Stransky <stransky@anakreon.cz>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,15 +36,15 @@ function Graph() {
   // Game sprites (a.k.a textures in PIXI terminology)
   this.sprites = Array();
   this.sprites_to_load = 0;
-  this.sprites_loaded = 0;  
+  this.sprites_loaded = 0;
   this.font_table = Array();
-  
+
   this.font_ax = 0;
   this.font_ay = 0;
   this.font_align = ALIGN_LEFT;
 }
 
-Graph.prototype.render = function() {  
+Graph.prototype.render = function() {
   this.renderer.render(this.stage);
 }
 
@@ -53,24 +53,24 @@ Graph.prototype.get_renderer = function() {
 }
 
 sprite_load_callback = function()
-{  
+{
   var position = this.callback_object.position;
   var position_base = this.callback_object.position;
   var sprites = this.responseText.split("\n");
   var base_text;
   var base_rect;
-  
+
   for (i = 0; i < sprites.length; i++) {
     var line = sprites[i];
     if(line[0] == "s") {
       // s x y dx dy scale
-      var sprite_file = this.callback_object.file.replace(".spr",".png");      
+      var sprite_file = this.callback_object.file.replace(".spr",".png");
       base_text = PIXI.Texture.fromImage(sprite_file).baseTexture;
 
       var r = line.slice(2).split(" ");
-      base_rect = new PIXI.Rectangle(parseInt(r[0]), 
-                                     parseInt(r[1]), 
-                                     parseInt(r[2]), 
+      base_rect = new PIXI.Rectangle(parseInt(r[0]),
+                                     parseInt(r[1]),
+                                     parseInt(r[2]),
                                      parseInt(r[3]));
 
       this.callback_object.graph.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
@@ -88,10 +88,10 @@ sprite_load_callback = function()
         base_rect.height += parseInt(l[3]);
 
         this.callback_object.graph.sprites[position] = new PIXI.Texture(base_text, base_rect.clone());
-        position++;        
+        position++;
       }
     }
-  }  
+  }
   this.callback_object.graph.sprites_loaded++;
   console.log(this.callback_object.graph.sprites_loaded + " : " + this.callback_object.file + " loaded...");
 }
@@ -104,12 +104,12 @@ Graph.prototype.is_loaded = function()
 // file     - sprite_file.spr
 // position - first used handle
 Graph.prototype.sprite_load = function(file, position)
-{ 
+{
   this.sprites_to_load++;
   load_file_text(file, sprite_load_callback, { graph : this, position : position, file : file});
 }
 
-// Draws sprite at specified location and returns handle to 
+// Draws sprite at specified location and returns handle to
 // displayed object
 Graph.prototype.sprite_insert = function(spr, x, y)
 {
@@ -127,25 +127,25 @@ Graph.prototype.sprite_insert = function(spr, x, y)
 }
 
 Graph.prototype.sprite_move = function(sprite_handle, x, y)
-{  
+{
   sprite_handle.position.x = x+(sprite_handle.width/2);
   sprite_handle.position.y = y+(sprite_handle.height/2);
   return(sprite_handle);
 }
 
 Graph.prototype.sprite_rotate = function(sprite_handle, rotation)
-{  
+{
   sprite_handle.rotation = (Math.PI/2)*rotation;
   return(sprite_handle);
 }
 
 Graph.prototype.sprite_remove = function(sprite_handle)
-{    
-  this.stage.removeChild(sprite_handle);  
+{
+  this.stage.removeChild(sprite_handle);
 }
 
 Graph.prototype.sprites_load = function()
-{  
+{
   this.sprite_load("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
   this.sprite_load("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
   this.sprite_load("data/Graphics/kyber1.spr",  FIRST_CYBER_LEVEL);
@@ -184,7 +184,7 @@ Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
 
 Graph.prototype.font_start_set = function(x, y)
 {
-  this.font_ax = x; 
+  this.font_ax = x;
   this.font_ay = y;
 }
 
@@ -218,7 +218,7 @@ Graph.prototype.print = function(text)
   if(this.font_align = ALIGN_RIGHT) {
     font_ax -= this.text_size_get(text).width;
   } else if(this.font_align = ALIGN_CENTER) {
-  
+
   }
 
   var sprite_first;
@@ -247,10 +247,10 @@ Graph.prototype.print = function(text)
 
 function FontTable(graph) {
   this.graph = graph;
-  
+
   this.position = Array();
   this.loaded = false;
-  
+
   this.sprite_first = 0;
   this.sprite_num = 0;
 }
@@ -274,6 +274,6 @@ FontTable.prototype.load = function(file)
 }
 
 FontTable.prototype.sprite_char_get = function(c)
-{  
+{
   return(this.sprite_first + this.position[c]);
 }

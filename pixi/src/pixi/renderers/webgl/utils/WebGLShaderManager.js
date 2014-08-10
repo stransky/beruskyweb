@@ -13,7 +13,7 @@ PIXI.WebGLShaderManager = function(gl)
 PIXI.WebGLShaderManager.prototype.setContext = function(gl)
 {
     this.gl = gl;
-    
+
     // the next one is used for rendering primatives
     this.primitiveShader = new PIXI.PrimitiveShader(gl);
 
@@ -28,7 +28,7 @@ PIXI.WebGLShaderManager.prototype.setContext = function(gl)
     gl.enableVertexAttribArray(this.defaultShader.colorAttribute);
     gl.enableVertexAttribArray(this.defaultShader.aTextureCoord);
 
-    
+
 };
 
 PIXI.WebGLShaderManager.prototype.activatePrimitiveShader = function()
