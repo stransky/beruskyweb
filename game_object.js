@@ -196,7 +196,7 @@ ObjectsRepository_load_anim_callback = function()
       var obj = new GameObject();
       obj.parse_anim_line(tline);
       // Debug print
-      obj.print();
+      //obj.print();
 
       if(this.callback_object.ObjectsRepository.repo[obj.item] === undefined)
         throw "ObjectsRepository_load_anim_callback - obj.item is undefined!";

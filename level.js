@@ -375,7 +375,7 @@ Level.prototype.cell_draw = function(cell, x, y, reset_sprite)
 {
   if(reset_sprite != undefined && reset_sprite) {
     cell.sprite_handle = this.graph.sprite_insert(this.repo.get_sprite(cell.item,
-                                                                  cell.variant));
+                                                                       cell.variant));
   }
   this.graph.sprite_move(cell.sprite_handle,
                          cell.diff_x + LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
