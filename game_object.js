@@ -277,9 +277,8 @@ GameAnimTemplate.prototype.create_sprite_table = function(frame_num, sprite_tabl
 
 GameAnimTemplate.prototype.get_frame_correction = function(position_in_animation)
 {
-  return(GameAnimTemplate.prototype.delay_table ? 
-             GameAnimTemplate.prototype.delay_table[position_in_animation] : 
-             GameAnimTemplate.prototype.frame_correction);
+  return(this.delay_table ? this.delay_table[position_in_animation] : 
+                            this.frame_correction);
 }
 
 GameAnimTemplate.prototype.parse_line = function(line)

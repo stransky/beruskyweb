@@ -66,7 +66,7 @@ GameAnimation.prototype.stop = function()
 GameAnimation.prototype.process = function(level)
 { 
   if(this.frame_current >= this.anim_template.frame_num) {
-    if(this.flag&(ANIM_LOOP))
+    if(this.anim_template.flags&ANIM_LOOP)
       this.start();
     else {
       this.stop();
@@ -78,7 +78,7 @@ GameAnimation.prototype.process = function(level)
     this.frame_correction--;
   } else {
     this.frame_correction = this.anim_template.get_frame_correction(this.position_in_animation);
-
+    
     var cell = level.cell_get(this.x, this.y, this.layer);
 
     if(this.anim_template.flags&ANIM_SPRITE) {
@@ -184,7 +184,7 @@ GameAnimationEngine.prototype.generate_anim = function(type)
     spr_array[i] = spr_array[i-2];
   }
   for(var i = 0; i < DOOR_FRAMES; i++) {
-    time_array[i] = (Math.random()*30)+1;
+    time_array[i] = ((Math.random()*30)|0) + 1;    
   }
 
   temp.create_sprite_table(DOOR_FRAMES, spr_array, time_array);
