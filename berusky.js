@@ -333,7 +333,8 @@ Game.prototype.exit_animate = function()
       var cell = this.level.level[level_index(x,y)];
       if(cell.item == P_EXIT) {
         if(cell.variant == ANIM_EXIT) {
-          alert("Anim - Todo!");
+          cell.animation = this.anim.create_temp(ANIM_EXIT_1,
+                                                 x, y, LAYER_LEVEL, NO_ROTATION);
         } else {
           cell.variant = (cell.variant == REV_EXIT) ? cell.variant-1 : cell.variant+1;
           this.level.cell_draw(cell, x, y, true);
@@ -342,15 +343,6 @@ Game.prototype.exit_animate = function()
     }
   }
 }
-
-/*
-if(variant == ANIM_EXIT) {
-  event_num += exit_animate(events+event_num, px, py, LAYER_ITEMS, 0);
-} else {
-  variant = (variant == REV_EXIT) ? variant-1 : variant+1;
-  event_num += item_variation_set(events+event_num, px, py, LAYER_ITEMS, variant, TRUE);
-}
-*/
 
 Game.prototype.check_borders = function(nx, ny)
 {
