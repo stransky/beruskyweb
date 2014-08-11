@@ -286,8 +286,9 @@ function LevelItem() {
   this.variant = 0;
   this.rotation = 0;
   this.sprite_handle = 0;
-  this.diff_x = 0; // sprite offset
+  this.diff_x = 0;    // sprite offset
   this.diff_y = 0;
+  this.animation = 0; // Animation connected to this cell
 }
 
 function LevelItem(item, variant, rotation) {

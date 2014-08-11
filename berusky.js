@@ -231,8 +231,9 @@ Game.prototype.animation_bug_move_end = function(data)
       cell.item = P_DV_H_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
-        data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_H), data.x, data.y,
-                                   LAYER_LEVEL, NO_ROTATION);
+        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_H), 
+                                                    data.x, data.y,
+                                                    LAYER_LEVEL, NO_ROTATION);
       }
       break;
     case P_DV_V_O:
@@ -243,8 +244,9 @@ Game.prototype.animation_bug_move_end = function(data)
       cell.item = P_DV_V_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
-        data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_V), data.x, data.y,
-                                   LAYER_LEVEL, NO_ROTATION);
+        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_V), 
+                                                    data.x, data.y,
+                                                    LAYER_LEVEL, NO_ROTATION);
       }
       break;
     // Opened ID doors
@@ -398,8 +400,12 @@ Game.prototype.bug_move = function(direction)
     player.is_moving = false;
     return;
   }
-
-  var cell = this.level.item_get(nx, ny);
+  var cell = this.level.cell_get(nx, ny, LAYER_PLAYER);
+  if(cell.item != NO_ITEM) {
+    player.is_moving = false;
+    return;
+  }
+  cell = this.level.item_get(nx, ny);
   switch(cell.item) {
     case NO_ITEM:  // Empty cell
     case P_DOOR1_H_O: // Opened key-doors
@@ -595,8 +601,8 @@ Game.prototype.level_cell_animate = function(cell, x, y, layer)
 {
   var obj = this.repo.get_object(cell.item, cell.variant);
   if(obj.flags&ANIM_TRIGGER_INSERT) {
-    this.anim.create_anim(this.anim.generate_anim(obj.animation), x, y,
-                          layer, NO_ROTATION);
+    cell.animation = this.anim.create_anim(this.anim.generate_anim(obj.animation), x, y,
+                                           layer, NO_ROTATION);
   }
 }
 
