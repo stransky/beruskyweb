@@ -215,13 +215,14 @@ function TokenItem(base, offset, num) {
 }
 
 function token_translate(token) {
-  // Split by | or +
+  // Split by | or + str.split("|").join("");
   var items = (token.replace("|","+")).split("+");
   var ret = 0;
   var base = 0;
 
+  console.log("token_translate :" + items);
   for(var i = 0; i < items.length; i++) {
-    var item = items[i].trim();
+    var item = items[i].trim();    
     if(is_number(item)) {
       ret += parseInt(item, 10);
     }

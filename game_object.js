@@ -190,8 +190,7 @@ ObjectsRepository_load_anim_callback = function()
 
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
-
-    console.log(tline);
+    
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameObject();
       obj.parse_anim_line(tline);
@@ -273,6 +272,7 @@ GameAnimTemplate.prototype.create_sprite_table = function(frame_num, sprite_tabl
 
   this.sprite_step = 0;
   this.sprite_first = 0;
+  this.frame_correction = 0;
 }
 
 GameAnimTemplate.prototype.get_frame_correction = function(position_in_animation)
@@ -325,6 +325,27 @@ GameAnimTemplate.prototype.parse_line = function(line)
   }
 }
 
+GameAnimTemplate.prototype.load_update = function()
+{
+  if(this.flags&ANIM_SPRITE && this.flags&ANIM_ADD_INVERSE) {
+    var spr_array = Array();
+    var time_array = Array();
+
+    for(var j = 0; j < this.frame_num; j++) {
+      spr_array[j] = this.sprite_first + j*this.sprite_step;
+      time_array[j] = this.frame_correction;
+    }
+
+    var frame_num = this.frame_num*2-2;
+    for(var j = this.frame_num; j < frame_num; j++) {
+      spr_array[j] = spr_array[frame_num - j];
+      time_array[j] = this.frame_correction;
+    }
+  
+    this.create_sprite_table(frame_num, spr_array, time_array);      
+  }
+}
+
 GameAnimTemplate.prototype.print = function()
 {
   console.log("GameAnimTemplate handle = " + this.template_handle);
@@ -358,11 +379,13 @@ GameAnimTemplateRepository_load_callback = function()
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
 
+    console.log(tline);
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
+      obj.load_update();
       // Debug print
-      //obj.print();
+      obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;
