@@ -288,6 +288,7 @@ GameAnimTemplate.prototype.parse_line = function(line)
   tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
+    //console.log("token: " + token);
     if(token.length != 0) {
       switch(token_pos) {
         case 0: // template handle
@@ -385,7 +386,7 @@ GameAnimTemplateRepository_load_callback = function()
       obj.parse_line(tline);
       obj.load_update();
       // Debug print
-      obj.print();
+      //obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;
