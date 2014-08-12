@@ -1,3 +1,5 @@
+- time array (frame correction) does not work
+
 - redraw item (door) -> new borders
 - cyber - one pass, ID -> animation (before/after move)
 

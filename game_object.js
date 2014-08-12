@@ -56,7 +56,7 @@ GameObject.prototype.parse_line = function(line)
 {
   var token_pos = 0;
 
-  tokens = line.split("\t");
+  var tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
     if(token.length != 0) {
@@ -110,7 +110,7 @@ GameObject.prototype.parse_anim_line = function(line)
 {
   var token_pos = 0;
 
-  tokens = line.split("\t");
+  var tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
     if(token.length != 0) {
@@ -285,10 +285,9 @@ GameAnimTemplate.prototype.parse_line = function(line)
 {
   var token_pos = 0;
 
-  tokens = line.split("\t");
+  var tokens = line.split("\t");
   for(var i = 0; i < tokens.length; i++) {
     var token = tokens[i];
-    //console.log("token: " + token);
     if(token.length != 0) {
       switch(token_pos) {
         case 0: // template handle
@@ -380,13 +379,13 @@ GameAnimTemplateRepository_load_callback = function()
   for(var i = 0; i < lines.length; i++) {
     var tline = lines[i].trim();
 
-    console.log(tline);
+    //console.log(tline);
     if(tline[0] != '#' && tline.length != 0) {
       var obj = new GameAnimTemplate();
       obj.parse_line(tline);
       obj.load_update();
       // Debug print
-      //obj.print();
+      obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;
