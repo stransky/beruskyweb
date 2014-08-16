@@ -489,7 +489,7 @@ Game.prototype.bug_move = function(direction)
         return;
       }
       break;
-    case P_DOOR1_H_Z: // Key-doors
+    case P_DOOR1_H_Z: // color-Key-doors
     case P_DOOR2_H_Z:
     case P_DOOR3_H_Z:
     case P_DOOR4_H_Z:
@@ -497,11 +497,20 @@ Game.prototype.bug_move = function(direction)
       if(player.number == (cell.item - P_DOOR1_H_Z) &&
          player.key_color)
       {
-        this.level.cell_remove(nx, ny, LAYER_LEVEL);
-        var cell = this.level.cell_get(nx, ny, LAYER_FLOOR);
-        cell.item = P_GROUND;
-        cell.variant = 3;
-        this.level.cell_draw(cell, nx, ny, true);
+        var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
+        if(cell.animation)
+          this.anim.remove(cell.animation);
+
+        if(cell.variant == DOOR_VARIATION_CYBER) {
+          this.level.cell_set(nx, ny, LAYER_LEVEL, P_DV_H, 0);
+        }
+        else {
+          this.level.cell_remove(nx, ny, LAYER_LEVEL);
+          var cell = this.level.cell_get(nx, ny, LAYER_FLOOR);
+          cell.item = P_GROUND;
+          cell.variant = 3;
+          this.level.cell_draw(cell, nx, ny, true);
+        }
         
         this.animation_bug_move(direction, nx, ny, false);
         if(player.key_color_remove()) {
@@ -510,7 +519,7 @@ Game.prototype.bug_move = function(direction)
         return;
       }
       break;    
-    case P_DOOR1_V_Z: // Key-doors
+    case P_DOOR1_V_Z: // color-Key-doors
     case P_DOOR2_V_Z:
     case P_DOOR3_V_Z:
     case P_DOOR4_V_Z:
@@ -518,11 +527,20 @@ Game.prototype.bug_move = function(direction)
       if(player.number == (cell.item - P_DOOR1_V_Z) &&
          player.key_color)
       {
-        this.level.cell_remove(nx, ny, LAYER_LEVEL);
-        var cell = this.level.cell_get(nx, ny, LAYER_FLOOR);
-        cell.item = P_GROUND;
-        cell.variant = 2;
-        this.level.cell_draw(cell, nx, ny, true);
+        var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
+        if(cell.animation)
+          this.anim.remove(cell.animation);
+        
+        if(cell.variant == DOOR_VARIATION_CYBER) {
+          this.level.cell_set(nx, ny, LAYER_LEVEL, P_DV_V, 0);
+        }
+        else {
+          this.level.cell_remove(nx, ny, LAYER_LEVEL);
+          var cell = this.level.cell_get(nx, ny, LAYER_FLOOR);
+          cell.item = P_GROUND;
+          cell.variant = 2;
+          this.level.cell_draw(cell, nx, ny, true);
+        }
         
         this.animation_bug_move(direction, nx, ny, false);
         if(player.key_color_remove()) {
@@ -531,7 +549,7 @@ Game.prototype.bug_move = function(direction)
         return;
       }
       break;    
-    case P_ID_DOOR1_H_Z: // ID Key-doors
+    case P_ID_DOOR1_H_Z: // ID doors
     case P_ID_DOOR2_H_Z:
     case P_ID_DOOR3_H_Z:
     case P_ID_DOOR4_H_Z:
@@ -539,14 +557,15 @@ Game.prototype.bug_move = function(direction)
       if(player.number == (cell.item - P_ID_DOOR1_H_Z))
       {        
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
-        cell.item = P_ID_DOOR1_H_O + player.number;
-        this.level.cell_draw(cell, nx, ny, true);
+        if(cell.animation)
+          this.anim.remove(cell.animation);
         
+        this.level.cell_set(nx, ny, LAYER_LEVEL, P_ID_DOOR1_H_O + player.number, cell.variant);
         this.animation_bug_move(direction, nx, ny, false);
         return;
       }
       break;    
-    case P_ID_DOOR1_V_Z: // ID Key-doors
+    case P_ID_DOOR1_V_Z: // ID doors
     case P_ID_DOOR2_V_Z:
     case P_ID_DOOR3_V_Z:
     case P_ID_DOOR4_V_Z:
@@ -554,9 +573,10 @@ Game.prototype.bug_move = function(direction)
       if(player.number == (cell.item - P_ID_DOOR1_V_Z))
       {        
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
-        cell.item = P_ID_DOOR1_V_O + player.number;
-        this.level.cell_draw(cell, nx, ny, true);
+        if(cell.animation)
+          this.anim.remove(cell.animation);
         
+        this.level.cell_set(nx, ny, LAYER_LEVEL, P_ID_DOOR1_V_O + player.number, cell.variant);
         this.animation_bug_move(direction, nx, ny, false);
         return;
       }

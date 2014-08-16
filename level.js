@@ -407,7 +407,7 @@ Level.prototype.cell_remove = function(x, y, layer)
   var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
-    cell_sprite_remove(cell);
+    this.cell_sprite_remove(cell);
   }
 }
 
@@ -443,17 +443,17 @@ Level.prototype.cell_sub_set = function(sub_object, x, y, layer)
   y += sub_object.y_cor;
   
   var cell = this.cell_get(x, y, layer);
-  cell_sprite_remove(cell);
-  cell.item = item;
-  cell.variant = variant;
+  this.cell_sprite_remove(cell);
+  cell.item = sub_object.item;
+  cell.variant = sub_object.variant;
   this.cell_draw(cell, x, y, true);
 }
 
-Level.prototype.cell_set = function(x, y, layer, item, variant, sub_object)
+Level.prototype.cell_set = function(x, y, layer, item, variant)
 {
   // Reset the main item
   var cell = this.cell_get(x,y,layer);
-  cell_sprite_remove(cell);
+  this.cell_sprite_remove(cell);
   cell.item = item;
   cell.variant = variant;
   this.cell_draw(cell, x, y, true);

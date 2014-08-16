@@ -1,4 +1,4 @@
-- redraw item (door) -> new borders
+- better anim handles! (anim pointers??)
 - cyber - one pass, ID -> animation (before/after move)
 
 - level animations

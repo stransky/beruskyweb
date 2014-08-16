@@ -128,7 +128,7 @@ GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation
   var index = this.anim_running.push(new GameAnimation(anim,
                                                        x, y, layer, rotation,
                                                        callback, callback_param));
-  return(index-1);
+  return(index);
 }
 
 GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rotation,
@@ -141,7 +141,7 @@ GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rota
 GameAnimationEngine.prototype.remove = function(anim_handle)
 {
   // Remove anim from the running ones
-  this.anim_running.splice(anim_handle, 1);
+  this.anim_running.splice(anim_handle-1, 1);
 }
 
 GameAnimationEngine.prototype.process = function()
