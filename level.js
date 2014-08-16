@@ -384,12 +384,21 @@ Level.prototype.cell_draw = function(cell, x, y, reset_sprite)
   this.graph.sprite_rotate(cell.sprite_handle, cell.rotation);
 }
 
-Level.prototype.cell_move_sprite = function(spr, x, y)
+Level.prototype.cell_sprite_move = function(spr, x, y)
 {
   this.graph.sprite_move(spr,
                          LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                          LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
 }
+
+Level.prototype.cell_sprite_remove = function(cell)
+{  
+  if(cell.sprite_handle) {
+    this.graph.sprite_remove(cell.sprite_handle);
+    cell.sprite_handle = 0;
+  }
+}
+
 
 // Remove specified LevelItem from level,
 // unregister sprite and so
@@ -398,10 +407,7 @@ Level.prototype.cell_remove = function(x, y, layer)
   var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
     cell.item = NO_ITEM;
-    if(cell.sprite_handle) {
-      this.graph.sprite_remove(cell.sprite_handle);
-      cell.sprite_handle = 0;
-    }
+    cell_sprite_remove(cell);
   }
 }
 
@@ -430,10 +436,38 @@ Level.prototype.cell_diff_set = function(x, y, dx, dy, layer)
   }
 }
 
-Level.prototype.cell_set = function(x, y, layer, item, variant)
+Level.prototype.cell_sub_set = function(sub_object, x, y, layer)
 {
+  // Reset the main item
+  x += sub_object.x_cor;
+  y += sub_object.y_cor;
+  
+  var cell = this.cell_get(x, y, layer);
+  cell_sprite_remove(cell);
+  cell.item = item;
+  cell.variant = variant;
+  this.cell_draw(cell, x, y, true);
+}
 
-
+Level.prototype.cell_set = function(x, y, layer, item, variant, sub_object)
+{
+  // Reset the main item
+  var cell = this.cell_get(x,y,layer);
+  cell_sprite_remove(cell);
+  cell.item = item;
+  cell.variant = variant;
+  this.cell_draw(cell, x, y, true);
+  
+  // Get the sub-items  
+  var obj = this.repo.get_object(item, variant);
+  if(obj.sub_objects[0].item) {
+    var sub = this.repo.get_object(obj.sub_objects[0].item, obj.sub_objects[0].variant);
+    this.cell_sub_set(sub, x, y, layer);  
+  }
+  if(obj.sub_objects[1].item) {
+    var sub = this.repo.get_object(obj.sub_objects[1].item, obj.sub_objects[1].variant);
+    this.cell_sub_set(sub, x, y, layer);  
+  }
 }
 
 Level.prototype.is_rendered = function()
@@ -525,7 +559,7 @@ Level.prototype.player_cursor_set_draw = function(draw)
 {
   if(draw && !this.player_mark_cursor && this.player_active.active) {
     this.player_mark_cursor = this.graph.sprite_insert(FIRST_CURSOR);
-    this.cell_move_sprite(this.player_mark_cursor,
+    this.cell_sprite_move(this.player_mark_cursor,
                           this.player_active.x,
                           this.player_active.y);
   }

@@ -138,6 +138,12 @@ GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rota
                           x, y, layer, rotation, callback, callback_param));
 }
 
+GameAnimationEngine.prototype.remove = function(anim_handle)
+{
+  // Remove anim from the running ones
+  this.anim_running.splice(anim_handle, 1);
+}
+
 GameAnimationEngine.prototype.process = function()
 {
   for(var i = 0; i < this.anim_running.length;) {
