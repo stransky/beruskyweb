@@ -384,24 +384,16 @@ Level.prototype.cell_draw = function(cell, x, y, reset_sprite)
   this.graph.sprite_rotate(cell.sprite_handle, cell.rotation);
 }
 
-Level.prototype.cell_draw_sprite = function(spr, x, y)
+Level.prototype.cell_move_sprite = function(spr, x, y)
 {
   this.graph.sprite_move(spr,
                          LEVEL_SCREEN_START_X + x*CELL_SIZE_X,
                          LEVEL_SCREEN_START_Y + y*CELL_SIZE_Y);
 }
 
-Level.prototype.item_draw = function(x, y, layer)
-{
-  var cell = cell_get(x,y,layer);
-  if(cell.item != NO_ITEM) {
-    this.cell_draw(cell,x,y);
-  }
-}
-
 // Remove specified LevelItem from level,
 // unregister sprite and so
-Level.prototype.item_remove = function(x, y, layer)
+Level.prototype.cell_remove = function(x, y, layer)
 {
   var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
@@ -415,9 +407,9 @@ Level.prototype.item_remove = function(x, y, layer)
 
 // 1. Remove a LevelItem at (nx,ny)
 // 2. Move LevelItem from (ox,oy) to (nx,ny)
-Level.prototype.item_move = function(ox, oy, nx, ny, layer)
+Level.prototype.cell_move = function(ox, oy, nx, ny, layer)
 {
-  this.item_remove(nx, ny, layer);
+  this.cell_remove(nx, ny, layer);
 
   var cell_old = this.cell_get(ox,oy,layer);
   if(cell_old.item != NO_ITEM) {
@@ -428,7 +420,7 @@ Level.prototype.item_move = function(ox, oy, nx, ny, layer)
   }
 }
 
-Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
+Level.prototype.cell_diff_set = function(x, y, dx, dy, layer)
 {
   var cell = this.cell_get(x,y,layer);
   if(cell.item != NO_ITEM) {
@@ -436,6 +428,12 @@ Level.prototype.item_diff_set = function(x, y, dx, dy, layer)
     cell.diff_y = dy;
     this.cell_draw(cell,x,y);
   }
+}
+
+Level.prototype.cell_set = function(x, y, layer, item, variant)
+{
+
+
 }
 
 Level.prototype.is_rendered = function()
@@ -527,7 +525,7 @@ Level.prototype.player_cursor_set_draw = function(draw)
 {
   if(draw && !this.player_mark_cursor && this.player_active.active) {
     this.player_mark_cursor = this.graph.sprite_insert(FIRST_CURSOR);
-    this.cell_draw_sprite(this.player_mark_cursor,
+    this.cell_move_sprite(this.player_mark_cursor,
                           this.player_active.x,
                           this.player_active.y);
   }

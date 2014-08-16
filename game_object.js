@@ -49,7 +49,9 @@ function GameObject() {
   this.sprite = 0;    // sprite for this item
   this.animation = 0; // animation for this item
 
-  this.sub_objects = []; // two sub-objects
+  this.sub_objects = Array(); // two sub-objects
+  this.sub_objects[0] = {};
+  this.sub_objects[1] = {};
 }
 
 GameObject.prototype.parse_line = function(line)
@@ -95,8 +97,14 @@ GameObject.prototype.parse_line = function(line)
         this.flags |= token_translate(token).num;
         break;
         case 10: // sub-object1
+        var tmp = token_translate(token);        
+        this.sub_objects[0].item = tmp.base;
+        this.sub_objects[0].variant = tmp.offset;
         break;
         case 11: // sub-object2
+        var tmp = token_translate(token);
+        this.sub_objects[1].item = tmp.base;
+        this.sub_objects[1].variant = tmp.offset;
         break;
         default:
         break;
@@ -385,7 +393,7 @@ GameAnimTemplateRepository_load_callback = function()
       obj.parse_line(tline);
       obj.load_update();
       // Debug print
-      obj.print();
+      //obj.print();
 
       this.callback_object.GameAnimTemplateRepository.anim_template[obj.template_handle] = obj;
       loaded++;

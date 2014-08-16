@@ -66,9 +66,9 @@ GameAnimation.prototype.stop = function()
 GameAnimation.prototype.process = function(level)
 {
   if(this.frame_current >= this.anim_template.frame_num) {
-    if(this.anim_template.flags&ANIM_LOOP)
+    if(this.anim_template.flags&ANIM_LOOP) {
       this.start();
-    else {
+    } else {
       this.stop();
       return(false);
     }
@@ -78,7 +78,7 @@ GameAnimation.prototype.process = function(level)
     this.frame_correction--;
   } else {
     this.frame_correction = this.anim_template.get_frame_correction(this.position_in_animation);
-
+    
     var cell = level.cell_get(this.x, this.y, this.layer);
 
     if(this.anim_template.flags&ANIM_SPRITE) {
