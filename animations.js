@@ -28,6 +28,9 @@
 // An active game animation
 function GameAnimation(template, x, y, layer, rotation, callback, callback_param)
 {
+  // Is it running?
+  this.active = false;
+
   // GameAnimTemplate for this animation
   this.anim_template = template;
 
@@ -51,6 +54,7 @@ function GameAnimation(template, x, y, layer, rotation, callback, callback_param
 
 GameAnimation.prototype.start = function()
 {
+  this.active = true;
   this.frame_current = 0;
   this.frame_correction = this.anim_template.get_frame_correction(0);
   this.position_in_animation = 0;
@@ -58,13 +62,19 @@ GameAnimation.prototype.start = function()
 
 GameAnimation.prototype.stop = function()
 {
-  if (this.callback != undefined) {
-    this.callback(this.callback_param);
+  if (this.active) {
+    if (this.callback != undefined) {
+      this.callback(this.callback_param);
+    }
+    this.active = false;
   }
 }
 
 GameAnimation.prototype.process = function(level)
 {
+  if (!this.active)
+    throw "Inactive animation!";
+
   if(this.frame_current >= this.anim_template.frame_num) {
     if(this.anim_template.flags&ANIM_LOOP) {
       this.start();
@@ -128,7 +138,8 @@ GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation
   var index = this.anim_running.push(new GameAnimation(anim,
                                                        x, y, layer, rotation,
                                                        callback, callback_param));
-  return(index);
+  this.anim_running[index-1].start();
+  return(this.anim_running[index-1]);
 }
 
 GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rotation,
@@ -140,13 +151,21 @@ GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rota
 
 GameAnimationEngine.prototype.remove = function(anim_handle)
 {
-  // Remove anim from the running ones
-  this.anim_running.splice(anim_handle-1, 1);
+  if(anim_handle.active) {
+    // Stop the animation
+    anim_handle.stop();
+    
+    // Remove anim from the running ones
+    var index = this.anim_running.indexOf(anim_handle);
+    if(index != -1) {
+      this.anim_running.splice(index, 1);
+    }
+  }
 }
 
 GameAnimationEngine.prototype.process = function()
 {
-  for(var i = 0; i < this.anim_running.length;) {
+  for(var i = 0; i < this.anim_running.length; ) {
     if(this.anim_running[i] != undefined) {
       var ret = this.anim_running[i].process(this.level);
       if(!ret) {
