@@ -157,6 +157,19 @@ var FONT_NUM                  = 3
 var FONT_STEP                 = 100
 var FONT_SPRITES              = 61
 
+var MENU_SPRIT_ROCK           = FIRST_MENU
+var MENU_SPRIT_END            = (FIRST_MENU+1)
+var MENU_SPRIT_LOGO           = (FIRST_MENU+2)
+var MENU_SPRIT_WALL           = (FIRST_MENU+3)
+var MENU_SPRIT_BACK           = (FIRST_MENU+4)
+var MENU_SPRIT_BACK1          = (FIRST_MENU+5)
+var MENU_SPRIT_BACK2          = (FIRST_MENU+6)
+var MENU_SPRIT_BACK3          = (FIRST_MENU+7)
+var MENU_SPRIT_LOGO_SMALL_1   = (FIRST_MENU+8)
+var MENU_SPRIT_LOGO_SMALL_2   = (FIRST_MENU+9)
+var MENU_SPRIT_LOGO_SMALL_3   = (FIRST_MENU+10)
+var MENU_SPRIT_LOGO_SMALL_NUM = 3
+
 var LAYER_ITEM                = 0
 var LAYER_VARIANT             = 1
 var LAYER_ROTATION            = 2

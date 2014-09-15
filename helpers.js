@@ -25,6 +25,8 @@
  *
  */
 
+/* Load helpers
+*/
 function load_file_text(file, callback, callback_object) {
   var request = new XMLHttpRequest();
   request.open('GET', file);
@@ -45,3 +47,35 @@ function load_file_binary(file, callback, callback_object) {
 function is_number(value) {
   return !isNaN(parseInt(value, 10));
 }
+
+/* Event helpers
+*/
+function BeruskyEvents() {
+  var event_callback = false;
+}
+
+BeruskyEvents.prototype.event_listener = function(e) {
+    console.log("Event_listener");
+    if(this.event_callback) {
+      this.event_callback(e.berusky_data);
+    }
+}
+
+BeruskyEvents.prototype.register = function(fn) {
+  if(fn) {
+    // Listen for the event.
+    this.event_callback = fn;
+    document.addEventListener('berusky', this.event_listener);
+  }
+  else {
+    this.event_callback = false;
+    document.removeEventListener('berusky', this.event_listener);
+  }
+}
+
+BeruskyEvents.prototype.send = function(data) {
+  var event = new CustomEvent('berusky', { "berusky_data" : data } );
+  document.dispatchEvent(event);
+}
+
+var events = new BeruskyEvents();

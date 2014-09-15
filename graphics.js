@@ -52,6 +52,15 @@ Graph.prototype.get_renderer = function() {
   return(this.renderer);
 }
 
+// Clears whole screen - removes all sprites
+Graph.prototype.clear = function()
+{
+  // code by enpu
+  for (var i = this.stage.children.length - 1; i >= 0; i--) {
+    this.stage.removeChild(stage.children[i]);
+  }
+}
+
 sprite_load_callback = function()
 {
   var position = this.callback_object.position;
