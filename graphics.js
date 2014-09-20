@@ -153,7 +153,7 @@ Graph.prototype.sprite_remove = function(sprite_handle)
   this.stage.removeChild(sprite_handle);
 }
 
-Graph.prototype.sprites_load = function()
+Graph.prototype.game_sprites_load = function()
 {
   this.sprite_load("data/Graphics/global1.spr", FIRST_GLOBAL_LEVEL);
   this.sprite_load("data/Graphics/klasik1.spr", FIRST_CLASSIC_LEVEL);
@@ -161,6 +161,19 @@ Graph.prototype.sprites_load = function()
   this.sprite_load("data/Graphics/herni1.spr",  FIRST_OTHER);
   this.sprite_load("data/Graphics/game_cur.spr",FIRST_CURSOR);
   this.sprite_load("data/Graphics/hraci1.spr",  FIRST_PLAYER);
+}
+
+Graph.prototype.menu_sprites_load = function()
+{
+  this.sprite_load("data/Graphics/menu1.spr", MENU_SPRIT_ROCK);
+  this.sprite_load("data/Graphics/menu2.spr", MENU_SPRIT_LOGO);
+  this.sprite_load("data/Graphics/menu3.spr", MENU_SPRIT_BACK);
+  this.sprite_load("data/Graphics/menu4.spr", MENU_SPRIT_ARROWS);
+  this.sprite_load("data/Graphics/menu5.spr", MENU_SPRIT_LOGO_SMALL_1);
+  this.sprite_load("data/Graphics/menu6.spr", MENU_SPRIT_WALL);
+  this.sprite_load("data/Graphics/controls.spr", MENU_CHECKBOX_CHECKED);
+  this.sprite_load("data/Graphics/slidebar.spr", MENU_SLIDEBAR);
+  this.sprite_load("data/Graphics/slider.spr", MENU_SLIDER);
 }
 
 Graph.prototype.background_load = function(background)
@@ -171,9 +184,10 @@ Graph.prototype.background_load = function(background)
 
 Graph.prototype.init = function()
 {
-  this.stage = new PIXI.Stage(0x000000);
+  this.stage = new PIXI.Stage(0x0);
   this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
-  this.sprites_load();
+  this.menu_sprites_load();
+  this.game_sprites_load();
 
   for(var i = 0; i < FONT_NUM; i++) {
     this.load_font(i, FIRST_FONT + i*FONT_STEP, FONT_SPRITES);

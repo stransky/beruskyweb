@@ -25,6 +25,12 @@
  *
  */
 
+var MENU_ENTER      = 1
+var MENU_RETURN     = 2
+var MENU_TIMER      = 3
+var MENU_KEY_INPUT  = 4
+var MENU_LEAVE      = 5
+
 function MenuEvent() {
     var type;
 }
@@ -40,7 +46,8 @@ function GameGui() {
   this.game = new Game();
   this.graph = this.game.graph;
   this.loaded = false;
-
+  this.events = new BeruskyEvents();
+  
   //this.menu_back_stack = Array();
   //this.menu_current = new MenuFunction();
   
@@ -48,13 +55,16 @@ function GameGui() {
   requestAnimFrame(GameGuiLoop);
 }
 
-GameGui.prototype.GameGuiLoop = function() {  
+GameGui.prototype.GameGuiLoop = function() {
+
   if(!this.loaded && this.graph.is_loaded()) {
     this.loaded = true;
-    events.register(this.callback);
+    this.events.listener_add(this);
     this.event_send(GC_MENU_START);    
-  }      
-  this.game.game_loop();
+  }
+  
+  //this.game.game_loop();
+  this.graph.render();
 }
 
 GameGui.prototype.event_send = function(type, p1, p2)
@@ -62,9 +72,8 @@ GameGui.prototype.event_send = function(type, p1, p2)
   var ev = new MenuEvent();  
   ev.type = type;
   ev.p1 = p1;
-  ev.p2 = p2;  
-  console.log("event_send()");
-  events.send(ev);
+  ev.p2 = p2;
+  this.events.send(ev);
 }
 
 /*
@@ -120,21 +129,20 @@ GameGui.prototype.menu_dummy = function(state, data, data1)
 */
 
 GameGui.prototype.menu_main = function(state, data, data1)
-{
-  console.log("GameGui.prototype.menu_main");
+{  
   switch(state) {
     case MENU_RETURN:
     case MENU_ENTER:
-      {
-        console.log("GameGui.prototype.menu_main");
+      {        
 /*      
         menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)(&game_gui::menu_main), data, data1);
-*/
+*/        
         this.graph.clear();
 
         var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
-        var width = spr.widtht;
+        var width = spr.width;
         var height = spr.height;
+
 /*        
         if(DOUBLE_SIZE) {
           p_grf->draw(menu_background_get(),0,0);
@@ -187,12 +195,11 @@ GameGui.prototype.menu_main = function(state, data, data1)
 }
 
 GameGui.prototype.callback = function(event)
-{
-  console.log("callback");
+{  
   var ev = event.type;
   switch(ev) {
     case GC_MENU_START:
-      menu_main(MENU_ENTER);
+      this.menu_main(MENU_ENTER);
       break;      
 /*     
     case GC_MENU_NEW_GAME:

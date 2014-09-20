@@ -51,31 +51,25 @@ function is_number(value) {
 /* Event helpers
 */
 function BeruskyEvents() {
-  var event_callback = false;
+  var listener = false;
 }
 
 BeruskyEvents.prototype.event_listener = function(e) {
-    console.log("Event_listener");
-    if(this.event_callback) {
-      this.event_callback(e.berusky_data);
-    }
+  var events = e.detail.events;
+  if(events.listener) {
+    events.listener.callback(e.detail.data);
+  }
 }
 
-BeruskyEvents.prototype.register = function(fn) {
-  if(fn) {
+BeruskyEvents.prototype.listener_add = function(listener) {  
+  if(!this.listener) {
     // Listen for the event.
-    this.event_callback = fn;
+    this.listener = listener;
     document.addEventListener('berusky', this.event_listener);
-  }
-  else {
-    this.event_callback = false;
-    document.removeEventListener('berusky', this.event_listener);
   }
 }
 
 BeruskyEvents.prototype.send = function(data) {
-  var event = new CustomEvent('berusky', { "berusky_data" : data } );
+  var event = new CustomEvent('berusky', { "detail" : { "events" : this, "data" : data }} );
   document.dispatchEvent(event);
 }
-
-var events = new BeruskyEvents();

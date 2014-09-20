@@ -159,9 +159,8 @@ Game.prototype.game_loop = function()
   // Update all running animations
   this.anim.process();
 
+  // Play the game
   this.game_play();
-
-  this.graph.render();
 }
 
 // Load the game
