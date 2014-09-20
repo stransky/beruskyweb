@@ -157,6 +157,9 @@ var FONT_NUM                  = 3
 var FONT_STEP                 = 100
 var FONT_SPRITES              = 61
 
+var FONT_DEFAULT              = 0
+var FONT_SELECTED             = 1
+
 var MENU_SPRIT_ROCK           = FIRST_MENU
 var MENU_SPRIT_END            = (FIRST_MENU+1)
 var MENU_SPRIT_LOGO           = (FIRST_MENU+2)

@@ -190,12 +190,12 @@ Graph.prototype.init = function()
   this.game_sprites_load();
 
   for(var i = 0; i < FONT_NUM; i++) {
-    this.load_font(i, FIRST_FONT + i*FONT_STEP, FONT_SPRITES);
+    this.font_load(i, FIRST_FONT + i*FONT_STEP, FONT_SPRITES);
   }
   this.font_set(0);
 }
 
-Graph.prototype.load_font = function(font_num, sprite_first, sprite_num)
+Graph.prototype.font_load = function(font_num, sprite_first, sprite_num)
 {
   this.sprite_load("data/Graphics/font" + font_num + ".spr",  sprite_first);
 
@@ -233,8 +233,13 @@ Graph.prototype.text_size_get = function(text)
   return(r);
 }
 
-Graph.prototype.print = function(text)
+Graph.prototype.print = function(text, x, y)
 {
+  if(x != undefined && y != undefined) {
+    this.font_ax = x;
+    this.font_ay = y;
+  }
+
   var font_ax = this.font_ax;
   var font_ay = this.font_ay;
 
