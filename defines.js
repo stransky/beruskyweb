@@ -25,6 +25,9 @@
  *
  */
 
+var DOUBLE_SIZE              = 0
+var VERSION                  = 1.0
+
 var GAME_RESOLUTION_X        = 640
 var GAME_RESOLUTION_Y        = 480
 

@@ -135,6 +135,15 @@ Graph.prototype.sprite_insert = function(spr, x, y)
   return(sprite);
 }
 
+// Insert interactive sprite
+// on mouse-over - draws spr_active
+// on mouse-click - call callback_click
+Graph.prototype.int_sprite_insert = function(spr_inactive, spr_active, x, y, callback_click)
+{
+
+
+}
+
 Graph.prototype.sprite_move = function(sprite_handle, x, y)
 {
   sprite_handle.position.x = x+(sprite_handle.width/2);
@@ -271,6 +280,16 @@ Graph.prototype.print = function(text, x, y)
   }
 
   return(sprite_first);
+}
+
+/* Draws interactive text
+   on mouse over - changes to active font
+   on mouse click - call callback_click
+*/
+Graph.prototype.int_print = function(text, x, y, callback_click)
+{
+
+
 }
 
 function FontTable(graph) {

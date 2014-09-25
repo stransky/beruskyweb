@@ -44,8 +44,9 @@ var MENU_DRAW_ONLY         = 0x8
 var MENU_TEXT_DIFF_X       = 10
 var MENU_TEXT_DIFF_Y       = 5
 
-function MenuEvent() {
-    var type;
+function MenuEvent(type) {
+  this.type = type;
+  this.params = Array();
 }
 
 function MenuFunction() {
@@ -156,9 +157,8 @@ GameGui.prototype.menu_item_set_add = function(dx, dy)
   this.menu_last_y += dy;
 }
 
-
-// MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y
 /*
+// MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y
 GameGui.prototype.menu_item_draw_sprite_set = function(sprite_active, sprite_inactive, 
                                                        menu_text_diff_x, menu_text_diff_y)
 {
@@ -308,19 +308,12 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags,
   }
 }
 
-void gui_base::menu_item_draw_sprite(tpos x, tpos y, char *p_text, MENU_TYPE spr_align, int flags,
-                                     LEVEL_EVENT click1, LEVEL_EVENT click2, LEVEL_EVENT click3)
-{
-  menu_item_set_pos(x,y);
-  menu_item_draw_sprite(p_text, spr_align, flags, click1, click2, click3);
-}
-
-void gui_base::menu_item_draw_text(char *p_text, MENU_TYPE align, int flags,
-                                   LEVEL_EVENT click1, LEVEL_EVENT click2, LEVEL_EVENT click3)
+GameGui.prototype.menu_item_draw_text = function(text, sprite_align, flags,
+                                        click1, click2, click3)
 {
   this.graph.font_alignment_set(align);
   this.graph.font_select(FONT_DEFAULT);
-  this.graph.font_print(&r, this.menu_last_x, this.menu_last_y, p_text);
+  this.graph.print(text, this.menu_last_x, this.menu_last_y);
 
   if(!(flags&MENU_DRAW_ONLY)) {
     LEVEL_EVENT s_text = LEVEL_EVENT(GI_STRING_DRAW, ET_INT(FONT_SELECTED), 
@@ -362,28 +355,21 @@ void gui_base::menu_item_draw_text(char *p_text, MENU_TYPE align, int flags,
   this.menu_last_y += this.menu_last_dy;
 }
 
-void gui_base::menu_item_draw_text(tpos x, tpos y, char *p_text, MENU_TYPE spr_align, int flags,
-                                   LEVEL_EVENT click1, LEVEL_EVENT click2, LEVEL_EVENT click3)
-{
-  menu_item_set_pos(x,y);
-  menu_item_draw_text(p_text, spr_align, flags, click1, click2, click3);
-}
-
-void gui_base::menu_item_draw(char *p_text, MENU_TYPE spr_align, int flags,
-                              LEVEL_EVENT click1, LEVEL_EVENT click2, LEVEL_EVENT click3)
+GameGui.prototype.menu_item_draw = function(text, sprite_align, flags,
+                                            click1, click2, click3)
 {
 
   if(flags&MENU_NO_SPRITE) {
-    menu_item_draw_text(p_text, spr_align, flags, click1, click2, click3);
+    menu_item_draw_text(text, spr_align, flags, click1, click2, click3);
   }
   else {
-    switch(spr_align)
+    switch(sprite_align)
     {
       case MENU_LEFT:
         {      
           menu_item_draw_sprite_set(MENU_SPRIT_ARROW_LC, MENU_SPRIT_ARROW_L, 
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(p_text, MENU_LEFT, flags,
+          menu_item_draw_sprite(text, MENU_LEFT, flags,
                                 click1, click2, click3);
         }
         break;
@@ -391,7 +377,7 @@ void gui_base::menu_item_draw(char *p_text, MENU_TYPE spr_align, int flags,
         {
           menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_R,
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(p_text, MENU_RIGHT, flags,
+          menu_item_draw_sprite(text, MENU_RIGHT, flags,
                                 click1, click2, click3);
         }          
         break;
@@ -400,38 +386,13 @@ void gui_base::menu_item_draw(char *p_text, MENU_TYPE spr_align, int flags,
         {
           menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_L,
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(p_text, MENU_CENTER, flags,
+          menu_item_draw_sprite(text, MENU_CENTER, flags,
                                 click1, click2, click3);
         }      
         break;
       default:
         break;
     }
-  }
-}
-
-void gui_base::menu_item_draw(tpos x, tpos y, char *p_text, MENU_TYPE spr_align, 
-                              int flags, LEVEL_EVENT click1, LEVEL_EVENT click2, LEVEL_EVENT click3)
-{
-  menu_item_set_pos(x,y);
-  menu_item_draw(p_text,spr_align,flags,click1,click2,click3);
-}
-*/
-
-/*
-GameGui.prototype.menu_dummy = function(state, data, data1)
-{
-  switch(state) {
-    case MENU_RETURN:
-    case MENU_ENTER:
-      menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&gui_base::menu_dummy, data, data1);
-      break;
-    
-    case MENU_LEAVE:
-      break;      
-    
-    default:
-      break;
   }
 }
 */
@@ -458,39 +419,38 @@ GameGui.prototype.menu_main = function(state, data, data1)
 */      
         this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
         
+        var new_game = "play";
+        var profiles = "change profile";
+        var settings = "settings";
+        var help = "help";
+        var editor = "editor";
+        var quit = "quit";
 /*
-        static char *new_game = _("play");
-        static char *profiles = _("change profile");
-        static char *settings = _("settings");
-        static char *help = _("help");
-        static char *editor = _("editor");
-        static char *quit = _("quit");
-
         this.graph.font_select(FONT_DEFAULT);
 
-        menu_item_set_pos(GAME_RESOLUTION_X/2 - 70, GAME_RESOLUTION_Y/2 - 50);
-
-        #define MENU_X_DIFF  0
-        #define MENU_Y_DIFF  (DOUBLE_SIZE ? 45 : 35)
-        menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70, GAME_RESOLUTION_Y/2 - 50);
         
-        menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_NEW_GAME));
-        menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_PROFILES));
-        menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_SETTINGS));
-        menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_HELP,FALSE));
-        menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_RUN_EDITOR));      
-        menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_QUIT));
+        var MENU_X_DIFF  = 0;
+        var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
+        this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+        
+        this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_NEW_GAME));
+        this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_PROFILES));
+        this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_SETTINGS));
+        this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_HELP,FALSE));
+        this.menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_RUN_EDITOR));      
+        this.menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_QUIT));
       
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);
-        this.graph.font_print(NULL,_("berusky version %s (C) Anakreon 1997-2012\n"), VERSION);
-        this.graph.font_print(_("distributed under GPLv2\n"));
+        this.graph.print("berusky version " + VERSION + "(C) Anakreon 1997-2012\n");
+        this.graph.print("distributed under GPLv2\n");
         
-        #define PROFILE_Y_DIFF  (DOUBLE_SIZE ? 70 : -10)
+        var PROFILE_Y_DIFF  = (DOUBLE_SIZE ? 70 : -10);
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, LOGO_START+height+PROFILE_Y_DIFF);
-        this.graph.font_print(NULL, _("Selected profile: %s"), profile.profile_name);
-*/
+        //this.graph.print("Selected profile: " + profile.profile_name);
+*/        
       }
       break;
     case MENU_LEAVE:      
