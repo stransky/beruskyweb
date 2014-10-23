@@ -136,12 +136,54 @@ Graph.prototype.sprite_insert = function(spr, x, y)
 }
 
 // Insert interactive sprite
-// on mouse-over - draws spr_active
+// on mouse-over - draws spr_active or call callback_over
 // on mouse-click - call callback_click
-Graph.prototype.int_sprite_insert = function(spr_inactive, spr_active, x, y, callback_click)
+Graph.prototype.int_sprite_insert = function(spr_inactive, spr_active, x, y,
+                                             callback_click)
 {
+  var spr = this.sprite_insert(spr_inactive, x, y);
+  spr.buttonMode = true;
+  spr.interactive = true;
+  spr.sprite_inactive = this.sprites[spr_inactive];
+  spr.sprite_active = this.sprites[spr_active];
 
+  // set the mousedown and touchstart callback..
+  spr.mousedown = spr.touchstart = function(data){
+    this.isdown = true;
+    this.setTexture(this.sprite_active);
+  }
 
+  // set the mouseup and touchend callback..
+  spr.mouseup = spr.touchend = spr.mouseupoutside = spr.touchendoutside = function(data){
+    this.isdown = false;
+    if(this.isOver)
+    {
+      this.setTexture(this.sprite_active);
+    }
+    else
+    {
+      this.setTexture(this.sprite_inactive);
+    }
+  }
+
+  // set the mouseover callback..
+  spr.mouseover = function(data){
+    this.isOver = true;
+    if(this.isdown)
+      return
+    this.setTexture(this.sprite_active)
+  }
+  
+  // set the mouseout callback..
+  spr.mouseout = function(data){
+    this.isOver = false;
+    if(this.isdown)
+      return
+    this.setTexture(this.sprite_inactive)
+  }
+  
+  spr.click = spr.tap = callback_click;  
+  return(spr);
 }
 
 Graph.prototype.sprite_move = function(sprite_handle, x, y)
@@ -252,7 +294,7 @@ Graph.prototype.print = function(text, x, y)
   var font_ax = this.font_ax;
   var font_ay = this.font_ay;
 
-  if(this.font_align = ALIGN_RIGHT) {
+  if(this.font_align == ALIGN_RIGHT) {
     font_ax -= this.text_size_get(text).width;
   } else if(this.font_align = ALIGN_CENTER) {
 
@@ -282,14 +324,79 @@ Graph.prototype.print = function(text, x, y)
   return(sprite_first);
 }
 
+font_callback_set_active = function(data)
+{
+  sprite_first
+  
+  for (var i = sprite_first.children.length - 1; i >= 0; i--) {
+    var spr = sprite_first.children[i];
+    spr.setTexture(spr.sprite_active);
+  }
+}
+
+font_callback_set_inactive = function(data)
+{
+  sprite_first
+  
+  for (var i = sprite_first.children.length - 1; i >= 0; i--) {
+    var spr = sprite_first.children[i];
+    spr.setTexture(spr.sprite_inactive);
+  }
+}
+
 /* Draws interactive text
-   on mouse over - changes to active font
+   on mouse over - changes to active font and redraw
    on mouse click - call callback_click
 */
-Graph.prototype.int_print = function(text, x, y, callback_click)
+Graph.prototype.int_print = function(text, callback_click, x, y)
 {
+  if(x != undefined && y != undefined) {
+    this.font_ax = x;
+    this.font_ay = y;
+  }
 
+  var font_ax = this.font_ax;
+  var font_ay = this.font_ay;
 
+  // reaction frame
+  var text_width = this.text_size_get(text).width;
+  var text_height = this.text_size_get(text).height;
+
+  if(this.font_align == ALIGN_RIGHT) {
+    font_ax -= text_width;
+  } else if(this.font_align = ALIGN_CENTER) {
+
+  }
+
+  var sprite_first;
+  var local_x = 0;
+  var local_y = 0;
+
+  for(var i = 0; i < text.length; i++) {
+    var spr_inactive = this.font_table[FONT_DEFAULT].sprite_char_get(text[i]);
+    var spr_active = this.font_table[FONT_SELECTED].sprite_char_get(text[i]);
+    
+    var spr = this.int_sprite_insert(spr_inactive, spr_active, 0, 0, 
+                                     callback_click);
+
+    TODO -> set hit area of first sprite, disable interactivity of other sprites
+    do the update for all sprites once
+    if(!i) {
+      this.sprite_move(spr, font_ax, font_ay);
+      this.hitArea = new Rectangle(font_ax, font_ay, text_width, text_height);
+      sprite_first = spr;
+      local_x -= spr.anchor.x*spr.width;
+      local_y -= spr.anchor.y*spr.height;
+    }
+    else {
+      this.sprite_move(spr, local_x, local_y);
+      sprite_first.addChild(spr);
+    }
+
+    local_x += spr.width;
+  }
+
+  return(sprite_first);
 }
 
 function FontTable(graph) {

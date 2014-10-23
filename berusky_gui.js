@@ -408,16 +408,16 @@ GameGui.prototype.menu_main = function(state, data, data1)
 */        
         this.graph.clear();
 
-        var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
-        var width = spr.width;
-        var height = spr.height;
+        //var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
+        //var width = spr.width;
+        //var height = spr.height;
 
 /*        
         if(DOUBLE_SIZE) {
           p_grf->draw(menu_background_get(),0,0);
         }      
 */      
-        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
+        //this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
         
         var new_game = "play";
         var profiles = "change profile";
@@ -425,6 +425,8 @@ GameGui.prototype.menu_main = function(state, data, data1)
         var help = "help";
         var editor = "editor";
         var quit = "quit";
+        
+        this.graph.int_print(new_game, "undefined", 0, 0);
 /*
         this.graph.font_select(FONT_DEFAULT);
 
