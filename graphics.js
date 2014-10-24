@@ -138,52 +138,104 @@ Graph.prototype.sprite_insert = function(spr, x, y)
 // Insert interactive sprite
 // on mouse-over - draws spr_active or call callback_over
 // on mouse-click - call callback_click
-Graph.prototype.int_sprite_insert = function(spr_inactive, spr_active, x, y,
-                                             callback_click)
+Graph.prototype.int_sprite_insert = function(active, 
+                                             spr_inactive, spr_active, 
+                                             x, y,
+                                             callback_click, 
+                                             callback_activate, 
+                                             callback_inactivate)
 {
   var spr = this.sprite_insert(spr_inactive, x, y);
-  spr.buttonMode = true;
-  spr.interactive = true;
   spr.sprite_inactive = this.sprites[spr_inactive];
   spr.sprite_active = this.sprites[spr_active];
-
-  // set the mousedown and touchstart callback..
-  spr.mousedown = spr.touchstart = function(data){
-    this.isdown = true;
-    this.setTexture(this.sprite_active);
-  }
-
-  // set the mouseup and touchend callback..
-  spr.mouseup = spr.touchend = spr.mouseupoutside = spr.touchendoutside = function(data){
-    this.isdown = false;
-    if(this.isOver)
-    {
-      this.setTexture(this.sprite_active);
+  
+  if(active) {
+    spr.buttonMode = true;
+    spr.interactive = true;
+    
+    spr.callback_activate = callback_activate;
+    spr.callback_inactivate = callback_inactivate;
+    
+    // set the mousedown and touchstart callback..
+    if(callback_activate != "undefined" && callback_inactivate != "undefined") {
+      spr.mousedown = spr.touchstart = function(data){
+        this.isdown = true;
+        this.callback_activate(this);
+      }
+      
+      // set the mouseup and touchend callback..
+      spr.mouseup = spr.touchend = spr.mouseupoutside = spr.touchendoutside = function(data){
+        this.isdown = false;
+        if(this.isOver)
+        {
+          this.callback_activate(this);
+        }
+        else
+        {
+          this.callback_inactivate(this);
+        }
+      }
+    
+      // set the mouseover callback..
+      spr.mouseover = function(data){
+        this.isOver = true;
+        if(this.isdown)
+          return
+        this.callback_activate(this);
+      }
+      
+      // set the mouseout callback..
+      spr.mouseout = function(data){
+        this.isOver = false;
+        if(this.isdown)
+          return
+        this.callback_inactivate(this);
+      }      
     }
-    else
-    {
-      this.setTexture(this.sprite_inactive);
+    else {    
+      spr.mousedown = spr.touchstart = function(data){
+        this.isdown = true;
+        this.setTexture(this.sprite_active);
+      }
+    
+      // set the mouseup and touchend callback..
+      spr.mouseup = spr.touchend = spr.mouseupoutside = spr.touchendoutside = function(data){
+        this.isdown = false;
+        if(this.isOver)
+        {
+          this.setTexture(this.sprite_active);
+        }
+        else
+        {
+          this.setTexture(this.sprite_inactive);
+        }
+      }
+    
+      // set the mouseover callback..
+      spr.mouseover = function(data){
+        this.isOver = true;
+        if(this.isdown)
+          return
+        this.setTexture(this.sprite_active)
+      }
+      
+      // set the mouseout callback..
+      spr.mouseout = function(data){
+        this.isOver = false;
+        if(this.isdown)
+          return
+        this.setTexture(this.sprite_inactive)
+      }      
     }
-  }
-
-  // set the mouseover callback..
-  spr.mouseover = function(data){
-    this.isOver = true;
-    if(this.isdown)
-      return
-    this.setTexture(this.sprite_active)
+    spr.click = spr.tap = callback_click;
   }
   
-  // set the mouseout callback..
-  spr.mouseout = function(data){
-    this.isOver = false;
-    if(this.isdown)
-      return
-    this.setTexture(this.sprite_inactive)
-  }
-  
-  spr.click = spr.tap = callback_click;  
   return(spr);
+}
+
+Graph.prototype.int_sprite_active_set = function(active)
+{
+  this.setTexture(active ? this.sprite_active : this.sprite_inactive);
 }
 
 Graph.prototype.sprite_move = function(sprite_handle, x, y)
@@ -324,20 +376,18 @@ Graph.prototype.print = function(text, x, y)
   return(sprite_first);
 }
 
-font_callback_set_active = function(data)
+font_callback_set_active = function(sprite_first)
 {
-  sprite_first
-  
+  sprite_first.setTexture(sprite_first.sprite_active);
   for (var i = sprite_first.children.length - 1; i >= 0; i--) {
     var spr = sprite_first.children[i];
     spr.setTexture(spr.sprite_active);
   }
 }
 
-font_callback_set_inactive = function(data)
+font_callback_set_inactive = function(sprite_first)
 {
-  sprite_first
-  
+  sprite_first.setTexture(sprite_first.sprite_inactive);
   for (var i = sprite_first.children.length - 1; i >= 0; i--) {
     var spr = sprite_first.children[i];
     spr.setTexture(spr.sprite_inactive);
@@ -375,15 +425,16 @@ Graph.prototype.int_print = function(text, callback_click, x, y)
   for(var i = 0; i < text.length; i++) {
     var spr_inactive = this.font_table[FONT_DEFAULT].sprite_char_get(text[i]);
     var spr_active = this.font_table[FONT_SELECTED].sprite_char_get(text[i]);
-    
-    var spr = this.int_sprite_insert(spr_inactive, spr_active, 0, 0, 
-                                     callback_click);
 
-    TODO -> set hit area of first sprite, disable interactivity of other sprites
-    do the update for all sprites once
+    var spr = this.int_sprite_insert(!i /* only first sprite is active*/,
+                                     spr_inactive, spr_active, 
+                                     0, 0,
+                                     callback_click,
+                                     font_callback_set_active,
+                                     font_callback_set_inactive);
     if(!i) {
       this.sprite_move(spr, font_ax, font_ay);
-      this.hitArea = new Rectangle(font_ax, font_ay, text_width, text_height);
+      this.hitArea = new PIXI.Rectangle(font_ax, font_ay, text_width, text_height);
       sprite_first = spr;
       local_x -= spr.anchor.x*spr.width;
       local_y -= spr.anchor.y*spr.height;
