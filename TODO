@@ -1,5 +1,8 @@
+strings/print -> implement "\n"
+
 http://www.goodboydigital.com/pixi-js-gets-interactive/
 - interactive stage? (Menu stage?)
+- interactive sprites -> bug sprites
 
 - move gameGui above the Game
 - launch level from gui

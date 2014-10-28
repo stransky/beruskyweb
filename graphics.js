@@ -357,9 +357,12 @@ Graph.prototype.text_size_get = function(text)
 {
   var r = new Rect();
 
-  r.height = this.sprites[this.font.sprite_char_get(text[0])].height;
+  r.height = this.sprites[this.font.sprite_char_get(text[0])].height;  
   for(var i = 0; i < text.length; i++) {
-    r.width += this.sprites[this.font.sprite_char_get(text[i])].width;
+    var c = this.font.sprite_char_get(text[i]);
+    if(c) {
+      r.width += this.sprites[c].width;
+    }
   }
 
   return(r);
@@ -385,21 +388,25 @@ Graph.prototype.print = function(text, x, y)
   var local_x = 0;
   var local_y = 0;
 
+TODO -> "\n"
+
   for(var i = 0; i < text.length; i++) {
-    var spr = this.sprite_insert(this.font.sprite_char_get(text[i]));
-
-    if(!i) {
-      this.sprite_move(spr, font_ax, font_ay);
-      sprite_first = spr;
-      local_x -= spr.anchor.x*spr.width;
-      local_y -= spr.anchor.y*spr.height;
+    var c = this.font.sprite_char_get(text[i]);
+    if(c) {
+      var spr = this.sprite_insert(c);
+      if(!i) {
+        this.sprite_move(spr, font_ax, font_ay);
+        sprite_first = spr;
+        local_x -= spr.anchor.x*spr.width;
+        local_y -= spr.anchor.y*spr.height;
+      }
+      else {
+        this.sprite_move(spr, local_x, local_y);
+        sprite_first.addChild(spr);
+      }
+  
+      local_x += spr.width;
     }
-    else {
-      this.sprite_move(spr, local_x, local_y);
-      sprite_first.addChild(spr);
-    }
-
-    local_x += spr.width;
   }
 
   return(sprite_first);
@@ -451,29 +458,33 @@ Graph.prototype.int_print = function(text, callback_click, callback_click_data, 
   var local_x = 0;
   var local_y = 0;
 
+TODO -> "\n"
+
   for(var i = 0; i < text.length; i++) {
     var spr_inactive = this.font_table[FONT_DEFAULT].sprite_char_get(text[i]);
     var spr_active = this.font_table[FONT_SELECTED].sprite_char_get(text[i]);
-
-    var spr = this.int_sprite_insert(!i /* only first sprite is active*/,
-                                     spr_inactive, spr_active, 
-                                     0, 0,
-                                     callback_click, callback_click_data,
-                                     font_callback_set_active,
-                                     font_callback_set_inactive);
-    if(!i) {
-      this.sprite_move(spr, font_ax, font_ay);
-      this.hitArea = new PIXI.Rectangle(font_ax, font_ay, text_width, text_height);
-      sprite_first = spr;
-      local_x -= spr.anchor.x*spr.width;
-      local_y -= spr.anchor.y*spr.height;
+    
+    if(spr_inactive && spr_active) {
+      var spr = this.int_sprite_insert(!i /* only first sprite is active*/,
+                                       spr_inactive, spr_active, 
+                                       0, 0,
+                                       callback_click, callback_click_data,
+                                       font_callback_set_active,
+                                       font_callback_set_inactive);
+      if(!i) {
+        this.sprite_move(spr, font_ax, font_ay);
+        this.hitArea = new PIXI.Rectangle(font_ax, font_ay, text_width, text_height);
+        sprite_first = spr;
+        local_x -= spr.anchor.x*spr.width;
+        local_y -= spr.anchor.y*spr.height;
+      }
+      else {
+        this.sprite_move(spr, local_x, local_y);
+        sprite_first.addChild(spr);
+      }
+  
+      local_x += spr.width;
     }
-    else {
-      this.sprite_move(spr, local_x, local_y);
-      sprite_first.addChild(spr);
-    }
-
-    local_x += spr.width;
   }
 
   return(sprite_first);
@@ -483,6 +494,9 @@ function FontTable(graph) {
   this.graph = graph;
 
   this.position = Array();
+  for(var i = 0; i < 255; i++)
+    this.position[i] = -1;
+  
   this.loaded = false;
 
   this.sprite_first = 0;
@@ -509,5 +523,6 @@ FontTable.prototype.load = function(file)
 
 FontTable.prototype.sprite_char_get = function(c)
 {
-  return(this.sprite_first + this.position[c]);
+  var pos = this.position[c];
+  return((pos != -1) ? this.sprite_first + pos : 0);
 }
