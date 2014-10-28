@@ -44,16 +44,27 @@ var MENU_DRAW_ONLY         = 0x8
 var MENU_TEXT_DIFF_X       = 10
 var MENU_TEXT_DIFF_Y       = 5
 
-function MenuEvent(type) {
-  this.type = type;
-  this.params = Array();
-}
-
 function MenuFunction() {
 /*
   void run(MENU_STATE state)
   void run_and_clear(MENU_STATE state)
   */
+}
+
+function MenuEvent(type, params) {
+  this.type = type;
+
+  if(params != "undefined") {
+    this.params = params;
+  }
+  else {
+    this.params = Array();  
+  }
+}
+
+function GameGuiCallbackData(gui, event) {
+  this.GameGui = gui;
+  this.event = event;
 }
 
 function GameGui() {
@@ -85,20 +96,11 @@ GameGui.prototype.GameGuiLoop = function() {
   if(!this.loaded && this.graph.is_loaded()) {
     this.loaded = true;
     this.events.listener_add(this);
-    this.event_send(GC_MENU_START);    
+    this.events.send(new MenuEvent(GC_MENU_START));
   }
   
   //this.game.game_loop();
   this.graph.render();
-}
-
-GameGui.prototype.event_send = function(type, p1, p2)
-{
-  var ev = new MenuEvent();  
-  ev.type = type;
-  ev.p1 = p1;
-  ev.p2 = p2;
-  this.events.send(ev);
 }
 
 /*
@@ -157,7 +159,11 @@ GameGui.prototype.menu_item_set_add = function(dx, dy)
   this.menu_last_y += dy;
 }
 
-/*
+GameGui.prototype.menu_item_callback = function(data)
+{
+  data.GameGui.events.send(data.event);
+}
+
 // MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y
 GameGui.prototype.menu_item_draw_sprite_set = function(sprite_active, sprite_inactive, 
                                                        menu_text_diff_x, menu_text_diff_y)
@@ -166,133 +172,45 @@ GameGui.prototype.menu_item_draw_sprite_set = function(sprite_active, sprite_ina
   this.menu_spr_inactive = sprite_inactive;
   this.menu_text_diff_x = menu_text_diff_x;
   this.menu_text_diff_y = menu_text_diff_y;
-  this.menu_spr_diff_dx = sprite_active.width;
-  this.menu_spr_diff_dy = sprite_active.height;
+  this.menu_spr_diff_dx = this.graph.sprites[sprite_active].width;
+  this.menu_spr_diff_dy = this.graph.sprites[sprite_active].height;
 }
 
-GameGui.prototype.menu_item_draw_sprite = function(text, align, flags,
-                                                   click1, click2, click3)
+GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
 {
   switch(align)
   {
     case MENU_LEFT:
       {
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
-          this.graph.sprite_insert(menu_spr_inactive, this.menu_last_x, this.menu_last_y);
+          this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
+                                     this.menu_last_x, this.menu_last_y,
+                                     this.menu_item_callback, new GameGuiCallbackData(this, event));
         }
-        this.graph.font_alignment_set(MENU_LEFT);
-        this.graph.font_select(FONT_DEFAULT);
-        this.graph.print(test, this.menu_last_x + menu_spr_diff_dx + menu_text_diff_x, 
-                               this.menu_last_y + menu_text_diff_y);
-      
-        if(!(flags&MENU_DRAW_ONLY)) {
-          RECT r_arrow = {this.menu_last_x, this.menu_last_y, menu_spr_diff_dx, menu_spr_diff_dy};
-      
-          LEVEL_EVENT s_spr;
-          LEVEL_EVENT u_spr;
-        
-          if(flags&MENU_DONT_DRAW_SPRITE) {
-            u_spr = s_spr = LEVEL_EVENT(EV_NONE);
-          }
-          else {
-            s_spr = LEVEL_EVENT(GI_SPRITE_DRAW, menu_spr_active, this.menu_last_x, this.menu_last_y);
-            u_spr = LEVEL_EVENT(GI_SPRITE_DRAW, menu_spr_inactive,  this.menu_last_x, this.menu_last_y);
-          }
-  
-          LEVEL_EVENT s_text = LEVEL_EVENT(GI_STRING_DRAW, ET(FONT_SELECTED),
-                               ET_INT(this.menu_last_x + menu_spr_diff_dx + menu_text_diff_x),
-                               ET_INT(this.menu_last_y + menu_text_diff_y),
-                               ET_INT(MENU_LEFT), ET_INT(p_text));
-          LEVEL_EVENT u_text = LEVEL_EVENT(GI_STRING_DRAW, ET_INT(FONT_DEFAULT),
-                               ET_INT(this.menu_last_x + menu_spr_diff_dx + menu_text_diff_x),
-                               ET_INT(this.menu_last_y + menu_text_diff_y),
-                               ET_INT(MENU_LEFT), ET_INT(p_text));
-          LEVEL_EVENT u_text_highlight = LEVEL_EVENT(GI_HIGHLIGHT_EVENT, highlight_group_next);
-          u_text_highlight.depends_add(2);
-      
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN,  s_spr, s_text));
-          if(!highlight_group_next)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_OUT, u_spr, u_text));
-          else
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, u_text_highlight, u_spr, u_text));
-          if(flags&MENU_SAVE_BACK)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, LEVEL_EVENT(GI_MENU_BACK_PUSH)));
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, click1, click2, click3));
-    
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN,  s_spr, s_text));
-          if(!highlight_group_next)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_OUT, u_spr, u_text));
-          else
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, u_text_highlight, u_spr, u_text));
-          if(flags&MENU_SAVE_BACK)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, LEVEL_EVENT(GI_MENU_BACK_PUSH)));
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, click1, click2, click3));
-          
-          highlight_group_next = HIGHLIGHT_GROUP_NONE;
-        }
-        
+        this.graph.font_alignment_set(ALIGN_LEFT);
+        this.graph.int_print(text,
+                             this.menu_item_callback, new GameGuiCallbackData(this, event),
+                             this.menu_last_x + this.menu_spr_diff_dx + this.menu_text_diff_x,
+                             this.menu_last_y + this.menu_text_diff_y);
+
         this.menu_last_x += this.menu_last_dx;
         this.menu_last_y += this.menu_last_dy;        
       }
       break;
+      
     case MENU_RIGHT:
       {
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
-          p_grf->draw(menu_spr_inactive, this.menu_last_x, this.menu_last_y);
+          this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
+                                     this.menu_last_x, this.menu_last_y,
+                                     this.menu_item_callback, new GameGuiCallbackData(this, event));
         }
-        this.graph.font_alignment_set(MENU_RIGHT);
-        this.graph.font_select(FONT_DEFAULT);
-        this.graph.font_print(&r, this.menu_last_x - menu_text_diff_x, this.menu_last_y + menu_text_diff_y, p_text);
+        this.graph.font_alignment_set(ALIGN_RIGHT);
+        this.graph.int_print(text,
+                             this.menu_item_callback, new GameGuiCallbackData(this, event),
+                             this.menu_last_x - this.menu_text_diff_x,
+                             this.menu_last_y + this.menu_text_diff_y);
 
-        if(!(flags&MENU_DRAW_ONLY)) {
-          RECT r_arrow = {this.menu_last_x, this.menu_last_y, menu_spr_diff_dx, menu_spr_diff_dy};
-  
-          LEVEL_EVENT s_spr;
-          LEVEL_EVENT u_spr;
-  
-          if(flags&MENU_DONT_DRAW_SPRITE) {
-            u_spr = s_spr = LEVEL_EVENT(EV_NONE);
-          }
-          else {
-            s_spr = LEVEL_EVENT(GI_SPRITE_DRAW, menu_spr_active, this.menu_last_x, this.menu_last_y);
-            u_spr = LEVEL_EVENT(GI_SPRITE_DRAW, menu_spr_inactive,  this.menu_last_x, this.menu_last_y);
-          }
-          
-          LEVEL_EVENT s_text = LEVEL_EVENT(GI_STRING_DRAW, 
-                                          ET_INT(FONT_SELECTED), 
-                                          ET_INT(this.menu_last_x - menu_text_diff_x), 
-                                          ET_INT(this.menu_last_y + menu_text_diff_y), 
-                                          ET_INT(MENU_RIGHT), ET_INT(p_text));
-          LEVEL_EVENT u_text = LEVEL_EVENT(GI_STRING_DRAW, 
-                                          ET_INT(FONT_DEFAULT),  
-                                          ET_INT(this.menu_last_x - menu_text_diff_x), 
-                                          ET_INT(this.menu_last_y + menu_text_diff_y), 
-                                          ET_INT(MENU_RIGHT), ET_INT(p_text));
-  
-          LEVEL_EVENT u_text_highlight = LEVEL_EVENT(GI_HIGHLIGHT_EVENT, highlight_group_next);
-          u_text_highlight.depends_add(2);
-  
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN,  s_spr, s_text));
-          if(!highlight_group_next)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_OUT, u_spr, u_text));
-          else
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, u_text_highlight, u_text));
-          if(flags&MENU_SAVE_BACK)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, LEVEL_EVENT(GI_MENU_BACK_PUSH)));        
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r_arrow, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, click1, click2, click3));
-  
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN,  s_spr, s_text));
-          if(!highlight_group_next)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_OUT, u_spr, u_text));
-          else
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, u_text_highlight, u_text));
-          if(flags&MENU_SAVE_BACK)
-            input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, LEVEL_EVENT(GI_MENU_BACK_PUSH)));        
-          input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, click1, click2, click3));
-  
-          highlight_group_next = HIGHLIGHT_GROUP_NONE;
-        }
-      
         this.menu_last_x += this.menu_last_dx;
         this.menu_last_y += this.menu_last_dy;
       }
@@ -308,86 +226,46 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags,
   }
 }
 
-GameGui.prototype.menu_item_draw_text = function(text, sprite_align, flags,
-                                        click1, click2, click3)
+GameGui.prototype.menu_item_draw_text = function(text, align, flags, event)
 {
   this.graph.font_alignment_set(align);
-  this.graph.font_select(FONT_DEFAULT);
-  this.graph.print(text, this.menu_last_x, this.menu_last_y);
-
-  if(!(flags&MENU_DRAW_ONLY)) {
-    LEVEL_EVENT s_text = LEVEL_EVENT(GI_STRING_DRAW, ET_INT(FONT_SELECTED), 
-                                    ET_INT(this.menu_last_x), 
-                                    ET_INT(this.menu_last_y), 
-                                    ET_INT(align),
-                                    ET_INT(p_text));
-    LEVEL_EVENT u_text = LEVEL_EVENT(GI_STRING_DRAW, ET_INT(FONT_DEFAULT),
-                                    ET_INT(this.menu_last_x), 
-                                    ET_INT(this.menu_last_y), 
-                                    ET_INT(align),
-                                    ET_INT(p_text));
-    LEVEL_EVENT u_text_highlight = LEVEL_EVENT(GI_HIGHLIGHT_EVENT, highlight_group_next);
-    u_text_highlight.depends_add(1);
+  this.graph.int_print(text,
+                       this.menu_item_callback, new GameGuiCallbackData(this, event),
+                       this.menu_last_x, this.menu_last_y);
   
-    // event - release the saved highlighted event (if any)
-    input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN,  s_text));
-    if(!highlight_group_next)
-      input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r), MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_OUT, u_text));
-    else
-      input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), 
-                       MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, 
-                       u_text_highlight, u_text));
-  
-    if(flags&MENU_SAVE_BACK) {
-      input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), 
-                       MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, 
-                       LEVEL_EVENT(GI_MENU_BACK_PUSH)));
-    }
-    
-    input.mevent_add(MOUSE_EVENT(MOUSE_STATE(r, MASK_BUTTON_LEFT), 
-                     MEVENT_ACTIVATE_ONCE|MEVENT_MOUSE_IN|MEVENT_MOUSE_BUTTONS, 
-                     click1, click2, click3));
-    
-    highlight_group_next = HIGHLIGHT_GROUP_NONE;
-  }
-
   this.menu_last_x += this.menu_last_dx;
   this.menu_last_y += this.menu_last_dy;
 }
 
-GameGui.prototype.menu_item_draw = function(text, sprite_align, flags,
-                                            click1, click2, click3)
+GameGui.prototype.menu_item_draw = function(text, sprite_align, flags, event)
 {
 
   if(flags&MENU_NO_SPRITE) {
-    menu_item_draw_text(text, spr_align, flags, click1, click2, click3);
+    this.menu_item_draw_text(text, spr_align, flags, event);
   }
   else {
     switch(sprite_align)
     {
       case MENU_LEFT:
         {      
-          menu_item_draw_sprite_set(MENU_SPRIT_ARROW_LC, MENU_SPRIT_ARROW_L, 
+          this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_LC, MENU_SPRIT_ARROW_L, 
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(text, MENU_LEFT, flags,
-                                click1, click2, click3);
+          this.menu_item_draw_sprite(text, MENU_LEFT, flags, event);
         }
         break;
       case MENU_RIGHT:
         {
-          menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_R,
+          this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_R,
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(text, MENU_RIGHT, flags,
-                                click1, click2, click3);
+          this.menu_item_draw_sprite(text, MENU_RIGHT, flags, event);
         }          
         break;
       
       case MENU_CENTER:
         {
-          menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_L,
+          this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_L,
                                     MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          menu_item_draw_sprite(text, MENU_CENTER, flags,
-                                click1, click2, click3);
+          this.menu_item_draw_sprite(text, MENU_CENTER, flags, event);
         }      
         break;
       default:
@@ -395,7 +273,6 @@ GameGui.prototype.menu_item_draw = function(text, sprite_align, flags,
     }
   }
 }
-*/
 
 GameGui.prototype.menu_main = function(state, data, data1)
 {  
@@ -408,16 +285,15 @@ GameGui.prototype.menu_main = function(state, data, data1)
 */        
         this.graph.clear();
 
-        //var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
-        //var width = spr.width;
-        //var height = spr.height;
-
+        var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
+        var width = spr.width;
+        var height = spr.height;
 /*        
         if(DOUBLE_SIZE) {
           p_grf->draw(menu_background_get(),0,0);
         }      
 */      
-        //this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
+        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
         
         var new_game = "play";
         var profiles = "change profile";
@@ -426,22 +302,20 @@ GameGui.prototype.menu_main = function(state, data, data1)
         var editor = "editor";
         var quit = "quit";
         
-        this.graph.int_print(new_game, "undefined", 0, 0);
-/*
-        this.graph.font_select(FONT_DEFAULT);
-
-        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70, GAME_RESOLUTION_Y/2 - 50);
-        
+        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
+                               GAME_RESOLUTION_Y/2 - 50);
         var MENU_X_DIFF  = 0;
         var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
         
-        this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_NEW_GAME));
-        this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_PROFILES));
-        this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_SETTINGS));
-        this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_HELP,FALSE));
-        this.menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_RUN_EDITOR));      
-        this.menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_QUIT));
+        this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
+        this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_PROFILES));
+        this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_SETTINGS));
+        this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_HELP, [ false ]));
+        this.menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_RUN_EDITOR));      
+        this.menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_QUIT));
+        
+/*
       
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);

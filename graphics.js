@@ -141,7 +141,7 @@ Graph.prototype.sprite_insert = function(spr, x, y)
 Graph.prototype.int_sprite_insert = function(active, 
                                              spr_inactive, spr_active, 
                                              x, y,
-                                             callback_click, 
+                                             callback_click, callback_click_data,
                                              callback_activate, 
                                              callback_inactivate)
 {
@@ -153,6 +153,8 @@ Graph.prototype.int_sprite_insert = function(active,
     spr.buttonMode = true;
     spr.interactive = true;
     
+    spr.callback_click = callback_click;
+    spr.callback_click_data = callback_click_data;
     spr.callback_activate = callback_activate;
     spr.callback_inactivate = callback_inactivate;
     
@@ -227,9 +229,36 @@ Graph.prototype.int_sprite_insert = function(active,
         this.setTexture(this.sprite_inactive)
       }      
     }
-    spr.click = spr.tap = callback_click;
+    
+    spr.click = spr.tap = function(data) {
+      this.callback_click(spr.callback_click_data);
+    }
   }
   
+  return(spr);
+}
+
+spr_callback_set_active = function(spr)
+{
+  spr.setTexture(spr.sprite_active);
+}
+
+spr_callback_set_inactive = function(spr)
+{
+  spr.setTexture(spr.sprite_inactive);
+}
+
+// Insert interactive sprite
+Graph.prototype.int_sprite_draw = function(spr_inactive, spr_active,
+                                           x, y,
+                                           callback_click, callback_click_data)
+{
+  var spr = this.int_sprite_insert(true,
+                                   spr_inactive, spr_active,
+                                   x, y,
+                                   callback_click, callback_click_data,
+                                   spr_callback_set_active,
+                                   spr_callback_set_inactive);
   return(spr);
 }
 
@@ -319,7 +348,7 @@ Graph.prototype.font_set = function(font)
   this.font = this.font_table[font];
 }
 
-Graph.prototype.font_align_set = function(align)
+Graph.prototype.font_alignment_set = function(align)
 {
   this.font_align = align;
 }
@@ -398,7 +427,7 @@ font_callback_set_inactive = function(sprite_first)
    on mouse over - changes to active font and redraw
    on mouse click - call callback_click
 */
-Graph.prototype.int_print = function(text, callback_click, x, y)
+Graph.prototype.int_print = function(text, callback_click, callback_click_data, x, y)
 {
   if(x != undefined && y != undefined) {
     this.font_ax = x;
@@ -429,7 +458,7 @@ Graph.prototype.int_print = function(text, callback_click, x, y)
     var spr = this.int_sprite_insert(!i /* only first sprite is active*/,
                                      spr_inactive, spr_active, 
                                      0, 0,
-                                     callback_click,
+                                     callback_click, callback_click_data,
                                      font_callback_set_active,
                                      font_callback_set_inactive);
     if(!i) {
