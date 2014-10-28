@@ -26,7 +26,7 @@
  */
 
 var DOUBLE_SIZE              = 0
-var VERSION                  = 1.0
+var VERSION                  = "1.0"
 
 var GAME_RESOLUTION_X        = 640
 var GAME_RESOLUTION_Y        = 480
@@ -269,9 +269,9 @@ var PLAYER_MASK               = FIRST_OTHER+56
 
 var SPRITE_MATOCK             = (FIRST_GLOBAL_LEVEL+6)
 
-var ALIGN_LEFT                = 0
-var ALIGN_RIGHT               = 1
+var ALIGN_LEFT                = 1
 var ALIGN_CENTER              = 2
+var ALIGN_RIGHT               = 3
 
 var ANIM_EXIT                 = 6
 var REV_EXIT                  = 8

@@ -187,7 +187,7 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
                                      this.menu_last_x, this.menu_last_y,
                                      this.menu_item_callback, new GameGuiCallbackData(this, event));
         }
-        this.graph.font_alignment_set(ALIGN_LEFT);
+        this.graph.font_alignment_set(align);
         this.graph.int_print(text,
                              this.menu_item_callback, new GameGuiCallbackData(this, event),
                              this.menu_last_x + this.menu_spr_diff_dx + this.menu_text_diff_x,
@@ -205,7 +205,7 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
                                      this.menu_last_x, this.menu_last_y,
                                      this.menu_item_callback, new GameGuiCallbackData(this, event));
         }
-        this.graph.font_alignment_set(ALIGN_RIGHT);
+        this.graph.font_alignment_set(align);
         this.graph.int_print(text,
                              this.menu_item_callback, new GameGuiCallbackData(this, event),
                              this.menu_last_x - this.menu_text_diff_x,
@@ -237,40 +237,39 @@ GameGui.prototype.menu_item_draw_text = function(text, align, flags, event)
   this.menu_last_y += this.menu_last_dy;
 }
 
-GameGui.prototype.menu_item_draw = function(text, sprite_align, flags, event)
+GameGui.prototype.menu_item_draw = function(text, align, flags, event)
 {
 
   if(flags&MENU_NO_SPRITE) {
-    this.menu_item_draw_text(text, spr_align, flags, event);
+    this.menu_item_draw_text(text, align, flags, event);
   }
   else {
-    switch(sprite_align)
+    switch(align)
     {
       case MENU_LEFT:
         {      
           this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_LC, MENU_SPRIT_ARROW_L, 
-                                    MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          this.menu_item_draw_sprite(text, MENU_LEFT, flags, event);
+                                         MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
         }
         break;
       case MENU_RIGHT:
         {
           this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_R,
-                                    MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          this.menu_item_draw_sprite(text, MENU_RIGHT, flags, event);
+                                         MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
         }          
         break;
       
       case MENU_CENTER:
         {
           this.menu_item_draw_sprite_set(MENU_SPRIT_ARROW_RC, MENU_SPRIT_ARROW_L,
-                                    MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
-          this.menu_item_draw_sprite(text, MENU_CENTER, flags, event);
+                                         MENU_TEXT_DIFF_X, MENU_TEXT_DIFF_Y);
         }      
         break;
       default:
         break;
     }
+    
+    this.menu_item_draw_sprite(text, align, flags, event);
   }
 }
 
@@ -314,14 +313,12 @@ GameGui.prototype.menu_main = function(state, data, data1)
         this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_HELP, [ false ]));
         this.menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_RUN_EDITOR));      
         this.menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_QUIT));
-        
-/*
-      
+             
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);
-        this.graph.print("berusky version " + VERSION + "(C) Anakreon 1997-2012\n");
+        this.graph.print("berusky version " + VERSION + " (C) Anakreon 1997-2014\n");
         this.graph.print("distributed under GPLv2\n");
-        
+/*        
         var PROFILE_Y_DIFF  = (DOUBLE_SIZE ? 70 : -10);
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, LOGO_START+height+PROFILE_Y_DIFF);

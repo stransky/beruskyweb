@@ -378,7 +378,7 @@ Graph.prototype.print = function(text, x, y)
   if(this.font_align == ALIGN_RIGHT) {
     font_ax -= this.text_size_get(text).width;
   } else if(this.font_align = ALIGN_CENTER) {
-
+    font_ax = (GAME_RESOLUTION_X - this.text_size_get(text).width) / 2;
   }
 
   var sprite_first;
@@ -444,7 +444,7 @@ Graph.prototype.int_print = function(text, callback_click, callback_click_data, 
   if(this.font_align == ALIGN_RIGHT) {
     font_ax -= text_width;
   } else if(this.font_align = ALIGN_CENTER) {
-
+    font_ax = (GAME_RESOLUTION_X - text_width) / 2;
   }
 
   var sprite_first;
