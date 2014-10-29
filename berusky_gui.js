@@ -306,7 +306,7 @@ GameGui.prototype.menu_main = function(state, data, data1)
         var MENU_X_DIFF  = 0;
         var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
-        
+                
         this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
         this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_PROFILES));
         this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_SETTINGS));
