@@ -278,10 +278,9 @@ GameGui.prototype.menu_main = function(state, data, data1)
   switch(state) {
     case MENU_RETURN:
     case MENU_ENTER:
-      {        
-/*      
-        menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)(&game_gui::menu_main), data, data1);
-*/        
+      { 
+        //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_main, data, data1);
+
         this.graph.clear();
 
         var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
@@ -333,6 +332,65 @@ GameGui.prototype.menu_main = function(state, data, data1)
   }
 }
 
+GameGui.prototype.menu_new_game = function(state, data, data1)
+{
+  switch(state) {
+    case MENU_RETURN:
+    case MENU_ENTER:
+      {
+        //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_new_game, data, data1);
+    
+        this.graph.clear();
+        
+        tpos width = p_grf->sprite_get_width(MENU_SPRIT_LOGO);
+
+        #define LOGO_START (DOUBLE_SIZE ? 60 : 0)
+      
+        if(DOUBLE_SIZE) {
+          p_grf->draw(menu_background_get(),0,0);
+        }
+      
+        p_grf->draw(MENU_SPRIT_LOGO,(GAME_RESOLUTION_X-width)/2,LOGO_START);
+      
+        #define MENU_X_START (GAME_RESOLUTION_X/2 - 70)
+        #define MENU_Y_START (GAME_RESOLUTION_Y/2)
+
+        p_font->select(FONT_DEFAULT);
+        p_font->alignment_set(MENU_CENTER);
+        p_font->start_set(0, MENU_Y_START - 50);
+        p_font->print(_("select difficulty of the new game:"));
+      
+        static char *training      = _("training");
+        static char *easy          = _("easy");
+        static char *intermediate  = _("intermediate");
+        static char *advanced      = _("advanced");
+        static char *impossible    = _("impossible");
+        static char *back          = _("back");
+      
+        menu_item_set_pos(MENU_X_START, MENU_Y_START);
+        
+        #define MENU_X_DIFF  0
+        #define MENU_Y_DIFF  (DOUBLE_SIZE ? 45 : 35)
+        menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+        
+        // udelat na to ulozeni tady flag -> prejdi a uloz!! (Zprava -> menu_back_save)
+        menu_item_start();
+        menu_item_draw(training, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 0));
+        menu_item_draw(easy, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 1));
+        menu_item_draw(intermediate, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 2));
+        menu_item_draw(advanced, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 3));
+        menu_item_draw(impossible, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 4));
+        menu_item_draw(back, MENU_LEFT, FALSE, LEVEL_EVENT(GI_MENU_BACK_POP));              
+      }
+      break;    
+    case MENU_LEAVE:    
+      break;
+    default:
+      break;
+  }
+}
+
+
 GameGui.prototype.callback = function(event)
 {  
   var ev = event.type;
@@ -340,10 +398,10 @@ GameGui.prototype.callback = function(event)
     case GC_MENU_START:
       this.menu_main(MENU_ENTER);
       break;      
-/*     
     case GC_MENU_NEW_GAME:
       menu_new_game(MENU_ENTER);
       break;      
+/*     
     case GC_MENU_PROFILES:
       menu_profiles(MENU_ENTER);
       break;
