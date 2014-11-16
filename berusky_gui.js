@@ -103,7 +103,6 @@ GameGui.prototype.GameGuiLoop = function() {
   this.graph.render();
 }
 
-/*
 // -------------------------------------------------------
 // Game UI - clean up management
 // -------------------------------------------------------
@@ -136,7 +135,7 @@ void gui_base::back_pop(void)
     fnc.run(MENU_RETURN);
   }
 }
-*/
+
 // -------------------------------------------------------
 // Game UI - items rendering
 // -------------------------------------------------------
@@ -282,7 +281,7 @@ GameGui.prototype.menu_main = function(state, data, data1)
         //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_main, data, data1);
 
         this.graph.clear();
-
+        
         var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
         var width = spr.width;
         var height = spr.height;
@@ -300,10 +299,10 @@ GameGui.prototype.menu_main = function(state, data, data1)
         var editor = "editor";
         var quit = "quit";
         
-        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
-                               GAME_RESOLUTION_Y/2 - 50);
         var MENU_X_DIFF  = 0;
         var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
+        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
+                               GAME_RESOLUTION_Y/2 - 50);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
                 
         this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
@@ -339,48 +338,42 @@ GameGui.prototype.menu_new_game = function(state, data, data1)
     case MENU_ENTER:
       {
         //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_new_game, data, data1);
-    
+
         this.graph.clear();
         
-        tpos width = p_grf->sprite_get_width(MENU_SPRIT_LOGO);
+        var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
+        var width = spr.width;
+        var height = spr.height;
 
-        #define LOGO_START (DOUBLE_SIZE ? 60 : 0)
-      
-        if(DOUBLE_SIZE) {
-          p_grf->draw(menu_background_get(),0,0);
-        }
-      
-        p_grf->draw(MENU_SPRIT_LOGO,(GAME_RESOLUTION_X-width)/2,LOGO_START);
-      
-        #define MENU_X_START (GAME_RESOLUTION_X/2 - 70)
-        #define MENU_Y_START (GAME_RESOLUTION_Y/2)
+        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
 
-        p_font->select(FONT_DEFAULT);
-        p_font->alignment_set(MENU_CENTER);
-        p_font->start_set(0, MENU_Y_START - 50);
-        p_font->print(_("select difficulty of the new game:"));
-      
-        static char *training      = _("training");
-        static char *easy          = _("easy");
-        static char *intermediate  = _("intermediate");
-        static char *advanced      = _("advanced");
-        static char *impossible    = _("impossible");
-        static char *back          = _("back");
-      
-        menu_item_set_pos(MENU_X_START, MENU_Y_START);
-        
-        #define MENU_X_DIFF  0
-        #define MENU_Y_DIFF  (DOUBLE_SIZE ? 45 : 35)
-        menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
-        
-        // udelat na to ulozeni tady flag -> prejdi a uloz!! (Zprava -> menu_back_save)
-        menu_item_start();
-        menu_item_draw(training, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 0));
-        menu_item_draw(easy, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 1));
-        menu_item_draw(intermediate, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 2));
-        menu_item_draw(advanced, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 3));
-        menu_item_draw(impossible, MENU_LEFT, MENU_SAVE_BACK, LEVEL_EVENT(GC_MENU_RUN_LEVEL, 4));
-        menu_item_draw(back, MENU_LEFT, FALSE, LEVEL_EVENT(GI_MENU_BACK_POP));              
+        var MENU_X_START = (GAME_RESOLUTION_X/2 - 70);
+        var MENU_Y_START = (GAME_RESOLUTION_Y/2);
+
+        this.graph.font_set(FONT_DEFAULT);
+        this.graph.font_alignment_set(MENU_CENTER);
+        this.graph.font_start_set(0, MENU_Y_START - 50);
+        this.graph.print("select difficulty of the new game:");
+
+        var training      = "training";
+        var easy          = "easy";
+        var intermediate  = "intermediate";
+        var advanced      = "advanced";
+        var impossible    = "impossible";
+        var back          = "back";
+
+        var MENU_X_DIFF = 0;
+        var MENU_Y_DIFF = 35;
+
+        this.menu_item_set_pos(MENU_X_START, MENU_Y_START);
+        this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+
+        this.menu_item_draw(training, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 0 ]));
+        this.menu_item_draw(easy, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 1 ]));
+        this.menu_item_draw(intermediate, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 2 ]));
+        this.menu_item_draw(advanced, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 3 ]));
+        this.menu_item_draw(impossible, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 4 ]));
+        this.menu_item_draw(back, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GI_MENU_BACK_POP));
       }
       break;    
     case MENU_LEAVE:    
@@ -399,7 +392,7 @@ GameGui.prototype.callback = function(event)
       this.menu_main(MENU_ENTER);
       break;      
     case GC_MENU_NEW_GAME:
-      menu_new_game(MENU_ENTER);
+      this.menu_new_game(MENU_ENTER);
       break;      
 /*     
     case GC_MENU_PROFILES:
@@ -497,13 +490,6 @@ GameGui.prototype.callback = function(event)
     case GC_RUN_EDITOR:
       run_editor();
       break;
-
-    case GI_MENU_BACK_POP:
-      back_pop();
-      break;
-    case GI_MENU_BACK_PUSH:
-      back_push();
-      break;
     
     case GI_SPRITE_DRAW:
     case GI_STRING_DRAW:
@@ -513,6 +499,12 @@ GameGui.prototype.callback = function(event)
       menu_services(p_queue, &tmp_queue, ev);
       break;
 */        
+    case GI_MENU_BACK_POP:
+      back_pop();
+      break;
+    case GI_MENU_BACK_PUSH:
+      back_push();
+      break;
     default:
       break;
   }

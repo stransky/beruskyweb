@@ -57,7 +57,7 @@ Graph.prototype.clear = function()
 {
   // code by enpu
   for (var i = this.stage.children.length - 1; i >= 0; i--) {
-    this.stage.removeChild(stage.children[i]);
+    this.stage.removeChild(this.stage.children[i]);
   }
 }
 
