@@ -318,33 +318,29 @@ GameGui.prototype.menu_main = function(state, data, data1)
         var new_game = "play";
         var profiles = "change profile";
         var settings = "settings";
-        var help = "help";
-        var editor = "editor";
-        var quit = "quit";
+        var help = "help";        
         
         var MENU_X_DIFF  = 0;
         var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
         this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
-                               GAME_RESOLUTION_Y/2 - 50);
+                               GAME_RESOLUTION_Y/2 - 0);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
                 
         this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
         this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_PROFILES));
         this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_SETTINGS));
         this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_HELP, [ false ]));
-        this.menu_item_draw(editor, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_RUN_EDITOR));      
-        this.menu_item_draw(quit, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_QUIT));
              
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);
         this.graph.print("berusky version " + VERSION + " (C) Anakreon 1997-2014\n");
         this.graph.print("distributed under GPLv2\n");
-/*        
-        var PROFILE_Y_DIFF  = (DOUBLE_SIZE ? 70 : -10);
+
+        var PROFILE_Y_DIFF  = (20);
         this.graph.font_alignment_set(MENU_CENTER);
-        this.graph.font_start_set(0, LOGO_START+height+PROFILE_Y_DIFF);
+        this.graph.font_start_set(0, height+PROFILE_Y_DIFF);
         //this.graph.print("Selected profile: " + profile.profile_name);
-*/        
+        this.graph.print("Selected profile: ");
       }
       break;
     case MENU_LEAVE:      
@@ -361,7 +357,6 @@ GameGui.prototype.menu_new_game = function(state, data, data1)
     case MENU_ENTER:
       {
         this.menu_enter(this, GameGui.prototype.menu_new_game, data, data1);
-
         this.graph.clear();
         
         var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
@@ -406,6 +401,30 @@ GameGui.prototype.menu_new_game = function(state, data, data1)
   }
 }
 
+// New level set - based on profiles
+GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
+{
+  switch(state) {
+    case MENU_RETURN:
+    case MENU_ENTER:
+      {            
+        this.menu_enter(this, GameGui.prototype.menu_level_run_new, data, data1);
+        this.graph.clear();
+      
+        this.level_set_select(level_set);
+        this.menu_level_run_path_draw(level_set,
+                                      profile.selected_level_get(),
+                                      p_ber->levelset_get_levelnum(),
+                                      profile.last_level_get());
+        this.menu_level_name_print();
+      }
+      break;
+    case MENU_LEAVE:
+      break;
+    default:
+      break;
+  }
+}
 
 GameGui.prototype.callback = function(event)
 {  
@@ -416,7 +435,22 @@ GameGui.prototype.callback = function(event)
       break;      
     case GC_MENU_NEW_GAME:
       this.menu_new_game(MENU_ENTER);
-      break;      
+      break;
+      
+    case GC_MENU_RUN_LEVEL:
+      menu_level_run_new(MENU_ENTER, event.params[0]);
+      break;
+/*      
+    case GC_MENU_END_LEVEL:
+      menu_level_end(MENU_ENTER);
+      break;
+    case GC_MENU_END_LEVEL_CUSTOM:
+      menu_level_end_custom(MENU_ENTER);
+      break;
+    case GC_MENU_END_LEVEL_SET:
+      menu_levelset_end(MENU_ENTER);
+      break;
+*/
 /*     
     case GC_MENU_PROFILES:
       menu_profiles(MENU_ENTER);
@@ -493,18 +527,6 @@ GameGui.prototype.callback = function(event)
       level_load(&tmp_queue);
       break;
    
-    case GC_MENU_RUN_LEVEL:
-      menu_level_run_new(MENU_ENTER, ev.param_int_get(PARAM_0));
-      break;
-    case GC_MENU_END_LEVEL:
-      menu_level_end(MENU_ENTER);
-      break;
-    case GC_MENU_END_LEVEL_CUSTOM:
-      menu_level_end_custom(MENU_ENTER);
-      break;
-    case GC_MENU_END_LEVEL_SET:
-      menu_levelset_end(MENU_ENTER);
-      break;
     
     case GC_MENU_IN_GAME:
       menu_in_game(MENU_ENTER);
