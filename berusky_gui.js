@@ -44,11 +44,31 @@ var MENU_DRAW_ONLY         = 0x8
 var MENU_TEXT_DIFF_X       = 10
 var MENU_TEXT_DIFF_Y       = 5
 
-function MenuFunction() {
-/*
-  void run(MENU_STATE state)
-  void run_and_clear(MENU_STATE state)
-  */
+function MenuFunction(obj, func, param1, param2) {
+  this.obj = obj;
+  this.func = func;
+  this.param1 = param1;
+  this.param2 = param2;
+}
+
+MenuFunction.prototype.run = function(st)
+{
+  if(this.func) {
+    this.func.call(this.obj, st, this.param1, this.param2);
+  }
+}
+
+MenuFunction.prototype.run_and_clear = function(st)
+{
+  if(this.func) {
+    this.func.call(this.obj, st, this.param1, this.param2);
+    this.func = 0;
+  }
+}
+
+MenuFunction.prototype.copy = function()
+{
+  return new MenuFunction(this.obj, this.func, this.param1, this.param2);
 }
 
 function MenuEvent(type, params) {
@@ -62,9 +82,10 @@ function MenuEvent(type, params) {
   }
 }
 
-function GameGuiCallbackData(gui, event) {
+function GameGuiCallbackData(gui, event, event_back) {
   this.GameGui = gui;
   this.event = event;
+  this.event_back = event_back;
 }
 
 function GameGui() {
@@ -83,12 +104,8 @@ function GameGui() {
   this.menu_last_x = false;
   this.menu_last_y = false;
 
-
-  //this.menu_back_stack = Array();
-  //this.menu_current = new MenuFunction();
-  
-  // launch the beast
-  requestAnimFrame(GameGuiLoop);
+  this.menu_back_stack = Array();
+  this.menu_current = new MenuFunction();  
 }
 
 GameGui.prototype.GameGuiLoop = function() {
@@ -106,33 +123,33 @@ GameGui.prototype.GameGuiLoop = function() {
 // -------------------------------------------------------
 // Game UI - clean up management
 // -------------------------------------------------------
-GameGui.prototype.menu_enter = function(class, func, param_1, param_2)
+GameGui.prototype.menu_enter = function(obj, func, param_1, param_2)
 {
   // If there is a menu function, call it
-  menu_leave();
+  this.menu_leave();
 
   // Set the new menu function
-  menu_current.set(p_class, p_func, param_1, param_2);
+  this.menu_current = new MenuFunction(obj, func, param_1, param_2);
 }
 
-void gui_base::menu_leave(void)
+GameGui.prototype.menu_leave = function()
 {
-  menu_current.run_and_clear(MENU_LEAVE);
+  this.menu_current.run_and_clear(MENU_LEAVE);
 }
 
 // -------------------------------------------------------
 // Game UI - "back" management
 // -------------------------------------------------------
-void gui_base::back_push(void)
+GameGui.prototype.back_push = function()
 {  
-  menu_back_stack.push(menu_current);
+  this.menu_back_stack.push(this.menu_current.copy());
 }
 
-void gui_base::back_pop(void)
+GameGui.prototype.back_pop = function()
 {
-  if(!(menu_back_stack.is_empty())) {
-    MENU_FUCTION fnc = menu_back_stack.pop();
-    fnc.run(MENU_RETURN);
+  if(this.menu_back_stack.length) {
+    var menu_func = this.menu_back_stack.pop();
+    menu_func.run(MENU_RETURN);
   }
 }
 
@@ -160,6 +177,9 @@ GameGui.prototype.menu_item_set_add = function(dx, dy)
 
 GameGui.prototype.menu_item_callback = function(data)
 {
+  if(data.event_back) {
+    data.GameGui.events.send(data.event_back);
+  }
   data.GameGui.events.send(data.event);
 }
 
@@ -177,6 +197,8 @@ GameGui.prototype.menu_item_draw_sprite_set = function(sprite_active, sprite_ina
 
 GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
 {
+  var event_back = (flags&MENU_SAVE_BACK) ? new MenuEvent(GI_MENU_BACK_PUSH) : 0;
+
   switch(align)
   {
     case MENU_LEFT:
@@ -184,11 +206,11 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
           this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
                                      this.menu_last_x, this.menu_last_y,
-                                     this.menu_item_callback, new GameGuiCallbackData(this, event));
+                                     this.menu_item_callback, new GameGuiCallbackData(this, event, event_back));
         }
         this.graph.font_alignment_set(align);
         this.graph.int_print(text,
-                             this.menu_item_callback, new GameGuiCallbackData(this, event),
+                             this.menu_item_callback, new GameGuiCallbackData(this, event, event_back),
                              this.menu_last_x + this.menu_spr_diff_dx + this.menu_text_diff_x,
                              this.menu_last_y + this.menu_text_diff_y);
 
@@ -202,11 +224,11 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
           this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
                                      this.menu_last_x, this.menu_last_y,
-                                     this.menu_item_callback, new GameGuiCallbackData(this, event));
+                                     this.menu_item_callback, new GameGuiCallbackData(this, event, event_back));
         }
         this.graph.font_alignment_set(align);
         this.graph.int_print(text,
-                             this.menu_item_callback, new GameGuiCallbackData(this, event),
+                             this.menu_item_callback, new GameGuiCallbackData(this, event, event_back),
                              this.menu_last_x - this.menu_text_diff_x,
                              this.menu_last_y + this.menu_text_diff_y);
 
@@ -227,9 +249,10 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
 
 GameGui.prototype.menu_item_draw_text = function(text, align, flags, event)
 {
+  var event_back = (flags&MENU_SAVE_BACK) ? new MenuEvent(GI_MENU_BACK_PUSH) : 0;
   this.graph.font_alignment_set(align);
   this.graph.int_print(text,
-                       this.menu_item_callback, new GameGuiCallbackData(this, event),
+                       this.menu_item_callback, new GameGuiCallbackData(this, event, event_back),
                        this.menu_last_x, this.menu_last_y);
   
   this.menu_last_x += this.menu_last_dx;
@@ -278,7 +301,7 @@ GameGui.prototype.menu_main = function(state, data, data1)
     case MENU_RETURN:
     case MENU_ENTER:
       { 
-        //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_main, data, data1);
+        this.menu_enter(this, GameGui.prototype.menu_main, data, data1);
 
         this.graph.clear();
         
@@ -337,7 +360,7 @@ GameGui.prototype.menu_new_game = function(state, data, data1)
     case MENU_RETURN:
     case MENU_ENTER:
       {
-        //menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_new_game, data, data1);
+        this.menu_enter(this, GameGui.prototype.menu_new_game, data, data1);
 
         this.graph.clear();
         
@@ -373,7 +396,7 @@ GameGui.prototype.menu_new_game = function(state, data, data1)
         this.menu_item_draw(intermediate, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 2 ]));
         this.menu_item_draw(advanced, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 3 ]));
         this.menu_item_draw(impossible, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 4 ]));
-        this.menu_item_draw(back, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GI_MENU_BACK_POP));
+        this.menu_item_draw(back, MENU_LEFT, 0, new MenuEvent(GI_MENU_BACK_POP));
       }
       break;    
     case MENU_LEAVE:    
@@ -500,10 +523,10 @@ GameGui.prototype.callback = function(event)
       break;
 */        
     case GI_MENU_BACK_POP:
-      back_pop();
+      this.back_pop();
       break;
     case GI_MENU_BACK_PUSH:
-      back_push();
+      this.back_push();
       break;
     default:
       break;

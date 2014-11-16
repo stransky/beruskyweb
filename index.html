@@ -28,10 +28,14 @@
 <body>
   <script>  
   var gui = new GameGui();
+  
   function GameGuiLoop() {
     gui.GameGuiLoop();
     requestAnimFrame(GameGuiLoop);
   }
+    // launch the beast
+  requestAnimFrame(GameGuiLoop);
+
 /*  
   var game = new Game();
   game.level_load("a.lv3");
