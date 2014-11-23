@@ -451,3 +451,6 @@ var GC_MENU_HELP_RULES = 40
 var GC_MENU_HELP_CREDIT = 41
 var GC_MENU_IN_GAME = 42
 var GC_MENU_QUIT = 43
+
+var FALSE  = 0
+var TRUE   = 1
