@@ -82,6 +82,101 @@ function MenuEvent(type, params) {
   }
 }
 
+var LEVEL_SET_NUM             = 6
+
+var PROFILE_NAME              = "name"
+var PROFILE_LAST_TRAINING     = "l0"
+var PROFILE_LAST_EASY         = "l1"
+var PROFILE_LAST_INTERMEDIATE = "l2"
+var PROFILE_LAST_ADVANCED     = "l3"
+var PROFILE_LAST_IMPOSSIBLE   = "l4"
+var PROFILE_LAST_USER         = "l5"
+
+function PlayerProfile() {
+  this.filename = "";
+  this.level_selected = Array();  //[LEVEL_SET_NUM] - selected level
+  this.level_last = Array();      //[LEVEL_SET_NUM] - last finished level
+  this.level_set_selected = 0;
+  this.profile_name = "";
+}
+
+// fill level_set_selected and level_selected
+PlayerProfile.profile.level_set_set = function(level_set_num)
+{
+  this.level_set_selected = level_set_num;
+  this.selected_level_set(this.level_selected[level_set_num]);
+}
+
+PlayerProfile.profile.level_set_get = function()
+{
+  return(this.level_set_selected);
+}
+
+PlayerProfile.profile.selected_level_set = function(level) 
+{
+  if(level > this.level_last[level_set_selected])
+    level = this.level_last[level_set_selected];
+  
+  this.level_selected[level_set_selected] = level;
+{
+
+PlayerProfile.profile.selected_level_get = function()
+{
+  return(this.level_selected[level_set_selected]);
+}
+
+PlayerProfile.profile.last_level_set = function(level) 
+{
+  this.level_last[level_set_selected] = level;
+}
+
+PlayerProfile.profile.last_level_get = function() 
+{
+  return(this.level_last[level_set_selected]);
+}
+
+  // The selected level has been successfuly finished
+PlayerProfile.profile.selected_level_finished = function()
+{
+  var selected_level = this.selected_level_get();
+
+  if(selected_level == this.last_level_get()) {
+    selected_level += 1;
+    this.last_level_set(selected_level);
+    this.selected_level_set(selected_level);
+  
+    // save the profile
+    this.save();
+  }
+}
+
+PlayerProfile.profile.create = function(name)
+{
+
+}
+
+PlayerProfile.profile.load = function(dir, file)
+{
+
+}
+
+PlayerProfile.profile.save = function()
+{
+
+}
+
+
+/* Stores recently loaded levelset
+*/
+function LevelStore() {
+
+  // Array of level names and passwords
+  this.levelname = Array();
+  this.password = Array();
+
+
+}
+
 function GameGuiCallbackData(gui, event, event_back) {
   this.GameGui = gui;
   this.event = event;
@@ -93,6 +188,7 @@ function GameGui() {
   this.graph = this.game.graph;
   this.loaded = false;
   this.events = new BeruskyEvents();
+  this.profile = new PlayerProfile();
 
   // Used for menu rendering
   this.menu_spr_active = false;
@@ -689,7 +785,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(select_string,
                               MENU_RIGHT, FALSE, 
                               //new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last, profile.level_spr_x ,profile.level_spr_y ]));
-                              new MenuEvent(GC_RUN_LEVEL_SELECT, [ 0, 0, 0]));
+                              new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last, 0, 0]));
 
           this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
@@ -1119,18 +1215,12 @@ GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
         this.menu_enter(this, GameGui.prototype.menu_level_run_new, level_set, unused);
         this.graph.clear();
       
-        //this.level_set_select(level_set);
-        /*
+        this.profile.level_set_select(level_set);
         this.menu_level_run_path_draw(level_set,
-                                      profile.selected_level_get(),
+                                      this.profile.selected_level_get(),
                                       p_ber->levelset_get_levelnum(),
-                                      profile.last_level_get());
-                                      */
-        this.menu_level_run_path_draw(0,
-                                      0,
-                                      0,
-                                      0);
-        //this.menu_level_name_print();
+                                      this.profile.last_level_get());
+        this.menu_level_name_print();
       }
       break;
     case MENU_LEAVE:
