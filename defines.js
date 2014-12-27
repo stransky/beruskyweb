@@ -194,12 +194,6 @@ var LAYER_ITEM                = 0
 var LAYER_VARIANT             = 1
 var LAYER_ROTATION            = 2
 
-var GAME_RESOLUTION_X         = 640
-var GAME_RESOLUTION_Y         = 480
-
-var CELL_SIZE_X               = 20
-var CELL_SIZE_Y               = 20
-
 var LEVEL_SCREEN_START_X      = 0
 var LEVEL_SCREEN_START_Y      = 40
 

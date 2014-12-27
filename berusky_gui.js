@@ -82,15 +82,13 @@ function MenuEvent(type, params) {
   }
 }
 
-var LEVEL_SET_NUM             = 6
-
+var LEVEL_SET_NUM             = 5
 var PROFILE_NAME              = "name"
 var PROFILE_LAST_TRAINING     = "l0"
 var PROFILE_LAST_EASY         = "l1"
 var PROFILE_LAST_INTERMEDIATE = "l2"
 var PROFILE_LAST_ADVANCED     = "l3"
 var PROFILE_LAST_IMPOSSIBLE   = "l4"
-var PROFILE_LAST_USER         = "l5"
 
 function PlayerProfile() {
   this.filename = "";
@@ -101,7 +99,7 @@ function PlayerProfile() {
 }
 
 // fill level_set_selected and level_selected
-PlayerProfile.profile.level_set_set = function(level_set_num)
+PlayerProfile.profile.level_set_select = function(level_set_num)
 {
   this.level_set_selected = level_set_num;
   this.selected_level_set(this.level_selected[level_set_num]);
@@ -165,16 +163,55 @@ PlayerProfile.profile.save = function()
 
 }
 
-
-/* Stores recently loaded levelset
+/* Stores levelset
 */
-function LevelStore() {
+LevelSet_load_callback = function()
+{
+  var level_set = this.callback_object;
+  var chars = this.responseText.split("\n");
 
+  for (var i = 0, var lv = 0; i < chars.length; i += 2, lv++) {
+    level_set.levelname[lv] = chars[i];
+    level_set.password[lv] = chars[i+1];
+  }
+  this.loaded = true;
+}
+
+function LevelSet(set) {
   // Array of level names and passwords
   this.levelname = Array();
   this.password = Array();
+  this.loaded = false;
 
+  var file = "data/GameData/s" + set + ".dat";
+  load_file_text(file, FontTable_load_callback, this);
+}
 
+LevelSet.prototype.levelnum_get = function() 
+{
+  return this.loaded ? this.levelname.lenght : 0;
+}
+
+function LevelStore() {
+  this.level_set = Array();
+  for(var i = 0; i < LEVEL_SET_NUM; i++)
+    this.level_set[i] = new LevelSet(i);
+}
+
+LevelStore.profile.loaded = function() {
+  for(var i = 0; i < LEVEL_SET_NUM; i++)
+    if(!this.level_set[i].loaded())
+      return false;
+
+  return true;
+}
+
+LevelStore.profile.levelset_get = function(set) {
+  return this.level_set[set];
+}
+
+LevelStore.profile.levelset_get_passwd = function(set, level) {
+  return this.level_set[set].password[level];
 }
 
 function GameGuiCallbackData(gui, event, event_back) {
@@ -189,6 +226,7 @@ function GameGui() {
   this.loaded = false;
   this.events = new BeruskyEvents();
   this.profile = new PlayerProfile();
+  this.store = new LevelStore();
 
   // Used for menu rendering
   this.menu_spr_active = false;
@@ -394,6 +432,89 @@ GameGui.prototype.menu_item_draw = function(text, align, flags, event)
   }
 }
 
+/* Print selected level name
+*/
+GameGui.prototype.menu_level_name_print = function()
+{
+  var level = this.profile.selected_level_get();
+  var level_set = this.profile.level_set_get();
+
+  this.graph.font_set(FONT_DEFAULT);
+  this.graph.font_alignment_set(MENU_LEFT);
+
+  var menu_x_start = 0;
+  var menu_y_start = 0;
+
+  if(DOUBLE_SIZE) {
+    this.graph.font_alignment_set(MENU_CENTER);
+    menu_x_start = 20;
+    menu_y_start = (GAME_RESOLUTION_Y - 220);
+  }
+  else {
+    switch(level_set) {
+      case 0:
+        menu_x_start = (GAME_RESOLUTION_X/2 - 70);
+        menu_y_start = (GAME_RESOLUTION_Y - 170);
+        break;
+      case 1:
+        menu_x_start = (GAME_RESOLUTION_X/2 - 130);
+        menu_y_start = (GAME_RESOLUTION_Y - 155);
+        break;
+      case 2:
+        menu_x_start = 10;
+        menu_y_start = (GAME_RESOLUTION_Y - 25);
+        break;
+      case 3:
+        menu_x_start = (GAME_RESOLUTION_X/2 - 17 - 180);
+        menu_y_start = (GAME_RESOLUTION_Y - 160);
+        break;
+      case 4:
+        p_font->alignment_set(MENU_CENTER);
+        menu_x_start = 20;
+        menu_y_start = (GAME_RESOLUTION_Y - 160);
+        break;
+      case 5:
+        menu_x_start = 70;
+        menu_y_start = (GAME_RESOLUTION_Y - 35);
+        break;
+    }
+  }
+  
+  TODO -> save the string
+  this.graph.font_start_set(menu_x_start, menu_y_start);
+  this.graph.print("Level: " + level+1 + " - " + this.store.levelset_get_passwd(level_set, level));
+}
+
+GameGui.prototype.level_set_select = function(level_set)
+{
+  bool ret = p_ber->levelset_load(level_set);
+  if(!ret) {
+    berror("Unable to load levelset %d\n",level_set);
+    return;
+  }
+  profile.level_set_set(level_set);
+}
+
+GameGui.prototype.level_select(level, tpos spr_x, tpos spr_y)
+{  
+  // Selec the level
+  p_ber->levelset_set_level(level);
+  profile.selected_level_set(level);
+
+  // Draw the selected level
+  p_grf->draw(LEVEL_DONE, profile.level_spr_x, profile.level_spr_y);
+  p_grf->redraw_add(profile.level_spr_x, profile.level_spr_y, 
+                    p_grf->sprite_get_width(LEVEL_DONE),
+                    p_grf->sprite_get_height(LEVEL_DONE));
+  p_grf->draw(LEVEL_NEXT, spr_x, spr_y);
+  p_grf->redraw_add(spr_x, spr_y,
+                    p_grf->sprite_get_width(LEVEL_NEXT),
+                    p_grf->sprite_get_height(LEVEL_NEXT));
+  profile.level_spr_x = spr_x;
+  profile.level_spr_y = spr_y;
+  p_grf->flip();
+}
+
 GameGui.prototype.menu_main = function(state, data, data1)
 {  
   switch(state) {
@@ -565,7 +686,7 @@ LevelPath.prototype.translate_direction = function(last, next)
   return(pipe);
 }
 
-GameGui.prototype.menu_level_draw_level = function(lev, level_act, level_num, 
+GameGui.prototype.menu_level_draw_level = function(lev, level_act,
                                                    level_last, level_set, x, y)
 {
   var spr_x = x*ITEM_SIZE;
@@ -632,7 +753,7 @@ GameGui.prototype.translate_coords = function(direction, coord)
   The level path is encoded from those paths + two digits of level number
 */
 GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
-                                                           level_num, level_last,
+                                                           level_last,
                                                            level_set, sx, sy)
 {
   var index_last = LEFT_I;
@@ -648,7 +769,7 @@ GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
           var tmp = [];
           tmp[0] = path[i+1];
           tmp[1] = path[i+2];
-          this.menu_level_draw_level(parseInt(tmp,10),level_act,level_num,level_last,level_set,sx,sy);
+          this.menu_level_draw_level(parseInt(tmp,10),level_act,level_last,level_set,sx,sy);
           i += 3;
           levels++;
         }
@@ -686,7 +807,7 @@ GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
 }
 
 // Draw level path
-GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, level_num, level_last)
+GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, level_last)
 {
   this.graph.clear();
   
@@ -709,34 +830,34 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         // Draw top of the pipe
         this.menu_level_draw_pipe(2,14,0);
         this.menu_level_draw_pipe(2,14,1);
-        this.menu_level_draw_level(0,level_act,level_num,level_last,level_set,14,2);
+        this.menu_level_draw_level(0,level_act, level_last,level_set,14,2);
       
         this.menu_level_draw_pipe(3,14,3);
         this.menu_level_draw_pipe(4,13,3);
-        this.menu_level_draw_level(1,level_act,level_num,level_last,level_set,13,4);
+        this.menu_level_draw_level(1,level_act,level_last,level_set,13,4);
       
         this.menu_level_draw_pipe(3,13,5);
         this.menu_level_draw_pipe(0,12,5);
         this.menu_level_draw_pipe(4,11,5);
-        this.menu_level_draw_level(2,level_act,level_num,level_last,level_set,11,6);
+        this.menu_level_draw_level(2,level_act,level_last,level_set,11,6);
       
         this.menu_level_draw_pipe(2,11,7);
-        this.menu_level_draw_level(3,level_act,level_num,level_last,level_set,11,8);
+        this.menu_level_draw_level(3,level_act,level_last,level_set,11,8);
       
         this.menu_level_draw_pipe(2,11,9);
-        this.menu_level_draw_level(4,level_act,level_num,level_last,level_set,11,10);
+        this.menu_level_draw_level(4,level_act,level_last,level_set,11,10);
       
         this.menu_level_draw_pipe(3,11,11);
         this.menu_level_draw_pipe(0,10,11);
         this.menu_level_draw_pipe(4,9,11);
-        this.menu_level_draw_level(5,level_act,level_num,level_last,level_set,9,12);
+        this.menu_level_draw_level(5,level_act,level_last,level_set,9,12);
 
         this.menu_level_draw_pipe(3,9,13);
         this.menu_level_draw_pipe(0,8,13);
         this.menu_level_draw_pipe(0,7,13);
         this.menu_level_draw_pipe(0,6,13);
         this.menu_level_draw_pipe(4,5,13);
-        this.menu_level_draw_level(6,level_act,level_num,level_last,level_set,5,14);
+        this.menu_level_draw_level(6,level_act,level_last,level_set,5,14);
         this.menu_level_draw_pipe(0,4,14);
         this.menu_level_draw_pipe(0,3,14);
         this.menu_level_draw_pipe(0,2,14);
@@ -745,13 +866,13 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
 
         this.menu_level_draw_pipe(2,5,15);
         this.menu_level_draw_pipe(2,5,16);
-        this.menu_level_draw_level(7,level_act,level_num,level_last,level_set,5,17);
+        this.menu_level_draw_level(7,level_act,level_last,level_set,5,17);
         
         this.menu_level_draw_pipe(2,5,18);
         this.menu_level_draw_pipe(5,5,19);
         this.menu_level_draw_pipe(0,6,19);
         this.menu_level_draw_pipe(0,7,19);
-        this.menu_level_draw_level(8,level_act,level_num,level_last,level_set,8,19);
+        this.menu_level_draw_level(8,level_act,level_last,level_set,8,19);
 
         this.menu_level_draw_pipe(0,10,6);
         this.menu_level_draw_pipe(0,9,6);
@@ -759,7 +880,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         this.menu_level_draw_pipe(5,7,6);
         this.menu_level_draw_pipe(2,7,5);
         this.menu_level_draw_pipe(2,7,4);
-        this.menu_level_draw_level(9,level_act,level_num,level_last,level_set,7,3);
+        this.menu_level_draw_level(9,level_act,level_last,level_set,7,3);
         this.menu_level_draw_pipe(2,7,2);
         this.menu_level_draw_pipe(2,7,1);
         this.menu_level_draw_pipe(2,7,0);
@@ -801,35 +922,35 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         int lev = 0;
       
         lev += menu_level_run_path_draw_line("V01LPUPUV02UPLPUPV03UPRPRV13UPUV04UPUV05UPRPRV06UPUPU",
-                                             level_act, level_num, level_last, level_set, 15, 12);
+                                             level_act,  level_last, level_set, 15, 12);
         lev += menu_level_run_path_draw_line("LPLPUPUV07LPUPUPV08UPUPUPUPU",
-                                             level_act, level_num, level_last, level_set, 13, 8);
+                                             level_act,  level_last, level_set, 13, 8);
         lev += menu_level_run_path_draw_line("UPUV09UPUV10UPLPUPU",
-                                             level_act, level_num, level_last, level_set, 6, 5);
+                                             level_act,  level_last, level_set, 6, 5);
         lev += menu_level_run_path_draw_line("UPRPRPRPRV00UPRV11UPUV12UPRPUV13UPUV14UPUV15UPRPUPU",
-                                             level_act, level_num, level_last, level_set, 15, 12);
+                                             level_act,  level_last, level_set, 15, 12);
         lev += menu_level_run_path_draw_line("DPRV16DPDV17",
-                                             level_act, level_num, level_last, level_set, 15, 12);
+                                             level_act,  level_last, level_set, 15, 12);
         lev += menu_level_run_path_draw_line("LPLPDPDV18DPDV19DPDPD",
-                                             level_act, level_num, level_last, level_set, 23, 17);
+                                             level_act,  level_last, level_set, 23, 17);
         lev += menu_level_run_path_draw_line("DPDV20DPRPDPRPR",
-                                             level_act, level_num, level_last, level_set, 12, -1);
+                                             level_act,  level_last, level_set, 12, -1);
         lev += menu_level_run_path_draw_line("LPLPLPLPUV21UPLPLPLPLPDV22DPDV23DPDV24LPDV25DPDV26",
-                                             level_act, level_num, level_last, level_set, 16, 15);
+                                             level_act,  level_last, level_set, 16, 15);
         lev += menu_level_run_path_draw_line("DPDV27DPLPDV28DPDV29DPDPLPDPDV30DPDPDV31LPLPLPLPLPLPU",
-                                             level_act, level_num, level_last, level_set, 27, -1);
+                                             level_act,  level_last, level_set, 27, -1);
         lev += menu_level_run_path_draw_line("DPLPDV32DPLPDPDPV33DPRPRPRPDPV34DPDV35",
-                                             level_act, level_num, level_last, level_set, 25, 12);
+                                             level_act,  level_last, level_set, 25, 12);
         lev += menu_level_run_path_draw_line("LPLPLPLPDV36LPLPL",
-                                             level_act, level_num, level_last, level_set, 6, 3);
+                                             level_act,  level_last, level_set, 6, 3);
         lev += menu_level_run_path_draw_line("DPDPV37DPDV38DPDV39DPDV40LPLPL",
-                                             level_act, level_num, level_last, level_set, 2, 4);
+                                             level_act,  level_last, level_set, 2, 4);
         lev += menu_level_run_path_draw_line("DPDV41DPRPRPRPRPDPRPR",
-                                             level_act, level_num, level_last, level_set, 2, 12);
+                                             level_act,  level_last, level_set, 2, 12);
         lev += menu_level_run_path_draw_line("LPDPDPV43DPDV44DPDV49DPDPDPD",
-                                             level_act, level_num, level_last, level_set, 2, 14);
+                                             level_act,  level_last, level_set, 2, 14);
         lev += menu_level_run_path_draw_line("LPLPDPDPLPLPLPLPLPUV45UPUV46UPUV47LPUPUV48",
-                                             level_act, level_num, level_last, level_set, 14, 10);
+                                             level_act,  level_last, level_set, 14, 10);
         //assert(lev == 50);
         
         if(!DOUBLE_SIZE) {
@@ -871,7 +992,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
                            "27UPUV28UPUV29UPRPUPV30UPUV31UPLPLPDPDPLPLPLPDPV32DPDV33DPLPDPDV34DPLP"
         int lev = 0;
       
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act, level_num, level_last, level_set, 27, -1);
+        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 27, -1);
         assert(lev == 35);
       
         if(!DOUBLE_SIZE) {
@@ -908,19 +1029,19 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         #define ADV_START_X 15
         #define ADV_START_Y 10
       
-        menu_level_draw_level(0,level_act,level_num,level_last,level_set,ADV_START_X, ADV_START_Y);
+        menu_level_draw_level(0,level_act,level_last,level_set,ADV_START_X, ADV_START_Y);
       
         menu_level_draw_pipe(2, ADV_START_X, ADV_START_Y-1);
-        menu_level_draw_level(1,level_act,level_num,level_last,level_set,ADV_START_X, ADV_START_Y-2);
+        menu_level_draw_level(1,level_act,level_last,level_set,ADV_START_X, ADV_START_Y-2);
       
         menu_level_draw_pipe(2, ADV_START_X, ADV_START_Y-3);
         menu_level_draw_pipe(2, ADV_START_X, ADV_START_Y-4);
-        menu_level_draw_level(3,level_act,level_num,level_last,level_set,ADV_START_X, ADV_START_Y-5);
+        menu_level_draw_level(3,level_act,level_last,level_set,ADV_START_X, ADV_START_Y-5);
       
         menu_level_draw_pipe(0, ADV_START_X-1, ADV_START_Y-5);
         menu_level_draw_pipe(5, ADV_START_X-2, ADV_START_Y-5);
         menu_level_draw_pipe(2, ADV_START_X-2, ADV_START_Y-6);
-        menu_level_draw_level(3,level_act,level_num,level_last,level_set,ADV_START_X-2, ADV_START_Y-7);
+        menu_level_draw_level(3,level_act,level_last,level_set,ADV_START_X-2, ADV_START_Y-7);
       
         menu_level_draw_pipe(2, ADV_START_X-2, ADV_START_Y-8);
         menu_level_draw_pipe(2, ADV_START_X-2, ADV_START_Y-9);
@@ -930,46 +1051,46 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         menu_level_draw_pipe(2, ADV_START_X, ADV_START_Y+2);
         menu_level_draw_pipe(5, ADV_START_X, ADV_START_Y+3);
         menu_level_draw_pipe(0, ADV_START_X+1, ADV_START_Y+3);
-        menu_level_draw_level(4,level_act,level_num,level_last,level_set,ADV_START_X+2, ADV_START_Y+3);
+        menu_level_draw_level(4,level_act,level_last,level_set,ADV_START_X+2, ADV_START_Y+3);
 
         menu_level_draw_pipe(4, ADV_START_X+2, ADV_START_Y+2);
         menu_level_draw_pipe(0, ADV_START_X+3, ADV_START_Y+2);
         menu_level_draw_pipe(0, ADV_START_X+4, ADV_START_Y+2);        
-        menu_level_draw_level(5,level_act,level_num,level_last,level_set,ADV_START_X+5, ADV_START_Y+2);
+        menu_level_draw_level(5,level_act,level_last,level_set,ADV_START_X+5, ADV_START_Y+2);
 
         menu_level_draw_pipe(2, ADV_START_X+5, ADV_START_Y+1);
         menu_level_draw_pipe(2, ADV_START_X+5, ADV_START_Y);
-        menu_level_draw_level(6,level_act,level_num,level_last,level_set,ADV_START_X+5, ADV_START_Y-1);
+        menu_level_draw_level(6,level_act,level_last,level_set,ADV_START_X+5, ADV_START_Y-1);
 
         menu_level_draw_pipe(4, ADV_START_X+5, ADV_START_Y-2);
         menu_level_draw_pipe(0, ADV_START_X+6, ADV_START_Y-2);
         menu_level_draw_pipe(0, ADV_START_X+7, ADV_START_Y-2);
         menu_level_draw_pipe(0, ADV_START_X+8, ADV_START_Y-2);
-        menu_level_draw_level(7,level_act,level_num,level_last,level_set,ADV_START_X+9, ADV_START_Y-2);
+        menu_level_draw_level(7,level_act,level_last,level_set,ADV_START_X+9, ADV_START_Y-2);
 
         menu_level_draw_pipe(2, ADV_START_X+9, ADV_START_Y-3);
         menu_level_draw_pipe(2, ADV_START_X+9, ADV_START_Y-4);
         menu_level_draw_pipe(2, ADV_START_X+9, ADV_START_Y-5);
-        menu_level_draw_level(8,level_act,level_num,level_last,level_set,ADV_START_X+9, ADV_START_Y-6);
+        menu_level_draw_level(8,level_act,level_last,level_set,ADV_START_X+9, ADV_START_Y-6);
 
         menu_level_draw_pipe(2, ADV_START_X+9, ADV_START_Y-1);
         menu_level_draw_pipe(2, ADV_START_X+9, ADV_START_Y);
-        menu_level_draw_level(9,level_act,level_num,level_last,level_set,ADV_START_X+9, ADV_START_Y+1);
+        menu_level_draw_level(9,level_act,level_last,level_set,ADV_START_X+9, ADV_START_Y+1);
         
         menu_level_draw_pipe(5, ADV_START_X+2, ADV_START_Y+4);
         menu_level_draw_pipe(0, ADV_START_X+3, ADV_START_Y+4);
-        menu_level_draw_level(10,level_act,level_num,level_last,level_set,ADV_START_X+4, ADV_START_Y+4);
+        menu_level_draw_level(10,level_act,level_last,level_set,ADV_START_X+4, ADV_START_Y+4);
         
         menu_level_run_path_draw_line("DPRPRPDPV11DPD",
-                                      level_act, level_num, level_last, level_set, ADV_START_X+4, ADV_START_Y+4);
-        menu_level_draw_level(12,level_act,level_num,level_last,level_set,ADV_START_X+6, ADV_START_Y+8);
+                                      level_act,  level_last, level_set, ADV_START_X+4, ADV_START_Y+4);
+        menu_level_draw_level(12,level_act,level_last,level_set,ADV_START_X+6, ADV_START_Y+8);
 
         menu_level_draw_pipe(0, ADV_START_X-1, ADV_START_Y);
         menu_level_draw_pipe(0, ADV_START_X-2, ADV_START_Y);
         menu_level_draw_pipe(0, ADV_START_X-3, ADV_START_Y);
         menu_level_draw_pipe(0, ADV_START_X-4, ADV_START_Y);
         menu_level_draw_pipe(5, ADV_START_X-5, ADV_START_Y);
-        menu_level_draw_level(13,level_act,level_num,level_last,level_set,ADV_START_X-5, ADV_START_Y-1);
+        menu_level_draw_level(13,level_act,level_last,level_set,ADV_START_X-5, ADV_START_Y-1);
         menu_level_draw_pipe(0, ADV_START_X-1, ADV_START_Y-2);
         menu_level_draw_pipe(0, ADV_START_X-2, ADV_START_Y-2);
         menu_level_draw_pipe(0, ADV_START_X-3, ADV_START_Y-2);
@@ -981,32 +1102,32 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         menu_level_draw_pipe(0, ADV_START_X-8, ADV_START_Y-1);
         menu_level_draw_pipe(0, ADV_START_X-9, ADV_START_Y-1);
         menu_level_draw_pipe(5, ADV_START_X-10, ADV_START_Y-1);
-        menu_level_draw_level(14,level_act,level_num,level_last,level_set,ADV_START_X-10, ADV_START_Y-2);
+        menu_level_draw_level(14,level_act,level_last,level_set,ADV_START_X-10, ADV_START_Y-2);
 
         menu_level_draw_pipe(2, ADV_START_X-10, ADV_START_Y-3);
         menu_level_draw_pipe(2, ADV_START_X-10, ADV_START_Y-4);
-        menu_level_draw_level(15,level_act,level_num,level_last,level_set,ADV_START_X-10, ADV_START_Y-5);
+        menu_level_draw_level(15,level_act,level_last,level_set,ADV_START_X-10, ADV_START_Y-5);
 
         menu_level_draw_pipe(2, ADV_START_X+6, ADV_START_Y+9);
         menu_level_draw_pipe(2, ADV_START_X+6, ADV_START_Y+10);
-        menu_level_draw_level(16,level_act,level_num,level_last,level_set,ADV_START_X+6, ADV_START_Y+11);
+        menu_level_draw_level(16,level_act,level_last,level_set,ADV_START_X+6, ADV_START_Y+11);
         
         menu_level_draw_pipe(2, ADV_START_X-10, ADV_START_Y-6);
         menu_level_draw_pipe(2, ADV_START_X-10, ADV_START_Y-7);
-        menu_level_draw_level(17,level_act,level_num,level_last,level_set,ADV_START_X-10, ADV_START_Y-8);
+        menu_level_draw_level(17,level_act,level_last,level_set,ADV_START_X-10, ADV_START_Y-8);
         
         menu_level_draw_pipe(4, ADV_START_X-11, ADV_START_Y-2);
         menu_level_draw_pipe(2, ADV_START_X-11, ADV_START_Y-1);
         menu_level_draw_pipe(2, ADV_START_X-11, ADV_START_Y);
         menu_level_draw_pipe(2, ADV_START_X-11, ADV_START_Y+1);
-        menu_level_draw_level(18,level_act,level_num,level_last,level_set,ADV_START_X-11, ADV_START_Y+2);
+        menu_level_draw_level(18,level_act,level_last,level_set,ADV_START_X-11, ADV_START_Y+2);
         
         menu_level_draw_pipe(3, ADV_START_X-11, ADV_START_Y+3);
         menu_level_draw_pipe(0, ADV_START_X-12, ADV_START_Y+3);        
         menu_level_draw_pipe(4, ADV_START_X-13, ADV_START_Y+3);
         menu_level_draw_pipe(2, ADV_START_X-13, ADV_START_Y+4);
         menu_level_draw_pipe(2, ADV_START_X-13, ADV_START_Y+5);
-        menu_level_draw_level(19,level_act,level_num,level_last,level_set,ADV_START_X-13, ADV_START_Y+6);
+        menu_level_draw_level(19,level_act,level_last,level_set,ADV_START_X-13, ADV_START_Y+6);
         
         menu_level_draw_pipe(0, ADV_START_X-14, ADV_START_Y+6);
         menu_level_draw_pipe(0, ADV_START_X-15, ADV_START_Y+6);
@@ -1046,15 +1167,15 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         #define IMP_START_Y 6
       
         menu_level_draw_pipe(5,IMP_START_X+1,IMP_START_Y);
-        menu_level_draw_level(0,level_act,level_num,level_last,level_set,IMP_START_X+2, IMP_START_Y);
+        menu_level_draw_level(0,level_act,level_last,level_set,IMP_START_X+2, IMP_START_Y);
       
         menu_level_draw_pipe(2,IMP_START_X+2,IMP_START_Y+1);
-        menu_level_draw_level(1,level_act,level_num,level_last,level_set,IMP_START_X+2, IMP_START_Y+2);
+        menu_level_draw_level(1,level_act,level_last,level_set,IMP_START_X+2, IMP_START_Y+2);
       
         menu_level_draw_pipe(5,IMP_START_X+2,IMP_START_Y+3);
         menu_level_draw_pipe(0,IMP_START_X+3,IMP_START_Y+3);
         menu_level_draw_pipe(1,IMP_START_X+4,IMP_START_Y+3);
-        menu_level_draw_level(2,level_act,level_num,level_last,level_set,IMP_START_X+4, IMP_START_Y+4);
+        menu_level_draw_level(2,level_act,level_last,level_set,IMP_START_X+4, IMP_START_Y+4);
       
         menu_level_draw_pipe(2,IMP_START_X+4,IMP_START_Y+5);
         menu_level_draw_pipe(3,IMP_START_X+4,IMP_START_Y+6);
@@ -1067,12 +1188,12 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         menu_level_draw_pipe(0,IMP_START_X-1,IMP_START_Y+7);
         menu_level_draw_pipe(5,IMP_START_X-2,IMP_START_Y+7);
         menu_level_draw_pipe(2,IMP_START_X-2,IMP_START_Y+6);
-        menu_level_draw_level(3,level_act,level_num,level_last,level_set,IMP_START_X-2, IMP_START_Y+5);
+        menu_level_draw_level(3,level_act,level_last,level_set,IMP_START_X-2, IMP_START_Y+5);
 
         menu_level_draw_pipe(1,IMP_START_X-2,IMP_START_Y+4);
         menu_level_draw_pipe(0,IMP_START_X-3,IMP_START_Y+4);
         menu_level_draw_pipe(5,IMP_START_X-4,IMP_START_Y+4);
-        menu_level_draw_level(4,level_act,level_num,level_last,level_set,IMP_START_X-4, IMP_START_Y+3);
+        menu_level_draw_level(4,level_act,level_last,level_set,IMP_START_X-4, IMP_START_Y+3);
 
         menu_level_draw_pipe(4,IMP_START_X-4,IMP_START_Y+2);
         menu_level_draw_pipe(0,IMP_START_X-3,IMP_START_Y+2);
@@ -1121,19 +1242,19 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         #define LEVEL_LINE "DPDV00DPDV01DPDV02DPLPDV03DPDV04DPDV05DPRPDV06DPDV07DPDV08DPLPLPDV09DPDV10"
         int lev = 0;
       
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act, level_num, level_last, level_set, 2, -1);
+        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 2, -1);
       
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV11DPRPRPDV12DPDV13DPDV14DPDV15DPRPDV16DPDV17DPRPDV18"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act, level_num, level_last, level_set, 8, -1);
+        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 8, -1);
             
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV19DPRPRPDV20DPRPRPDPV21DPLPLPDV22DPRPRPDV23DPLPLPDV24DPRPDV25DPRPRPRPDV26DPDV27DPDV28DPDV29"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act, level_num, level_last, level_set, 15, -1);
+        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 15, -1);
       
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV29DPRPRPDV30DPRPRPDPDPLPLPLPDV31"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act, level_num, level_last, level_set, 23, -1);
+        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 23, -1);
               
         if(!DOUBLE_SIZE) {
           #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17 - 60 - 60)
@@ -1214,11 +1335,10 @@ GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
       {            
         this.menu_enter(this, GameGui.prototype.menu_level_run_new, level_set, unused);
         this.graph.clear();
-      
+        
         this.profile.level_set_select(level_set);
         this.menu_level_run_path_draw(level_set,
                                       this.profile.selected_level_get(),
-                                      p_ber->levelset_get_levelnum(),
                                       this.profile.last_level_get());
         this.menu_level_name_print();
       }
