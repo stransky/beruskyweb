@@ -90,51 +90,54 @@ var PROFILE_LAST_INTERMEDIATE = "l2"
 var PROFILE_LAST_ADVANCED     = "l3"
 var PROFILE_LAST_IMPOSSIBLE   = "l4"
 
-function PlayerProfile() {
-  this.filename = "";
-  this.level_selected = Array();  //[LEVEL_SET_NUM] - selected level
-  this.level_last = Array();      //[LEVEL_SET_NUM] - last finished level
+function PlayerProfile(name) {  
+  this.level_last_names = [ "l0l", "l1l", "l2l", "l3l", "l4l"];
+  this.level_last       = [0,0,0,0,0]; // Last finished level
+  
+  this.level_selected_names = [ "l0s", "l1s", "l2s", "l3s", "l4s"];
+  this.level_selected  = [0,0,0,0,0]; // Selected level
+
   this.level_set_selected = 0;
-  this.profile_name = "";
+  this.profile_name = name;
 }
 
 // fill level_set_selected and level_selected
-PlayerProfile.profile.level_set_select = function(level_set_num)
+PlayerProfile.prototype.level_set_select = function(level_set_num)
 {
   this.level_set_selected = level_set_num;
-  this.selected_level_set(this.level_selected[level_set_num]);
+  this.selected_level_set(this.level_selected[level_set_num]);  
 }
 
-PlayerProfile.profile.level_set_get = function()
+PlayerProfile.prototype.level_set_get = function()
 {
   return(this.level_set_selected);
 }
 
-PlayerProfile.profile.selected_level_set = function(level) 
+PlayerProfile.prototype.selected_level_set = function(level) 
 {
-  if(level > this.level_last[level_set_selected])
-    level = this.level_last[level_set_selected];
+  if(level > this.level_last[this.level_set_selected])
+    level = this.level_last[this.level_set_selected];
   
-  this.level_selected[level_set_selected] = level;
-{
-
-PlayerProfile.profile.selected_level_get = function()
-{
-  return(this.level_selected[level_set_selected]);
+  this.level_selected[this.level_set_selected] = level;
 }
 
-PlayerProfile.profile.last_level_set = function(level) 
+PlayerProfile.prototype.selected_level_get = function()
 {
-  this.level_last[level_set_selected] = level;
+  return(this.level_selected[this.level_set_selected]);
 }
 
-PlayerProfile.profile.last_level_get = function() 
+PlayerProfile.prototype.last_level_set = function(level) 
 {
-  return(this.level_last[level_set_selected]);
+  this.level_last[this.level_set_selected] = level;
 }
 
-  // The selected level has been successfuly finished
-PlayerProfile.profile.selected_level_finished = function()
+PlayerProfile.prototype.last_level_get = function() 
+{
+  return(this.level_last[this.level_set_selected]);
+}
+
+// The selected level has been successfuly finished
+PlayerProfile.prototype.selected_level_finished = function()
 {
   var selected_level = this.selected_level_get();
 
@@ -148,20 +151,27 @@ PlayerProfile.profile.selected_level_finished = function()
   }
 }
 
-PlayerProfile.profile.create = function(name)
+PlayerProfile.prototype.load = function(name)
 {
 
 }
 
-PlayerProfile.profile.load = function(dir, file)
+PlayerProfile.prototype.save = function()
 {
-
+  var profile_string = "profile_name = " + this.profile_name + ";";
+  for(var i = 0; i < LEVEL_SET_NUM; i++); {
+    profile_string += this.level_last_names[i] + "=" + this.level_last + ";";
+    profile_string += this.level_selected_names[i] + "=" + this.level_selected  + ";";
+  }
+  document.cookie = profile_string;
 }
 
-PlayerProfile.profile.save = function()
-{
-
-}
+/*
+  this.level_set_names = [ "l0", "l1", "l2", "l3", "l4"];
+  this.level_selected  = [0,0,0,0,0]; // Selected level
+  this.level_last      = [0,0,0,0,0]; // Last finished level
+  this.level_set_selected = 0;  
+*/
 
 /* Stores levelset
 */
@@ -170,10 +180,13 @@ LevelSet_load_callback = function()
   var level_set = this.callback_object;
   var chars = this.responseText.split("\n");
 
-  for (var i = 0, var lv = 0; i < chars.length; i += 2, lv++) {
+  var i = 0;
+  var lv = 0;
+  for (; i < chars.length; i += 2, lv++) {
     level_set.levelname[lv] = chars[i];
     level_set.password[lv] = chars[i+1];
   }
+   
   this.loaded = true;
 }
 
@@ -184,7 +197,7 @@ function LevelSet(set) {
   this.loaded = false;
 
   var file = "data/GameData/s" + set + ".dat";
-  load_file_text(file, FontTable_load_callback, this);
+  load_file_text(file, LevelSet_load_callback, this);
 }
 
 LevelSet.prototype.levelnum_get = function() 
@@ -198,7 +211,7 @@ function LevelStore() {
     this.level_set[i] = new LevelSet(i);
 }
 
-LevelStore.profile.loaded = function() {
+LevelStore.prototype.loaded = function() {
   for(var i = 0; i < LEVEL_SET_NUM; i++)
     if(!this.level_set[i].loaded())
       return false;
@@ -206,11 +219,11 @@ LevelStore.profile.loaded = function() {
   return true;
 }
 
-LevelStore.profile.levelset_get = function(set) {
+LevelStore.prototype.levelset_get = function(set) {
   return this.level_set[set];
 }
 
-LevelStore.profile.levelset_get_passwd = function(set, level) {
+LevelStore.prototype.levelset_get_passwd = function(set, level) {
   return this.level_set[set].password[level];
 }
 
@@ -225,7 +238,7 @@ function GameGui() {
   this.graph = this.game.graph;
   this.loaded = false;
   this.events = new BeruskyEvents();
-  this.profile = new PlayerProfile();
+  this.profile = new PlayerProfile("Default");
   this.store = new LevelStore();
 
   // Used for menu rendering
@@ -237,6 +250,8 @@ function GameGui() {
   this.menu_spr_diff_dy = false;
   this.menu_last_x = false;
   this.menu_last_y = false;
+
+  this.sprite_levelname = false;
 
   this.menu_back_stack = Array();
   this.menu_current = new MenuFunction();  
@@ -469,7 +484,7 @@ GameGui.prototype.menu_level_name_print = function()
         menu_y_start = (GAME_RESOLUTION_Y - 160);
         break;
       case 4:
-        p_font->alignment_set(MENU_CENTER);
+        this.graph.font_alignment_set(MENU_CENTER);        
         menu_x_start = 20;
         menu_y_start = (GAME_RESOLUTION_Y - 160);
         break;
@@ -480,24 +495,21 @@ GameGui.prototype.menu_level_name_print = function()
     }
   }
   
-  TODO -> save the string
   this.graph.font_start_set(menu_x_start, menu_y_start);
-  this.graph.print("Level: " + level+1 + " - " + this.store.levelset_get_passwd(level_set, level));
+  if(this.sprite_levelname)
+    this.graph.sprite_remove(this.sprite_levelname);
+  this.sprite_levelname = this.graph.print("Level: " + level+1 + " - " + this.store.levelset_get_passwd(level_set, level));
 }
 
 GameGui.prototype.level_set_select = function(level_set)
 {
-  bool ret = p_ber->levelset_load(level_set);
-  if(!ret) {
-    berror("Unable to load levelset %d\n",level_set);
-    return;
-  }
-  profile.level_set_set(level_set);
+  this.profile.level_set_select(level_set);
 }
 
-GameGui.prototype.level_select(level, tpos spr_x, tpos spr_y)
+GameGui.prototype.level_select = function(level, spr_x, spr_y)
 {  
-  // Selec the level
+/*
+  // Select the level
   p_ber->levelset_set_level(level);
   profile.selected_level_set(level);
 
@@ -513,6 +525,7 @@ GameGui.prototype.level_select(level, tpos spr_x, tpos spr_y)
   profile.level_spr_x = spr_x;
   profile.level_spr_y = spr_y;
   p_grf->flip();
+  */
 }
 
 GameGui.prototype.menu_main = function(state, data, data1)
@@ -1480,8 +1493,10 @@ GameGui.prototype.callback = function(event)
   }
 }
 
+/*
 GameGui.prototype.level_run = function(event)
 {
 
 
 }
+*/
