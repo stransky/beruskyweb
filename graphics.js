@@ -262,9 +262,18 @@ Graph.prototype.int_sprite_draw = function(spr_inactive, spr_active,
   return(spr);
 }
 
-Graph.prototype.int_sprite_active_set = function(active)
+// Insert interactive sprite
+Graph.prototype.int_sprite_change = function(spr_handle, spr_inactive, spr_active, state)
 {
-  this.setTexture(active ? this.sprite_active : this.sprite_inactive);
+  spr_handle.sprite_inactive = this.sprites[spr_inactive];
+  spr_handle.sprite_active = this.sprites[spr_active];
+  this.int_sprite_active_set(spr_handle, state);
+  return(spr_handle);
+}
+
+Graph.prototype.int_sprite_active_set = function(spr_handle, active)
+{
+  spr_handle.setTexture(active ? spr_handle.sprite_active : spr_handle.sprite_inactive);
 }
 
 Graph.prototype.sprite_move = function(sprite_handle, x, y)

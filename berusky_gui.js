@@ -92,13 +92,13 @@ var PROFILE_LAST_IMPOSSIBLE   = "l4"
 
 function PlayerProfile(name) {  
   this.level_last_names = [ "l0l", "l1l", "l2l", "l3l", "l4l"];
-  this.level_last       = [0,0,0,0,0]; // Last finished level
+  this.level_last       = [3,0,0,0,0]; // Last finished level
   
   this.level_selected_names = [ "l0s", "l1s", "l2s", "l3s", "l4s"];
-  this.level_selected  = [0,0,0,0,0]; // Selected level
+  this.level_selected  = [3,0,0,0,0]; // Selected level
 
   this.level_set_selected = 0;
-  this.profile_name = name;
+  this.profile_name = name;  
 }
 
 // fill level_set_selected and level_selected
@@ -233,6 +233,22 @@ function GameGuiCallbackData(gui, event, event_back) {
   this.event_back = event_back;
 }
 
+function LevelSprite(icon_handle) {
+  this.icon_handle = icon_handle;
+}
+
+LevelSprite.prototype.draw_state = function(graph, state)
+{
+  if(state) {
+    graph.int_sprite_change(this.icon_handle, LEVEL_NEXT, LEVEL_NEXT,
+                            true);
+  }
+  else {
+    graph.int_sprite_change(this.icon_handle, LEVEL_DONE, LEVEL_NEXT,
+                            false);  
+  }
+}
+
 function GameGui() {
   this.game = new Game();
   this.graph = this.game.graph;
@@ -255,6 +271,9 @@ function GameGui() {
 
   this.menu_back_stack = Array();
   this.menu_current = new MenuFunction();  
+
+  // Array of LevelSprite()
+  this.level_sprite_table = Array();
 }
 
 GameGui.prototype.GameGuiLoop = function() {
@@ -344,22 +363,25 @@ GameGui.prototype.menu_item_draw_sprite_set = function(sprite_active, sprite_ina
   this.menu_spr_diff_dy = this.graph.sprites[sprite_active].height;
 }
 
+// Returns drawn sprite and text start as a array [spr, text_spr]
 GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
 {
   var event_back = (flags&MENU_SAVE_BACK) ? new MenuEvent(GI_MENU_BACK_PUSH) : 0;
+  var ret = [0,0];
 
   switch(align)
   {
     case MENU_LEFT:
       {
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
-          this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
-                                     this.menu_last_x, this.menu_last_y,
-                                     this.menu_item_callback, new GameGuiCallbackData(this, event, event_back));
+          ret[0] = this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
+                                              this.menu_last_x, this.menu_last_y,
+                                              this.menu_item_callback, 
+                                              new GameGuiCallbackData(this, event, event_back));
         }
         if(text != "") {
           this.graph.font_alignment_set(align);
-          this.graph.int_print(text,
+          ret[1] = this.graph.int_print(text,
                                this.menu_item_callback, new GameGuiCallbackData(this, event, event_back),
                                this.menu_last_x + this.menu_spr_diff_dx + this.menu_text_diff_x,
                                this.menu_last_y + this.menu_text_diff_y);
@@ -373,13 +395,14 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
     case MENU_RIGHT:
       {
         if(!(flags&MENU_DONT_DRAW_SPRITE)) {
-          this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
-                                     this.menu_last_x, this.menu_last_y,
-                                     this.menu_item_callback, new GameGuiCallbackData(this, event, event_back));
+          ret[0] = this.graph.int_sprite_draw(this.menu_spr_inactive, this.menu_spr_active,
+                                              this.menu_last_x, this.menu_last_y,
+                                              this.menu_item_callback, 
+                                              new GameGuiCallbackData(this, event, event_back));
         }
         if(text != "") {
           this.graph.font_alignment_set(align);
-          this.graph.int_print(text,
+          ret[1] = this.graph.int_print(text,
                                this.menu_item_callback, new GameGuiCallbackData(this, event, event_back),
                                this.menu_last_x - this.menu_text_diff_x,
                                this.menu_last_y + this.menu_text_diff_y);
@@ -397,6 +420,8 @@ GameGui.prototype.menu_item_draw_sprite = function(text, align, flags, event)
     default:
       break;
   }
+  
+  return ret;
 }
 
 GameGui.prototype.menu_item_draw_text = function(text, align, flags, event)
@@ -498,7 +523,7 @@ GameGui.prototype.menu_level_name_print = function()
   this.graph.font_start_set(menu_x_start, menu_y_start);
   if(this.sprite_levelname)
     this.graph.sprite_remove(this.sprite_levelname);
-  this.sprite_levelname = this.graph.print("Level: " + level+1 + " - " + this.store.levelset_get_passwd(level_set, level));
+  this.sprite_levelname = this.graph.print("Level: " + (level+1) + " - " + this.store.levelset_get_passwd(level_set, level));
 }
 
 GameGui.prototype.level_set_select = function(level_set)
@@ -506,26 +531,13 @@ GameGui.prototype.level_set_select = function(level_set)
   this.profile.level_set_select(level_set);
 }
 
-GameGui.prototype.level_select = function(level, spr_x, spr_y)
-{  
-/*
-  // Select the level
-  p_ber->levelset_set_level(level);
-  profile.selected_level_set(level);
+GameGui.prototype.level_select = function(level)
+{ 
+  var lev = this.profile.selected_level_get();
+  this.level_sprite_table[lev].draw_state(this.graph, false);
 
-  // Draw the selected level
-  p_grf->draw(LEVEL_DONE, profile.level_spr_x, profile.level_spr_y);
-  p_grf->redraw_add(profile.level_spr_x, profile.level_spr_y, 
-                    p_grf->sprite_get_width(LEVEL_DONE),
-                    p_grf->sprite_get_height(LEVEL_DONE));
-  p_grf->draw(LEVEL_NEXT, spr_x, spr_y);
-  p_grf->redraw_add(spr_x, spr_y,
-                    p_grf->sprite_get_width(LEVEL_NEXT),
-                    p_grf->sprite_get_height(LEVEL_NEXT));
-  profile.level_spr_x = spr_x;
-  profile.level_spr_y = spr_y;
-  p_grf->flip();
-  */
+  this.profile.selected_level_set(level);
+  this.level_sprite_table[level].draw_state(this.graph, true);
 }
 
 GameGui.prototype.menu_main = function(state, data, data1)
@@ -705,11 +717,12 @@ GameGui.prototype.menu_level_draw_level = function(lev, level_act,
   var spr_x = x*ITEM_SIZE;
   var spr_y = y*ITEM_SIZE;
   var spr;
+  var level_spr = [0,0];
 
   if(lev > level_last) {
     // Draw as inactive sprite
     spr = LEVEL_CLOSED;
-    this.graph.sprite_insert(spr, spr_x, spr_y);
+    level_spr[0] = this.graph.sprite_insert(spr, spr_x, spr_y);
   }
   else {  
   
@@ -720,13 +733,15 @@ GameGui.prototype.menu_level_draw_level = function(lev, level_act,
       spr = LEVEL_DONE;
     }
       
-    this.menu_item_draw_sprite_set(spr, LEVEL_DONE,
+    this.menu_item_draw_sprite_set(LEVEL_NEXT, spr,
                                    TEXT_SHIFT_HORIZONTAL-ITEM_SIZE,
                                    TEXT_SHIFT_VERTICAL);
     this.menu_item_set_pos(spr_x, spr_y);
-    this.menu_item_draw_sprite("", MENU_LEFT, 0,
-                               new MenuEvent(GC_RUN_LEVEL_SELECT, [lev]));
+    level_spr = this.menu_item_draw_sprite("", MENU_LEFT, 0,
+                                           new MenuEvent(GC_RUN_LEVEL_SELECT, [ lev ]));
   }
+  
+  this.level_sprite_table[lev] = new LevelSprite(level_spr[0]);
 }
 
 GameGui.prototype.menu_level_draw_pipe = function(pip, x, y)
@@ -917,9 +932,8 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
 
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
-                              MENU_RIGHT, FALSE, 
-                              //new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last, profile.level_spr_x ,profile.level_spr_y ]));
-                              new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last, 0, 0]));
+                              MENU_RIGHT, FALSE,                               
+                              new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
 
           this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
@@ -1376,12 +1390,11 @@ GameGui.prototype.callback = function(event)
     case GC_MENU_RUN_LEVEL:
       this.menu_level_run_new(MENU_ENTER, event.params[0]);
       break;
-/*
     case GC_RUN_LEVEL_SELECT:
-      level_select(event.params[0], event.params[1], event.params[2]);      
-      menu_level_name_print();
+      this.level_select(event.params[0]);
+      this.menu_level_name_print();
       break;
-*/
+
 /*      
     case GC_MENU_END_LEVEL:
       menu_level_end(MENU_ENTER);
