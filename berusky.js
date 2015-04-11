@@ -46,7 +46,7 @@ StepStatus.prototype.add = function()
   this.steps++;
 
   this.graph.font_start_set(LOW_PANEL_STP_X_TEXT, LOW_PANEL_STP_Y);
-  this.graph.font_align_set(ALIGN_RIGHT);
+  this.graph.font_alignment_set(ALIGN_RIGHT);
   if(this.sprites) {
     this.graph.sprite_remove(this.sprites);
   }
@@ -147,6 +147,15 @@ Game.prototype.game_play = function()
     this.bug_switch(3);
   else if(this.input.key_get(BUG_SELECT_5, true))
     this.bug_switch(4);
+        
+  if(this.input.key_get(LEVEL_EXIT))
+    this. TODO -> level end, return to menu
+  else if(this.input.key_get(LEVEL_HELP))
+    ;
+  else if(this.input.key_get(LEVEL_SAVE))
+    ;
+  else if(this.input.key_get(LEVEL_LOAD))
+    ;
 }
 
 Game.prototype.game_loop = function()

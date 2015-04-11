@@ -160,8 +160,8 @@ PlayerProfile.prototype.save = function()
 {
   var profile_string = "profile_name = " + this.profile_name + ";";
   for(var i = 0; i < LEVEL_SET_NUM; i++); {
-    profile_string += this.level_last_names[i] + "=" + this.level_last + ";";
-    profile_string += this.level_selected_names[i] + "=" + this.level_selected  + ";";
+    profile_string += this.profile_name + "$" + this.level_last_names[i] + "=" + this.level_last + ";";
+    profile_string += this.profile_name + "$" + this.level_selected_names[i] + "=" + this.level_selected  + ";";
   }
   document.cookie = profile_string;
 }
@@ -270,10 +270,12 @@ function GameGui() {
   this.sprite_levelname = false;
 
   this.menu_back_stack = Array();
-  this.menu_current = new MenuFunction();  
+  this.menu_current = new MenuFunction();
 
   // Array of LevelSprite()
   this.level_sprite_table = Array();
+  
+  this.level_running = false;
 }
 
 GameGui.prototype.GameGuiLoop = function() {
@@ -284,7 +286,9 @@ GameGui.prototype.GameGuiLoop = function() {
     this.events.send(new MenuEvent(GC_MENU_START));
   }
   
-  //this.game.game_loop();
+  if(this.level_running)
+    this.game.game_loop();
+
   this.graph.render();
 }
 
@@ -1394,6 +1398,18 @@ GameGui.prototype.callback = function(event)
       this.level_select(event.params[0]);
       this.menu_level_name_print();
       break;
+    case GC_RUN_LEVEL_SET:
+      this.level_run();
+      break;
+
+/*
+    case GC_RUN_LEVEL_LINE:
+      level_run(&tmp_queue, (char *)ev.param_point_get(PARAM_0));
+      break;
+    case GC_STOP_LEVEL:
+      level_stop(&tmp_queue, ev.param_int_get(PARAM_0), ev.param_int_get(PARAM_1));
+      break; 
+*/
 
 /*      
     case GC_MENU_END_LEVEL:
@@ -1450,16 +1466,6 @@ GameGui.prototype.callback = function(event)
       menu_level_hint(MENU_ENTER, ev.param_int_get(PARAM_0));
       break;
     
-    case GC_RUN_LEVEL_LINE:
-      level_run(&tmp_queue, (char *)ev.param_point_get(PARAM_0));
-      break;
-    case GC_RUN_LEVEL_SET:
-      level_run(&tmp_queue);
-      break;
-    case GC_STOP_LEVEL:
-      level_stop(&tmp_queue, ev.param_int_get(PARAM_0), ev.param_int_get(PARAM_1));
-      break;
-    
     case GC_SUSPEND_LEVEL:
       level_suspend(&tmp_queue);
       break;
@@ -1506,10 +1512,16 @@ GameGui.prototype.callback = function(event)
   }
 }
 
-/*
-GameGui.prototype.level_run = function(event)
+GameGui.prototype.level_run = function()
 {
+  this.menu_leave();
+  this.graph.clear();
 
+  var level_set = this.profile.level_set_get();
+  var level_num = this.profile.selected_level_get();
+  var level_name = this.store.levelset_get(level_set).levelname[level_num];
 
+  var file = "data/Levels/" + level_name;
+  this.game.level_load(file);
+  this.level_running = true;
 }
-*/

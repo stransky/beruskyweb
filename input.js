@@ -41,6 +41,13 @@ var BUG_SELECT_4    = KeyEvent.DOM_VK_4
 var BUG_SELECT_5    = KeyEvent.DOM_VK_5
 var BUG_SELECT_NEXT = (-1)
 
+var LEVEL_HELP      = KeyEvent.VK_F1
+var LEVEL_SAVE      = KeyEvent.VK_F2
+var LEVEL_LOAD      = KeyEvent.VK_F3
+
+// Hack - for debugging
+var LEVEL_EXIT      = KeyEvent.VK_ESCAPE
+
 var input_object;
 
 function Input()
