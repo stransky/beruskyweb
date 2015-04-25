@@ -100,6 +100,8 @@ function Game() {
   this.steps_panel = new StepStatus(this.graph);
 
   this.loaded = false;
+  this.level_running = false;
+  this.level_end = false;
 }
 
 Game.prototype.game_load = function()
@@ -122,6 +124,22 @@ Game.prototype.game_load = function()
     this.level_animate();
   }
   this.loaded = true;
+}
+
+Game.prototype.level_play = function(level_name)
+{
+  var file = "data/Levels/" + level_name;
+  
+  this.level_running = true;
+  this.level_end = false;
+  
+  this.level_load(file);
+}
+
+Game.prototype.level_quit = function()
+{
+  this.level_running = false;
+  this.level_end = true;
 }
 
 Game.prototype.game_play = function()
@@ -148,8 +166,11 @@ Game.prototype.game_play = function()
   else if(this.input.key_get(BUG_SELECT_5, true))
     this.bug_switch(4);
         
-  if(this.input.key_get(LEVEL_EXIT))
-    this. TODO -> level end, return to menu
+  if(this.input.key_get(LEVEL_EXIT)) {
+    // HACK - debugging hack
+    this.level.keys_final = 5;
+    this.level_quit();
+  }
   else if(this.input.key_get(LEVEL_HELP))
     ;
   else if(this.input.key_get(LEVEL_SAVE))
@@ -448,7 +469,7 @@ Game.prototype.bug_move = function(direction)
       break;
     case P_EXIT:
       if(this.level.keys_final == 5) {
-        // exit
+        this.level_quit();
       }
       break;
     case P_STONE:

@@ -286,8 +286,14 @@ GameGui.prototype.GameGuiLoop = function() {
     this.events.send(new MenuEvent(GC_MENU_START));
   }
   
-  if(this.level_running)
+  // Game section
+  if(this.game.level_running) {
     this.game.game_loop();
+  }
+  if(this.game.level_end) {
+    this.game.level_end = false;
+    this.level_finish();
+  }
 
   this.graph.render();
 }
@@ -1381,6 +1387,185 @@ GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
   }
 }
 
+GameGui.prototype.menu_level_end = function()
+{
+/*
+  switch(state) {
+    case MENU_RETURN:
+    case MENU_ENTER:
+      {
+        menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_level_end, data, data1);
+
+        // Some statistics here 
+        p_grf->fill(0,0,GAME_RESOLUTION_X,GAME_RESOLUTION_Y,0);
+        p_font->alignment_set(MENU_CENTER);
+        p_font->select(FONT_DEFAULT);
+
+        LEVEL_STATUS *p_status = p_ber->level_status_get();
+        char tmp[100];
+
+        if(DOUBLE_SIZE) {
+          p_grf->draw(menu_background_get(),0,0);
+        }
+
+        if(DOUBLE_SIZE) {
+          #define LOGO_START (DOUBLE_SIZE ? 60 : 0)
+          tpos width = p_grf->sprite_get_width(MENU_SPRIT_LOGO);
+          p_grf->draw(MENU_SPRIT_LOGO,
+                      (GAME_RESOLUTION_X-width)/2, 
+                      LOGO_START);
+        }
+        else {
+          #define SMALL_LOGO_START 80
+          p_grf->draw(MENU_SPRIT_LOGO_SMALL_2,
+                      p_grf->sprite_get_width_center(MENU_SPRIT_LOGO_SMALL_2),
+                      SMALL_LOGO_START);
+        }
+      
+        #define END_TEXT_START (DOUBLE_SIZE ? (GAME_RESOLUTION_Y/2-100) : 80)
+      
+        if(p_status->resolved()) {
+          p_font->print(NULL,0,END_TEXT_START+100,_("your bugs have survived!"));
+          p_font->print(NULL,0,END_TEXT_START+130,_("difficulty %s"), p_ber->levelset_get_difficulty());
+          p_font->print(NULL,0,END_TEXT_START+180,_("they made %d steps"), p_status->steps_get());
+          p_font->print(NULL,0,END_TEXT_START+210,_("and %s."), p_status->time_get(tmp,100));
+        } else {
+          p_font->print(NULL,0,END_TEXT_START+100,_("your bugs have given it up!"));
+          p_font->print(NULL,0,END_TEXT_START+130,_("difficulty %s"), p_ber->levelset_get_difficulty());
+          p_font->print(NULL,0,END_TEXT_START+180,_("they made %d steps"), p_status->steps_get());
+          p_font->print(NULL,0,END_TEXT_START+210,_("and spent %s"), p_status->time_get(tmp,100));
+        }
+
+        p_grf->draw(MENU_SPRIT_LOGO_SMALL_3,
+                    p_grf->sprite_get_width_center(MENU_SPRIT_LOGO_SMALL_3),
+                    GAME_RESOLUTION_Y-130);
+        
+        #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17 - 120)
+        #define MENU_X_START_R (GAME_RESOLUTION_X/2 + 120)
+        #define MENU_Y_START   (DOUBLE_SIZE ? (GAME_RESOLUTION_Y-80) : 400)
+        #define MENU_X_DIFF     0
+        #define MENU_Y_DIFF     30
+        
+        static char *play_string = _("play next level");
+        static char *back_string = _("back to menu");
+      
+        menu_item_start();
+
+        if(p_status->resolved() &&
+           profile.selected_level_get() == profile.last_level_get())
+        {
+          // Run next level directly
+          menu_item_draw(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF, play_string,
+                         MENU_RIGHT, FALSE, LEVEL_EVENT(GC_RUN_LEVEL_SET));
+        }
+        menu_item_draw(MENU_X_START_L, MENU_Y_START+1*MENU_Y_DIFF, back_string,
+                       MENU_LEFT, FALSE, LEVEL_EVENT(GC_MENU_RUN_LEVEL, profile.level_set_get()));
+
+        p_grf->redraw_add(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
+        p_grf->flip();        
+      }
+      break;
+    
+    case MENU_LEAVE:
+      input.mevent_clear();
+      break;
+    
+    default:
+      break;
+  }
+  */
+}
+
+GameGui.prototype.menu_levelset_end = function()
+{
+/*
+  static char *p_text = NULL;
+  static int frame = 0;
+  static int position;
+
+  switch(state) {
+    case MENU_RETURN:
+    case MENU_ENTER:
+      {
+        menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_levelset_end, data, data1);
+        
+        int set = data;
+      
+        p_text = level_end_text_load(set);
+        assert(p_text);        
+      
+        sprite::color_key_set(COLOR_KEY_BLACK);
+        p_grf->sprite_delete(MENU_SPRIT_END, 1);
+      
+        char line[1000];
+        snprintf(line, 1000, SET_END_FILE_BACK, set+1);
+        p_grf->sprite_insert(line, MENU_SPRIT_END);
+      
+        input.keyset_set(&menu_keys);
+        
+        menu_timer.set((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_levelset_end, data, data1);
+        frame = 0;
+        position = 0;
+      }
+      break;
+    
+    case MENU_TIMER:
+      {
+        if((frame & 0x3) == 0x0) {
+          p_font->alignment_set(MENU_CENTER);
+          p_font->select(FONT_DEFAULT);
+        
+          tpos width = p_grf->sprite_get_width(MENU_SPRIT_END);
+        
+          p_grf->fill(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y, 0);
+          p_grf->draw(MENU_SPRIT_END,GAME_RESOLUTION_X/2-width/2,DOUBLE_SIZE ? 60 : 0);
+
+          if(position >= p_font->height_get_new_line(p_text)) {
+            position -= p_font->height_get_new_line(p_text);
+            p_text = strchr(p_text+1,'\n');
+          }
+
+          if(p_text) {
+            #define SCROLL_START_X  0
+            #define SCROLL_START_Y  0
+            #define SCROLL_LINES    (DOUBLE_SIZE ? 40 : 20)
+
+            p_font->print(NULL, SCROLL_START_X, SCROLL_START_Y-position, SCROLL_LINES, p_text);
+          } else {
+            menu_timer.clear();
+
+            #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17)
+            #define MENU_Y_START   (DOUBLE_SIZE ? (GAME_RESOLUTION_Y - 90) : 440)
+
+            static char *back_string = _("back");
+
+            menu_item_start();
+            menu_item_draw(MENU_X_START_L, MENU_Y_START, back_string, MENU_LEFT, FALSE, LEVEL_EVENT(GC_MENU_START));
+          }
+
+          p_grf->redraw_add(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
+          p_grf->flip();
+
+          // pokud jsem na konci -> odregistrovat timer, pridat <- back menu          
+          position += 2;
+        }
+        frame++;
+      }    
+      break;
+
+    case MENU_LEAVE:
+      p_text = NULL;
+      menu_timer.clear();
+      input.keyset_set(NULL);
+      input.mevent_clear();
+      break;
+    
+    default:
+      break;
+  }
+*/
+}
+
 GameGui.prototype.callback = function(event)
 {  
   var ev = event.type;
@@ -1401,25 +1586,18 @@ GameGui.prototype.callback = function(event)
     case GC_RUN_LEVEL_SET:
       this.level_run();
       break;
-
+    case GC_STOP_LEVEL:
+      this.level_stop();
+      break;
+    case GC_MENU_END_LEVEL:
+      this.menu_level_end();
+      break;
+    case GC_MENU_END_LEVEL_SET:
+      this.menu_levelset_end();
+      break;
 /*
     case GC_RUN_LEVEL_LINE:
       level_run(&tmp_queue, (char *)ev.param_point_get(PARAM_0));
-      break;
-    case GC_STOP_LEVEL:
-      level_stop(&tmp_queue, ev.param_int_get(PARAM_0), ev.param_int_get(PARAM_1));
-      break; 
-*/
-
-/*      
-    case GC_MENU_END_LEVEL:
-      menu_level_end(MENU_ENTER);
-      break;
-    case GC_MENU_END_LEVEL_CUSTOM:
-      menu_level_end_custom(MENU_ENTER);
-      break;
-    case GC_MENU_END_LEVEL_SET:
-      menu_levelset_end(MENU_ENTER);
       break;
 */
 /*     
@@ -1521,7 +1699,29 @@ GameGui.prototype.level_run = function()
   var level_num = this.profile.selected_level_get();
   var level_name = this.store.levelset_get(level_set).levelname[level_num];
 
-  var file = "data/Levels/" + level_name;
-  this.game.level_load(file);
-  this.level_running = true;
+  this.game.level_play(level_name);
+}
+
+GameGui.prototype.level_finish = function()
+{
+  this.graph.clear();
+
+  var level_set = this.profile.level_set_get();
+  var level_num = this.profile.selected_level_get();
+
+  if(this.game.level.keys_final == 5) {
+    this.profile.selected_level_finished();
+
+    if(level+1 < this.store.levelset_get(level_set).levelnum_get()) {
+      /* There are more levels to finish */
+      this.events.send(new MenuEvent(GC_MENU_END_LEVEL));
+    } else {
+      /* The whole level-set has been finished */
+      this.events.send(new MenuEvent(GC_MENU_END_LEVEL_SET, level_set));
+    }
+  }
+  else {
+    /* if we run it from set, return to menu */
+    this.events.send(new MenuEvent(GC_MENU_END_LEVEL));
+  }
 }
