@@ -1707,7 +1707,7 @@ GameGui.prototype.level_finish = function()
   this.graph.clear();
 
   var level_set = this.profile.level_set_get();
-  var level_num = this.profile.selected_level_get();
+  var level = this.profile.selected_level_get();
 
   if(this.game.level.keys_final == 5) {
     this.profile.selected_level_finished();

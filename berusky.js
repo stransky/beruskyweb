@@ -355,7 +355,7 @@ Game.prototype.exit_animate = function()
                                                  x, y, LAYER_LEVEL, NO_ROTATION);
         } else {
           cell.variant = (cell.variant == REV_EXIT) ? cell.variant-1 : cell.variant+1;
-          this.level.item_draw(cell, x, y, true);
+          this.level.cell_draw(cell, x, y, true);
         }
       }
     }
