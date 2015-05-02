@@ -67,9 +67,9 @@ sprite_load_callback = function()
   var position_base = this.callback_object.position;
   var sprites = this.responseText.split("\n");
   var base_text;
-  var base_rect;
+  var base_rect;  
 
-  for (i = 0; i < sprites.length; i++) {
+  for (var i = 0; i < sprites.length; i++) {
     var line = sprites[i];
     if(line[0] == "s") {
       // s x y dx dy scale
@@ -90,7 +90,7 @@ sprite_load_callback = function()
       var l = line.slice(2).split(" ");
       var num = parseInt(l[4]);
 
-      for(i = 0; i < num; i++) {
+      for(var j = 0; j < num; j++) {
         base_rect.x += parseInt(l[0]);
         base_rect.y += parseInt(l[1]);
         base_rect.width += parseInt(l[2]);

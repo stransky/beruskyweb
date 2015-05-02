@@ -142,6 +142,11 @@ Game.prototype.level_quit = function()
   this.level_end = true;
 }
 
+Game.prototype.is_resolved = function()
+{
+  return (this.level.keys_final == 5);
+}
+
 Game.prototype.game_play = function()
 {
   if(this.input.key_get(BUG_MOVE_UP))
@@ -468,7 +473,7 @@ Game.prototype.bug_move = function(direction)
       }
       break;
     case P_EXIT:
-      if(this.level.keys_final == 5) {
+      if(this.is_resolved()) {
         this.level_quit();
       }
       break;

@@ -187,7 +187,7 @@ LevelSet_load_callback = function()
     level_set.password[lv] = chars[i+1];
   }
    
-  this.loaded = true;
+  level_set.loaded = true;
 }
 
 function LevelSet(set) {
@@ -196,13 +196,33 @@ function LevelSet(set) {
   this.password = Array();
   this.loaded = false;
 
+  switch(set) {
+    case 0:
+      this.name = "training";
+      break;
+    case 1:
+      this.name = "easy";
+      break;
+    case 2:
+      this.name = "intermediate";
+      break;
+    case 3:
+      this.name = "advanced";
+      break;
+    case 4:
+      this.name = "impossible";
+      break;
+    default:
+      throw "Unknown!";
+  }
+
   var file = "data/GameData/s" + set + ".dat";
   load_file_text(file, LevelSet_load_callback, this);
 }
 
 LevelSet.prototype.levelnum_get = function() 
 {
-  return this.loaded ? this.levelname.lenght : 0;
+  return this.loaded ? this.levelname.length : 0;
 }
 
 function LevelStore() {
@@ -1387,23 +1407,19 @@ GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
   }
 }
 
-GameGui.prototype.menu_level_end = function()
+GameGui.prototype.menu_level_end = function(state, level_set, unused)
 {
-/*
   switch(state) {
     case MENU_RETURN:
     case MENU_ENTER:
       {
-        menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_level_end, data, data1);
+        this.menu_enter(this, GameGui.prototype.menu_level_run_new, level_set, unused);
+        this.graph.clear();
 
-        // Some statistics here 
-        p_grf->fill(0,0,GAME_RESOLUTION_X,GAME_RESOLUTION_Y,0);
-        p_font->alignment_set(MENU_CENTER);
-        p_font->select(FONT_DEFAULT);
-
-        LEVEL_STATUS *p_status = p_ber->level_status_get();
-        char tmp[100];
-
+        // Some statistics here         
+        this.graph.font_alignment_set(MENU_CENTER);
+        this.graph.font_set(FONT_DEFAULT);
+/*
         if(DOUBLE_SIZE) {
           p_grf->draw(menu_background_get(),0,0);
         }
@@ -1416,64 +1432,59 @@ GameGui.prototype.menu_level_end = function()
                       LOGO_START);
         }
         else {
-          #define SMALL_LOGO_START 80
-          p_grf->draw(MENU_SPRIT_LOGO_SMALL_2,
-                      p_grf->sprite_get_width_center(MENU_SPRIT_LOGO_SMALL_2),
-                      SMALL_LOGO_START);
-        }
-      
-        #define END_TEXT_START (DOUBLE_SIZE ? (GAME_RESOLUTION_Y/2-100) : 80)
-      
-        if(p_status->resolved()) {
-          p_font->print(NULL,0,END_TEXT_START+100,_("your bugs have survived!"));
-          p_font->print(NULL,0,END_TEXT_START+130,_("difficulty %s"), p_ber->levelset_get_difficulty());
-          p_font->print(NULL,0,END_TEXT_START+180,_("they made %d steps"), p_status->steps_get());
-          p_font->print(NULL,0,END_TEXT_START+210,_("and %s."), p_status->time_get(tmp,100));
+*/
+        var SMALL_LOGO_START = 80;
+        var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO_SMALL_2);
+        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-spr.width)/2, SMALL_LOGO_START);
+
+        var END_TEXT_START = (DOUBLE_SIZE ? (GAME_RESOLUTION_Y/2-100) : 80);
+
+        var level_set = this.profile.level_set_get();
+        var name = this.store.levelset_get(level_set).name;
+        var steps = this.game.steps_panel.steps;
+
+        if(this.game.is_resolved()) {
+          this.graph.print("your bugs have survived!", 0, END_TEXT_START+100);
+          this.graph.print("difficulty " + name, 0, END_TEXT_START+130);
+          this.graph.print("they made "  + steps + " steps", 0, END_TEXT_START+180);
         } else {
-          p_font->print(NULL,0,END_TEXT_START+100,_("your bugs have given it up!"));
-          p_font->print(NULL,0,END_TEXT_START+130,_("difficulty %s"), p_ber->levelset_get_difficulty());
-          p_font->print(NULL,0,END_TEXT_START+180,_("they made %d steps"), p_status->steps_get());
-          p_font->print(NULL,0,END_TEXT_START+210,_("and spent %s"), p_status->time_get(tmp,100));
+          this.graph.print("your bugs have given it up!", 0, END_TEXT_START+100);
+          this.graph.print("difficulty " + name, 0, END_TEXT_START+130);
+          this.graph.print("they made " + steps + " steps", 0, END_TEXT_START+180);
         }
 
-        p_grf->draw(MENU_SPRIT_LOGO_SMALL_3,
-                    p_grf->sprite_get_width_center(MENU_SPRIT_LOGO_SMALL_3),
-                    GAME_RESOLUTION_Y-130);
-        
-        #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17 - 120)
-        #define MENU_X_START_R (GAME_RESOLUTION_X/2 + 120)
-        #define MENU_Y_START   (DOUBLE_SIZE ? (GAME_RESOLUTION_Y-80) : 400)
-        #define MENU_X_DIFF     0
-        #define MENU_Y_DIFF     30
-        
-        static char *play_string = _("play next level");
-        static char *back_string = _("back to menu");
-      
-        menu_item_start();
+        spr = this.graph.sprite_insert(MENU_SPRIT_LOGO_SMALL_3);
+        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-spr.width)/2, GAME_RESOLUTION_Y-160);
 
-        if(p_status->resolved() &&
-           profile.selected_level_get() == profile.last_level_get())
+        var MENU_X_START_L = (GAME_RESOLUTION_X/2 - 17 - 120);
+        var MENU_X_START_R = (GAME_RESOLUTION_X/2 + 120);
+        var MENU_Y_START   = (DOUBLE_SIZE ? (GAME_RESOLUTION_Y-80) : 400);
+        var MENU_X_DIFF    = 0;
+        var MENU_Y_DIFF    = 30;
+        
+        var play_string = "play next level";
+        var back_string = "back to menu";
+
+        this.graph.font_alignment_set(MENU_LEFT);
+
+        if(this.game.is_resolved() &&
+           this.profile.selected_level_get() == this.profile.last_level_get())
         {
           // Run next level directly
-          menu_item_draw(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF, play_string,
-                         MENU_RIGHT, FALSE, LEVEL_EVENT(GC_RUN_LEVEL_SET));
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF);
+          this.menu_item_draw(play_string, MENU_RIGHT, 0, new MenuEvent(GC_RUN_LEVEL_SET));
         }
-        menu_item_draw(MENU_X_START_L, MENU_Y_START+1*MENU_Y_DIFF, back_string,
-                       MENU_LEFT, FALSE, LEVEL_EVENT(GC_MENU_RUN_LEVEL, profile.level_set_get()));
-
-        p_grf->redraw_add(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
-        p_grf->flip();        
+        this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+1*MENU_Y_DIFF);
+        this.menu_item_draw(back_string, MENU_LEFT, 0, new MenuEvent(GC_MENU_RUN_LEVEL));                       
       }
       break;
     
     case MENU_LEAVE:
-      input.mevent_clear();
       break;
     
     default:
       break;
   }
-  */
 }
 
 GameGui.prototype.menu_levelset_end = function()
@@ -1590,10 +1601,10 @@ GameGui.prototype.callback = function(event)
       this.level_stop();
       break;
     case GC_MENU_END_LEVEL:
-      this.menu_level_end();
+      this.menu_level_end(MENU_ENTER);
       break;
     case GC_MENU_END_LEVEL_SET:
-      this.menu_levelset_end();
+      this.menu_levelset_end(MENU_ENTER);
       break;
 /*
     case GC_RUN_LEVEL_LINE:
@@ -1709,10 +1720,11 @@ GameGui.prototype.level_finish = function()
   var level_set = this.profile.level_set_get();
   var level = this.profile.selected_level_get();
 
-  if(this.game.level.keys_final == 5) {
+  if(this.game.is_resolved()) {
     this.profile.selected_level_finished();
 
-    if(level+1 < this.store.levelset_get(level_set).levelnum_get()) {
+    var level_last = this.store.levelset_get(level_set).levelnum_get();
+    if(level+1 < level_last) {
       /* There are more levels to finish */
       this.events.send(new MenuEvent(GC_MENU_END_LEVEL));
     } else {
