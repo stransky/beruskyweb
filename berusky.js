@@ -115,6 +115,7 @@ function Game() {
 Game.prototype.clear = function()
 {
   this.graph.clear();
+  this.anim.clear();
 
   this.mattock_panel.clear();
   this.steps_panel.clear();

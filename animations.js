@@ -128,6 +128,11 @@ function GameAnimationEngine(level)
   this.anim_templates = new GameAnimTemplateRepository();
   this.anim_templates.load();
 
+  this.clear();
+}
+
+GameAnimationEngine.prototype.clear = function()
+{
   // Array of running animations
   this.anim_running = Array();
 }
