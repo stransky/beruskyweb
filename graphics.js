@@ -35,6 +35,8 @@ function Rect() {
 function Graph() {
   // Game sprites (a.k.a textures in PIXI terminology)
   this.sprites = Array();
+  this.sprites[FIRST_BACKGROUND] = false;
+  
   this.sprites_to_load = 0;
   this.sprites_loaded = 0;
   this.font_table = Array();

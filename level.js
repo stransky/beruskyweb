@@ -312,8 +312,11 @@ LevelItem.prototype.copy = function(template)
 
 function Level(graph, repo) {
   this.graph = graph;
-  this.repo = repo;
-  this.name = "a.lv3";
+  this.repo = repo;  
+}
+
+Level.prototype.clear = function()
+{  
   this.loaded = false;
   this.background_sprite = 0;
   this.background_loaded = false;
@@ -337,8 +340,11 @@ Level.prototype.is_loaded = function() {
 // Load binary level data from original lv3 files
 // use the Blob interface
 Level.prototype.load = function(file) {
+  this.clear();
+
   this.name = file;
   this.loaded = false;
+
   console.log("Loading " + this.name);
 
   load_file_binary(file, level_load_callback, this);

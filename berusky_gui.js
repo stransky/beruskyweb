@@ -1712,8 +1712,7 @@ GameGui.prototype.callback = function(event)
 GameGui.prototype.level_run = function()
 {
   this.menu_leave();
-  this.graph.clear();
-
+  
   var level_set = this.profile.level_set_get();
   var level_num = this.profile.selected_level_get();
   var level_name = this.store.levelset_get(level_set).levelname[level_num];

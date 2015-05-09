@@ -37,6 +37,11 @@ var LOW_PANEL_STP_Y      = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
 
 function StepStatus(graph) {
   this.graph = graph;
+  this.clear();
+}
+
+StepStatus.prototype.clear = function()
+{
   this.steps = 0;
   this.sprites = 0;
 }
@@ -58,8 +63,7 @@ var LOW_PANEL_MAT_Y    = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
 
 function MattockStatus(graph) {
   this.graph = graph;
-  this.mattocks = 0;
-  this.sprites = Array();
+  this.clear();
 }
 
 MattockStatus.prototype.update = function(player)
@@ -83,6 +87,12 @@ MattockStatus.prototype.update = function(player)
   }
 }
 
+MattockStatus.prototype.clear = function()
+{
+  this.mattocks = 0;
+  this.sprites = Array();
+}
+
 function Game() {
   this.graph = new Graph();
   this.graph.init();
@@ -90,15 +100,25 @@ function Game() {
   document.body.appendChild(this.graph.get_renderer().view);
 
   this.repo = new ObjectsRepository();
-
   this.level = new Level(this.graph, this.repo);
+  
   this.input = new Input(this);
-
+  
   this.anim = new GameAnimationEngine(this.level);
 
   this.mattock_panel = new MattockStatus(this.graph);
   this.steps_panel = new StepStatus(this.graph);
 
+  this.clear();
+}
+
+Game.prototype.clear = function()
+{
+  this.graph.clear();
+
+  this.mattock_panel.clear();
+  this.steps_panel.clear();
+  
   this.loaded = false;
   this.level_running = false;
   this.level_end = false;
@@ -128,16 +148,17 @@ Game.prototype.game_load = function()
 
 Game.prototype.level_play = function(level_name)
 {
+  this.clear();
+
   var file = "data/Levels/" + level_name;
   
-  this.level_running = true;
-  this.level_end = false;
-  
+  this.level_running = true;  
   this.level_load(file);
 }
 
 Game.prototype.level_quit = function()
 {
+  // set propper flags
   this.level_running = false;
   this.level_end = true;
 }
