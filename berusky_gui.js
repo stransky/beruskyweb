@@ -551,9 +551,16 @@ GameGui.prototype.menu_level_name_print = function()
   }
   
   this.graph.font_start_set(menu_x_start, menu_y_start);
-  if(this.sprite_levelname)
-    this.graph.sprite_remove(this.sprite_levelname);
+  this.menu_level_name_print_clear();
   this.sprite_levelname = this.graph.print("Level: " + (level+1) + " - " + this.store.levelset_get_passwd(level_set, level));
+}
+
+GameGui.prototype.menu_level_name_print_clear = function()
+{
+  if(this.sprite_levelname) {
+    this.graph.sprite_remove(this.sprite_levelname);
+    this.sprite_levelname = false;
+  }
 }
 
 GameGui.prototype.level_set_select = function(level_set)
@@ -1401,6 +1408,7 @@ GameGui.prototype.menu_level_run_new = function(state, level_set, unused)
       }
       break;
     case MENU_LEAVE:
+      this.menu_level_name_print_clear();
       break;
     default:
       break;
@@ -1475,7 +1483,7 @@ GameGui.prototype.menu_level_end = function(state, level_set, unused)
           this.menu_item_draw(play_string, MENU_RIGHT, 0, new MenuEvent(GC_RUN_LEVEL_SET));
         }
         this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+1*MENU_Y_DIFF);
-        this.menu_item_draw(back_string, MENU_LEFT, 0, new MenuEvent(GC_MENU_RUN_LEVEL));                       
+        this.menu_item_draw(back_string, MENU_LEFT, 0, new MenuEvent(GC_MENU_RUN_LEVEL, [ level_set ]));
       }
       break;
     
