@@ -105,6 +105,16 @@ sprite_load_callback = function()
   }
   this.callback_object.graph.sprites_loaded++;
   console.log(this.callback_object.graph.sprites_loaded + " : " + this.callback_object.file + " loaded...");
+  
+  if (this.callback_object.callback != undefined) {
+    if (this.callback_object.callback_params[0]) {
+      this.callback_object.callback.call(this.callback_object.callback_params[0], 
+                                         this.callback_object.callback_params[1]);
+    }
+    else {
+      this.callback_object.callback(this.callback_object.callback_params[1]);
+    }
+  }
 }
 
 Graph.prototype.is_loaded = function()
@@ -114,10 +124,12 @@ Graph.prototype.is_loaded = function()
 
 // file     - sprite_file.spr
 // position - first used handle
-Graph.prototype.sprite_load = function(file, position)
+Graph.prototype.sprite_load = function(file, position, callback, callback_params )
 {
   this.sprites_to_load++;
-  load_file_text(file, sprite_load_callback, { graph : this, position : position, file : file});
+  load_file_text(file, sprite_load_callback, { graph : this, position : position, 
+                                               file : file, callback : callback, 
+                                               callback_params : callback_params});
 }
 
 // Draws sprite at specified location and returns handle to
@@ -323,6 +335,12 @@ Graph.prototype.background_load = function(background)
 {
   background = background+1;
   this.sprite_load("data/Graphics/background" + background + ".spr", FIRST_BACKGROUND);
+}
+
+Graph.prototype.end_sprite_load = function(level_set, callback, callback_params)
+{  
+  this.sprite_load("data/Graphics/end" + (level_set + 1) + ".spr", 
+                   MENU_SPRIT_END, callback, callback_params);
 }
 
 Graph.prototype.init = function()

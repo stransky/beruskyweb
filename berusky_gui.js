@@ -92,10 +92,10 @@ var PROFILE_LAST_IMPOSSIBLE   = "l4"
 
 function PlayerProfile(name) {  
   this.level_last_names = [ "l0l", "l1l", "l2l", "l3l", "l4l"];
-  this.level_last       = [3,0,0,0,0]; // Last finished level
+  this.level_last       = [9,0,0,0,0]; // Last finished level
   
   this.level_selected_names = [ "l0s", "l1s", "l2s", "l3s", "l4s"];
-  this.level_selected  = [3,0,0,0,0]; // Selected level
+  this.level_selected  = [9,0,0,0,0]; // Selected level
 
   this.level_set_selected = 0;
   this.profile_name = name;  
@@ -1421,7 +1421,7 @@ GameGui.prototype.menu_level_end = function(state, level_set, unused)
     case MENU_RETURN:
     case MENU_ENTER:
       {
-        this.menu_enter(this, GameGui.prototype.menu_level_run_new, level_set, unused);
+        this.menu_enter(this, GameGui.prototype.menu_level_end, level_set, unused);
         this.graph.clear();
 
         // Some statistics here         
@@ -1495,94 +1495,31 @@ GameGui.prototype.menu_level_end = function(state, level_set, unused)
   }
 }
 
-GameGui.prototype.menu_levelset_end = function()
+GameGui.prototype.menu_levelset_end = function(state)
 {
-/*
-  static char *p_text = NULL;
-  static int frame = 0;
-  static int position;
-
   switch(state) {
     case MENU_RETURN:
     case MENU_ENTER:
       {
-        menu_enter((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_levelset_end, data, data1);
-        
-        int set = data;
-      
-        p_text = level_end_text_load(set);
-        assert(p_text);        
-      
-        sprite::color_key_set(COLOR_KEY_BLACK);
-        p_grf->sprite_delete(MENU_SPRIT_END, 1);
-      
-        char line[1000];
-        snprintf(line, 1000, SET_END_FILE_BACK, set+1);
-        p_grf->sprite_insert(line, MENU_SPRIT_END);
-      
-        input.keyset_set(&menu_keys);
-        
-        menu_timer.set((GUI_BASE *)this,(GUI_BASE_FUNC)&game_gui::menu_levelset_end, data, data1);
-        frame = 0;
-        position = 0;
+        var level_set = this.profile.level_set_get();
+
+        this.menu_enter(this, GameGui.prototype.menu_levelset_end, level_set, false);
+        this.graph.clear();
+
+        // Some statistics here         
+        this.graph.font_alignment_set(MENU_CENTER);
+        this.graph.font_set(FONT_DEFAULT);
+
+        spr = this.graph.sprite_insert(MENU_SPRIT_END);
+        this.graph.sprite_move(spr, GAME_RESOLUTION_X/2-width/2, DOUBLE_SIZE ? 60 : 0);
       }
       break;
-    
-    case MENU_TIMER:
-      {
-        if((frame & 0x3) == 0x0) {
-          p_font->alignment_set(MENU_CENTER);
-          p_font->select(FONT_DEFAULT);
-        
-          tpos width = p_grf->sprite_get_width(MENU_SPRIT_END);
-        
-          p_grf->fill(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y, 0);
-          p_grf->draw(MENU_SPRIT_END,GAME_RESOLUTION_X/2-width/2,DOUBLE_SIZE ? 60 : 0);
-
-          if(position >= p_font->height_get_new_line(p_text)) {
-            position -= p_font->height_get_new_line(p_text);
-            p_text = strchr(p_text+1,'\n');
-          }
-
-          if(p_text) {
-            #define SCROLL_START_X  0
-            #define SCROLL_START_Y  0
-            #define SCROLL_LINES    (DOUBLE_SIZE ? 40 : 20)
-
-            p_font->print(NULL, SCROLL_START_X, SCROLL_START_Y-position, SCROLL_LINES, p_text);
-          } else {
-            menu_timer.clear();
-
-            #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17)
-            #define MENU_Y_START   (DOUBLE_SIZE ? (GAME_RESOLUTION_Y - 90) : 440)
-
-            static char *back_string = _("back");
-
-            menu_item_start();
-            menu_item_draw(MENU_X_START_L, MENU_Y_START, back_string, MENU_LEFT, FALSE, LEVEL_EVENT(GC_MENU_START));
-          }
-
-          p_grf->redraw_add(0, 0, GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
-          p_grf->flip();
-
-          // pokud jsem na konci -> odregistrovat timer, pridat <- back menu          
-          position += 2;
-        }
-        frame++;
-      }    
-      break;
-
     case MENU_LEAVE:
-      p_text = NULL;
-      menu_timer.clear();
-      input.keyset_set(NULL);
-      input.mevent_clear();
       break;
     
     default:
       break;
   }
-*/
 }
 
 GameGui.prototype.callback = function(event)
@@ -1612,7 +1549,7 @@ GameGui.prototype.callback = function(event)
       this.menu_level_end(MENU_ENTER);
       break;
     case GC_MENU_END_LEVEL_SET:
-      this.menu_levelset_end(MENU_ENTER);
+      this.graph.end_sprite_load(this.profile.level_set_get(), this.menu_levelset_end, [this, MENU_ENTER] );
       break;
 /*
     case GC_RUN_LEVEL_LINE:
