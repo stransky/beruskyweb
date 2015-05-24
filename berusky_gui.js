@@ -1511,7 +1511,23 @@ GameGui.prototype.menu_levelset_end = function(state)
         this.graph.font_set(FONT_DEFAULT);
 
         spr = this.graph.sprite_insert(MENU_SPRIT_END);
-        this.graph.sprite_move(spr, GAME_RESOLUTION_X/2-width/2, DOUBLE_SIZE ? 60 : 0);
+        this.graph.sprite_move(spr, GAME_RESOLUTION_X/2-spr.width/2, DOUBLE_SIZE ? 60 : 0);
+
+        var END_TEXT_START = 350;
+
+        var level_set = this.profile.level_set_get();
+        var name = this.store.levelset_get(level_set).name;
+
+        this.graph.print("your bugs escaped!", 0, END_TEXT_START);
+        this.graph.print("difficulty " + name, 0, END_TEXT_START+30);
+
+        var MENU_X_START_L = (GAME_RESOLUTION_X/2 - 45);
+        var MENU_Y_START   = (DOUBLE_SIZE ? (GAME_RESOLUTION_Y - 90) : 440);
+
+        var back_string = "back";        
+        
+        this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START);
+        this.menu_item_draw(back_string, MENU_LEFT, 0, new MenuEvent(GC_MENU_START));
       }
       break;
     case MENU_LEAVE:
@@ -1665,10 +1681,14 @@ GameGui.prototype.level_finish = function()
   var level = this.profile.selected_level_get();
 
   if(this.game.is_resolved()) {
-    this.profile.selected_level_finished();
-
     var level_last = this.store.levelset_get(level_set).levelnum_get();
-    if(level+1 < level_last) {
+    
+    /* level is 0...(level_num-1) */
+    if(level+2 < level_last) {
+    
+      /* Select next level */
+      this.profile.selected_level_finished();
+      
       /* There are more levels to finish */
       this.events.send(new MenuEvent(GC_MENU_END_LEVEL));
     } else {
