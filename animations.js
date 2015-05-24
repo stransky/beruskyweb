@@ -24,34 +24,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 // An active game animation
 function GameAnimation(template, x, y, layer, rotation, callback, callback_param)
 {
   // Is it running?
   this.active = false;
-
   // GameAnimTemplate for this animation
   this.anim_template = template;
-
   this.frame_current = 0;
   this.frame_correction = 0;
-
   this.position_in_animation = 0;
-
   // Position in level (x,y,layer)
   this.x = x;
   this.y = y;
   this.layer = layer;
-
   // rotation of the rendered item
   this.rotation = rotation;
-
   // callback functions at animation end
   this.callback = callback;
   this.callback_param = callback_param;
 }
-
 GameAnimation.prototype.start = function()
 {
   this.active = true;
@@ -59,7 +51,6 @@ GameAnimation.prototype.start = function()
   this.frame_correction = this.anim_template.get_frame_correction(0);
   this.position_in_animation = 0;
 }
-
 GameAnimation.prototype.stop = function()
 {
   if (this.active) {
@@ -69,12 +60,10 @@ GameAnimation.prototype.stop = function()
     this.active = false;
   }
 }
-
 GameAnimation.prototype.process = function(level)
 {
   if (!this.active)
     throw "Inactive animation!";
-
   if(this.frame_current >= this.anim_template.frame_num) {
     if(this.anim_template.flags&ANIM_LOOP) {
       this.start();
@@ -83,60 +72,46 @@ GameAnimation.prototype.process = function(level)
       return(false);
     }
   }
-
   if(this.frame_correction) {
     this.frame_correction--;
   } else {
     this.frame_correction = this.anim_template.get_frame_correction(this.position_in_animation);
-    
     var cell = level.cell_get(this.x, this.y, this.layer);
-
     if(this.anim_template.flags&ANIM_SPRITE) {
       if(cell.sprite_handle)
         level.graph.sprite_remove(cell.sprite_handle);
-
       var spr = (this.anim_template.sprite_table) ? this.anim_template.sprite_table[this.position_in_animation] :
                                                     this.anim_template.sprite_first + this.anim_template.sprite_step * this.position_in_animation;
       cell.sprite_handle = level.graph.sprite_insert(spr);
-
       if(this.rotation != NO_ROTATION) {
         cell.rotation = this.rotation;
       }
     }
-
     if(this.anim_template.flags&ANIM_MOVE) {
       cell.diff_x += this.anim_template.dx;
       cell.diff_y += this.anim_template.dy;
     }
-
     level.cell_draw(cell, this.x, this.y);
-
     this.position_in_animation++;
     this.frame_current++;
   }
-
   return(true);
 }
-
 // Performs the animations
 function GameAnimationEngine(level)
 {
   // Reference to level interface
   this.level = level;
-
   // Array of anim templates
   this.anim_templates = new GameAnimTemplateRepository();
   this.anim_templates.load();
-
   this.clear();
 }
-
 GameAnimationEngine.prototype.clear = function()
 {
   // Array of running animations
   this.anim_running = Array();
 }
-
 GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation,
                                                      callback, callback_param)
 {
@@ -146,20 +121,17 @@ GameAnimationEngine.prototype.create_anim = function(anim, x, y, layer, rotation
   this.anim_running[index-1].start();
   return(this.anim_running[index-1]);
 }
-
 GameAnimationEngine.prototype.create_temp = function(template, x, y, layer, rotation,
                                                      callback, callback_param)
 {
   return(this.create_anim(this.anim_templates.anim_template[template],
                           x, y, layer, rotation, callback, callback_param));
 }
-
 GameAnimationEngine.prototype.remove = function(anim_handle)
 {
   if(anim_handle.active) {
     // Stop the animation
     anim_handle.stop();
-    
     // Remove anim from the running ones
     var index = this.anim_running.indexOf(anim_handle);
     if(index != -1) {
@@ -167,7 +139,6 @@ GameAnimationEngine.prototype.remove = function(anim_handle)
     }
   }
 }
-
 GameAnimationEngine.prototype.process = function()
 {
   for(var i = 0; i < this.anim_running.length; ) {
@@ -182,14 +153,11 @@ GameAnimationEngine.prototype.process = function()
     i++;
   }
 }
-
 GameAnimationEngine.prototype.generate_anim = function(type)
 {
   var temp = new GameAnimTemplate(ANIM_SPRITE|ANIM_LOOP, DOOR_FRAMES);
-
   var spr_array = Array();
   var time_array = Array();
-
   switch(type) {
     case ANIM_DOOR_ID_H:
       spr_array[0] = FIRST_CYBER_LEVEL+39;
@@ -208,7 +176,6 @@ GameAnimationEngine.prototype.generate_anim = function(type)
       spr_array[1] = FIRST_CYBER_LEVEL+70;
       break;
   }
-
   for(var i = 3; i < DOOR_FRAMES; i += 2) {
     spr_array[i-1] = spr_array[i-3];
     spr_array[i] = spr_array[i-2];
@@ -216,7 +183,6 @@ GameAnimationEngine.prototype.generate_anim = function(type)
   for(var i = 0; i < DOOR_FRAMES; i++) {
     time_array[i] = ((Math.random()*30)|0) + 1;
   }
-
   temp.create_sprite_table(DOOR_FRAMES, spr_array, time_array);
   return(temp);
 }

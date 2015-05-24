@@ -24,32 +24,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 // Player control
 var MOVE_NONE   = 0
 var MOVE_UP     = 1
 var MOVE_DOWN   = 2
 var MOVE_LEFT   = 3
 var MOVE_RIGHT  = 4
-
 var LOW_PANEL_STP_X_TEXT = (GAME_RESOLUTION_X - 5)
 var LOW_PANEL_STP_Y      = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
-
 function StepStatus(graph) {
   this.graph = graph;
   this.clear();
 }
-
 StepStatus.prototype.clear = function()
 {
   this.steps = 0;
   this.sprites = 0;
 }
-
 StepStatus.prototype.add = function()
 {
   this.steps++;
-
   this.graph.font_start_set(LOW_PANEL_STP_X_TEXT, LOW_PANEL_STP_Y);
   this.graph.font_alignment_set(ALIGN_RIGHT);
   if(this.sprites) {
@@ -57,15 +51,12 @@ StepStatus.prototype.add = function()
   }
   this.sprites = this.graph.print("steps: " + this.steps);
 }
-
 var LOW_PANEL_MAT_X    = 0
 var LOW_PANEL_MAT_Y    = (LEVEL_RESOLUTION_Y+LEVEL_SCREEN_START_Y)
-
 function MattockStatus(graph) {
   this.graph = graph;
   this.clear();
 }
-
 MattockStatus.prototype.update = function(player)
 {
   if(this.mattocks != player.matocks) {
@@ -86,59 +77,44 @@ MattockStatus.prototype.update = function(player)
     this.mattocks = player.matocks;
   }
 }
-
 MattockStatus.prototype.clear = function()
 {
   this.mattocks = 0;
   this.sprites = Array();
 }
-
 function Game() {
   this.graph = new Graph();
   this.graph.init();
-
   document.body.appendChild(this.graph.get_renderer().view);
-
   this.repo = new ObjectsRepository();
   this.level = new Level(this.graph, this.repo);
-  
   this.input = new Input(this);
-  
   this.anim = new GameAnimationEngine(this.level);
-
   this.mattock_panel = new MattockStatus(this.graph);
   this.steps_panel = new StepStatus(this.graph);
-
   this.clear();
 }
-
 Game.prototype.clear = function()
 {
   this.graph.clear();
   this.anim.clear();
-
   this.mattock_panel.clear();
   this.steps_panel.clear();
-  
   this.loaded = false;
   this.level_running = false;
   this.level_end = false;
 }
-
 Game.prototype.game_load = function()
 {
   // Load game repo
   if(!this.repo.is_loaded())
     return;
-
   // Load game level
   if(!this.level.is_loaded())
     return;
-
   // Game sprites
   if(!this.graph.is_loaded())
     return;
-
   // Render already loaded level
   if(!this.level.is_rendered()) {
     this.level.render(this.repo);
@@ -146,29 +122,23 @@ Game.prototype.game_load = function()
   }
   this.loaded = true;
 }
-
 Game.prototype.level_play = function(level_name)
 {
   this.clear();
-
   var file = "data/Levels/" + level_name;
-  
-  this.level_running = true;  
+  this.level_running = true;
   this.level_load(file);
 }
-
 Game.prototype.level_quit = function()
 {
   // set propper flags
   this.level_running = false;
   this.level_end = true;
 }
-
 Game.prototype.is_resolved = function()
 {
   return (this.level.keys_final == 5);
 }
-
 Game.prototype.game_play = function()
 {
   if(this.input.key_get(BUG_MOVE_UP))
@@ -179,7 +149,6 @@ Game.prototype.game_play = function()
     this.bug_move(MOVE_RIGHT);
   else if(this.input.key_get(BUG_MOVE_LEFT))
     this.bug_move(MOVE_LEFT);
-
   if(this.input.key_get(BUG_SWITCH, true))
     this.bug_switch(BUG_SELECT_NEXT);
   else if(this.input.key_get(BUG_SELECT_1, true))
@@ -192,7 +161,6 @@ Game.prototype.game_play = function()
     this.bug_switch(3);
   else if(this.input.key_get(BUG_SELECT_5, true))
     this.bug_switch(4);
-        
   if(this.input.key_get(LEVEL_EXIT)) {
     // HACK - debugging hack
     this.level.keys_final = 5;
@@ -205,38 +173,30 @@ Game.prototype.game_play = function()
   else if(this.input.key_get(LEVEL_LOAD))
     ;
 }
-
 Game.prototype.game_loop = function()
 {
   if(!this.loaded) {
     this.game_load();
     return;
   }
-
   // Update all running animations
   this.anim.process();
-
   // Play the game
   this.game_play();
 }
-
 // Load the game
 Game.prototype.level_load = function(name)
 {
   this.level.load(name);
 }
-
 // Animate bug movement
 Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
 {
   var player = this.level.player_active;
-
   var x = player.x;
   var y = player.y;
-
   var anim = 0;
   var rotation = 0;
-
   switch(direction) {
     case MOVE_UP:
       anim = ANIM_MOVE_UP;
@@ -255,26 +215,21 @@ Game.prototype.animation_bug_move = function(direction, nx, ny, remove_target)
       rotation = ROTATION_RIGHT;
       break;
   }
-
   var data = { game:this, x:x, y:y, nx:nx, ny:ny, remove_target : (remove_target || 0) };
   this.anim.create_temp(anim, x, y, LAYER_PLAYER, rotation, this.animation_bug_move_end, data);
   this.anim.create_temp(player.number - ANIM_PLAYER_1, x, y, LAYER_PLAYER, rotation);
   this.level.player_cursor_set_draw(false);
   this.steps_panel.add();
 }
-
 Game.prototype.animation_bug_move_end = function(data)
 {
   if(data.remove_target)
     data.game.level.cell_remove(data.nx, data.ny, LAYER_LEVEL);
-
   data.game.level.cell_diff_set(data.x, data.y, 0, 0, LAYER_PLAYER);
   data.game.level.cell_diff_set(data.nx, data.ny, 0, 0, LAYER_PLAYER);
   data.game.level.cell_move(data.x, data.y, data.nx, data.ny, LAYER_PLAYER);
-
   var player = data.game.level.player_active;
   player.x = data.nx; player.y = data.ny;
-
   // Handle doors
   var cell = data.game.level.item_get(data.x, data.y);
   switch(cell.item) {
@@ -282,7 +237,7 @@ Game.prototype.animation_bug_move_end = function(data)
       cell.item = P_DV_H_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
-        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_H), 
+        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_H),
                                                     data.x, data.y, LAYER_LEVEL, NO_ROTATION);
       }
       break;
@@ -290,7 +245,7 @@ Game.prototype.animation_bug_move_end = function(data)
       cell.item = P_DV_V_Z;
       data.game.level.cell_draw(cell, data.x, data.y, true);
       if(cell.variant == DOOR_VARIATION_CYBER) {
-        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_V), 
+        cell.animation = data.game.anim.create_anim(data.game.anim.generate_anim(ANIM_DOOR_DV_V),
                                                     data.x, data.y, LAYER_LEVEL, NO_ROTATION);
       }
       break;
@@ -311,15 +266,12 @@ Game.prototype.animation_bug_move_end = function(data)
     default:
       break;
   }
-
   player.is_moving = false;
 }
-
 // Animate box movement
 Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
 {
   var anim = 0;
-
   switch(direction) {
     case MOVE_UP:
       anim = ANIM_MOVE_UP;
@@ -334,35 +286,29 @@ Game.prototype.animation_box_move = function(direction, x, y, nx, ny)
       anim = ANIM_MOVE_RIGHT;
       break;
   }
-
   var data = { game:this, x:x, y:y, nx:nx, ny:ny };
   this.anim.create_temp(anim, x, y, LAYER_LEVEL, NO_ROTATION, this.animation_box_move_end, data);
 }
-
 Game.prototype.animation_box_move_end = function(data)
 {
   data.game.level.cell_diff_set(data.x, data.y, 0, 0, LAYER_LEVEL);
   data.game.level.cell_diff_set(data.nx, data.ny, 0, 0, LAYER_LEVEL);
   data.game.level.cell_move(data.x, data.y, data.nx, data.ny, LAYER_LEVEL);
 }
-
 // Animate box movement
 Game.prototype.animation_box_explosion = function(direction, nx, ny, nnx, nny)
 {
   this.level.cell_remove(nx, ny, LAYER_LEVEL);
   this.level.cell_remove(nnx, nny, LAYER_LEVEL);
-
   var data = { game:this, nx:nx, ny:ny, direction:direction };
   this.anim.create_temp(ANIM_BLAST, nnx, nny, LAYER_LEVEL, NO_ROTATION);
   this.animation_bug_move(data.direction, data.nx, data.ny);
 }
-
 Game.prototype.animation_stone_explosion_end = function(data)
 {
   data.game.level.cell_remove(data.nx, data.ny, LAYER_LEVEL);
   data.game.animation_bug_move(data.direction, data.nx, data.ny);
 }
-
 // Animate stone animation
 Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
 {
@@ -370,7 +316,6 @@ Game.prototype.animation_stone_explosion = function(variant, direction, nx, ny)
   this.anim.create_temp(ANIM_STONE_1+variant, nx, ny, LAYER_LEVEL, NO_ROTATION,
                    this.animation_stone_explosion_end, data);
 }
-
 Game.prototype.exit_animate = function()
 {
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
@@ -388,17 +333,14 @@ Game.prototype.exit_animate = function()
     }
   }
 }
-
 Game.prototype.check_borders = function(nx, ny)
 {
   if(nx < 0 || nx >= LEVEL_CELLS_X)
     return(false);
   if(ny < 0 || ny >= LEVEL_CELLS_Y)
     return(false);
-
   return(true);
 }
-
 // Get an active player
 // Check if we can move
 // Move it
@@ -408,12 +350,10 @@ Game.prototype.bug_move = function(direction)
   if(player.is_moving)
     return;
   player.is_moving = 1;
-
   var nx = player.x;
   var ny = player.y;
   var nnx = nx;
   var nny = ny;
-
   switch(direction) {
     case MOVE_UP:
       ny--;
@@ -432,7 +372,6 @@ Game.prototype.bug_move = function(direction)
       nnx += 2;
       break;
   }
-
   if(!this.check_borders(nx, ny)) {
     player.is_moving = false;
     return;
@@ -449,7 +388,7 @@ Game.prototype.bug_move = function(direction)
     case P_DOOR2_H_O:
     case P_DOOR3_H_O:
     case P_DOOR4_H_O:
-    case P_DOOR5_H_O:    
+    case P_DOOR5_H_O:
     case P_DOOR1_V_O: // Opened key-doors
     case P_DOOR2_V_O:
     case P_DOOR3_V_O:
@@ -549,14 +488,13 @@ Game.prototype.bug_move = function(direction)
     case P_DOOR2_H_Z:
     case P_DOOR3_H_Z:
     case P_DOOR4_H_Z:
-    case P_DOOR5_H_Z:      
+    case P_DOOR5_H_Z:
       if(player.number == (cell.item - P_DOOR1_H_Z) &&
          player.key_color)
       {
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
         if(cell.animation)
           this.anim.remove(cell.animation);
-
         if(cell.variant == DOOR_VARIATION_CYBER) {
           this.level.cell_set(nx, ny, LAYER_LEVEL, P_DV_H, 0);
         }
@@ -567,14 +505,13 @@ Game.prototype.bug_move = function(direction)
           cell.variant = 3;
           this.level.cell_draw(cell, nx, ny, true);
         }
-        
         this.animation_bug_move(direction, nx, ny, false);
         if(player.key_color_remove()) {
           this.level.panel_draw_player(player.number);
         }
         return;
       }
-      break;    
+      break;
     case P_DOOR1_V_Z: // color-Key-doors
     case P_DOOR2_V_Z:
     case P_DOOR3_V_Z:
@@ -586,7 +523,6 @@ Game.prototype.bug_move = function(direction)
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
         if(cell.animation)
           this.anim.remove(cell.animation);
-        
         if(cell.variant == DOOR_VARIATION_CYBER) {
           this.level.cell_set(nx, ny, LAYER_LEVEL, P_DV_V, 0);
         }
@@ -597,41 +533,38 @@ Game.prototype.bug_move = function(direction)
           cell.variant = 2;
           this.level.cell_draw(cell, nx, ny, true);
         }
-        
         this.animation_bug_move(direction, nx, ny, false);
         if(player.key_color_remove()) {
           this.level.panel_draw_player(player.number);
         }
         return;
       }
-      break;    
+      break;
     case P_ID_DOOR1_H_Z: // ID doors
     case P_ID_DOOR2_H_Z:
     case P_ID_DOOR3_H_Z:
     case P_ID_DOOR4_H_Z:
     case P_ID_DOOR5_H_Z:
       if(player.number == (cell.item - P_ID_DOOR1_H_Z))
-      {        
+      {
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
         if(cell.animation)
           this.anim.remove(cell.animation);
-        
         this.level.cell_set(nx, ny, LAYER_LEVEL, P_ID_DOOR1_H_O + player.number, cell.variant);
         this.animation_bug_move(direction, nx, ny, false);
         return;
       }
-      break;    
+      break;
     case P_ID_DOOR1_V_Z: // ID doors
     case P_ID_DOOR2_V_Z:
     case P_ID_DOOR3_V_Z:
     case P_ID_DOOR4_V_Z:
-    case P_ID_DOOR5_V_Z:   
+    case P_ID_DOOR5_V_Z:
       if(player.number == (cell.item - P_ID_DOOR1_V_Z))
-      {        
+      {
         var cell = this.level.cell_get(nx, ny, LAYER_LEVEL);
         if(cell.animation)
           this.anim.remove(cell.animation);
-        
         this.level.cell_set(nx, ny, LAYER_LEVEL, P_ID_DOOR1_V_O + player.number, cell.variant);
         this.animation_bug_move(direction, nx, ny, false);
         return;
@@ -640,20 +573,16 @@ Game.prototype.bug_move = function(direction)
     default:
       break;
   }
-
   player.is_moving = false;
 }
-
 Game.prototype.bug_switch = function(number)
 {
   if(this.level.player_active.is_moving) {
     return;
   }
-
   this.level.player_switch(number);
   this.mattock_panel.update(this.level.player_active);
 }
-
 Game.prototype.level_cell_animate = function(cell, x, y, layer)
 {
   var obj = this.repo.get_object(cell.item, cell.variant);
@@ -662,7 +591,6 @@ Game.prototype.level_cell_animate = function(cell, x, y, layer)
                                            layer, NO_ROTATION);
   }
 }
-
 Game.prototype.level_animate = function()
 {
   for(var y = 0; y < LEVEL_CELLS_Y; y++) {
