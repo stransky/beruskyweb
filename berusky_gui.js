@@ -244,6 +244,7 @@ function GameGui() {
   this.sprite_levelname = false;
   this.menu_back_stack = Array();
   this.menu_current = new MenuFunction();
+  this.path = new LevelPath();
   // Array of LevelSprite()
   this.level_sprite_table = Array();
   this.level_running = false;
@@ -626,11 +627,13 @@ function LevelPath() {
   this.pipe_table[DOWN_I][LEFT_I] = 3;
   this.pipe_table[DOWN_I][RIGHT_I] = 5;
 }
+
 LevelPath.prototype.translate_direction = function(last, next)
 {
   pipe = this.pipe_table[last][next];
   return(pipe);
 }
+
 GameGui.prototype.menu_level_draw_level = function(lev, level_act,
                                                    level_last, level_set, x, y)
 {
@@ -718,9 +721,9 @@ GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
         {
           index_next = LEFT_I;
           var coord = {x:0, y:0, index:index_next};
-          this.translate_coords(p_path[i+1], coord);
+          this.translate_coords(path[i+1], coord);
           index_next = coord.index;
-          pipe_num = translate_direction(index_last, index_next);
+          pipe_num = this.path.translate_direction(index_last, index_next);
           this.menu_level_draw_pipe(pipe_num, sx, sy);
           i++;
         }
@@ -730,7 +733,7 @@ GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
         lx = sx;
         ly = sy;
         var coord = {x:sx, y:sy, index:index_last};
-        this.translate_coords(p_path[i], coord);
+        this.translate_coords(path[i], coord);
         sx = coord.x; sy = coord.y; index_last = coord.index;
         i++;
         break;
@@ -827,48 +830,49 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         }
       }
       break;
-/*
+
     // Easy
     case 1:
       {
-        int lev = 0;
-        lev += menu_level_run_path_draw_line("V01LPUPUV02UPLPUPV03UPRPRV13UPUV04UPUV05UPRPRV06UPUPU",
+        var lev = 0;
+        lev += this.menu_level_run_path_draw_line("V01LPUPUV02UPLPUPV03UPRPRV13UPUV04UPUV05UPRPRV06UPUPU",
                                              level_act,  level_last, level_set, 15, 12);
-        lev += menu_level_run_path_draw_line("LPLPUPUV07LPUPUPV08UPUPUPUPU",
+        lev += this.menu_level_run_path_draw_line("LPLPUPUV07LPUPUPV08UPUPUPUPU",
                                              level_act,  level_last, level_set, 13, 8);
-        lev += menu_level_run_path_draw_line("UPUV09UPUV10UPLPUPU",
+        lev += this.menu_level_run_path_draw_line("UPUV09UPUV10UPLPUPU",
                                              level_act,  level_last, level_set, 6, 5);
-        lev += menu_level_run_path_draw_line("UPRPRPRPRV00UPRV11UPUV12UPRPUV13UPUV14UPUV15UPRPUPU",
+        lev += this.menu_level_run_path_draw_line("UPRPRPRPRV00UPRV11UPUV12UPRPUV13UPUV14UPUV15UPRPUPU",
                                              level_act,  level_last, level_set, 15, 12);
-        lev += menu_level_run_path_draw_line("DPRV16DPDV17",
+        lev += this.menu_level_run_path_draw_line("DPRV16DPDV17",
                                              level_act,  level_last, level_set, 15, 12);
-        lev += menu_level_run_path_draw_line("LPLPDPDV18DPDV19DPDPD",
+        lev += this.menu_level_run_path_draw_line("LPLPDPDV18DPDV19DPDPD",
                                              level_act,  level_last, level_set, 23, 17);
-        lev += menu_level_run_path_draw_line("DPDV20DPRPDPRPR",
+        lev += this.menu_level_run_path_draw_line("DPDV20DPRPDPRPR",
                                              level_act,  level_last, level_set, 12, -1);
-        lev += menu_level_run_path_draw_line("LPLPLPLPUV21UPLPLPLPLPDV22DPDV23DPDV24LPDV25DPDV26",
+        lev += this.menu_level_run_path_draw_line("LPLPLPLPUV21UPLPLPLPLPDV22DPDV23DPDV24LPDV25DPDV26",
                                              level_act,  level_last, level_set, 16, 15);
-        lev += menu_level_run_path_draw_line("DPDV27DPLPDV28DPDV29DPDPLPDPDV30DPDPDV31LPLPLPLPLPLPU",
+        lev += this.menu_level_run_path_draw_line("DPDV27DPLPDV28DPDV29DPDPLPDPDV30DPDPDV31LPLPLPLPLPLPU",
                                              level_act,  level_last, level_set, 27, -1);
-        lev += menu_level_run_path_draw_line("DPLPDV32DPLPDPDPV33DPRPRPRPDPV34DPDV35",
+        lev += this.menu_level_run_path_draw_line("DPLPDV32DPLPDPDPV33DPRPRPRPDPV34DPDV35",
                                              level_act,  level_last, level_set, 25, 12);
-        lev += menu_level_run_path_draw_line("LPLPLPLPDV36LPLPL",
+        lev += this.menu_level_run_path_draw_line("LPLPLPLPDV36LPLPL",
                                              level_act,  level_last, level_set, 6, 3);
-        lev += menu_level_run_path_draw_line("DPDPV37DPDV38DPDV39DPDV40LPLPL",
+        lev += this.menu_level_run_path_draw_line("DPDPV37DPDV38DPDV39DPDV40LPLPL",
                                              level_act,  level_last, level_set, 2, 4);
-        lev += menu_level_run_path_draw_line("DPDV41DPRPRPRPRPDPRPR",
+        lev += this.menu_level_run_path_draw_line("DPDV41DPRPRPRPRPDPRPR",
                                              level_act,  level_last, level_set, 2, 12);
-        lev += menu_level_run_path_draw_line("LPDPDPV43DPDV44DPDV49DPDPDPD",
+        lev += this.menu_level_run_path_draw_line("LPDPDPV43DPDV44DPDV49DPDPDPD",
                                              level_act,  level_last, level_set, 2, 14);
-        lev += menu_level_run_path_draw_line("LPLPDPDPLPLPLPLPLPUV45UPUV46UPUV47LPUPUV48",
+        lev += this.menu_level_run_path_draw_line("LPLPDPDPLPLPLPLPLPUV45UPUV46UPUV47LPUPUV48",
                                              level_act,  level_last, level_set, 14, 10);
         //assert(lev == 50);
         if(!DOUBLE_SIZE) {
-          #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17 - 60 - 10)
-          #define MENU_X_START_R (GAME_RESOLUTION_X/2 + 60 - 10)
-          #define MENU_Y_START   (GAME_RESOLUTION_Y - (DOUBLE_SIZE ? 180 : 130))
-          #define MENU_X_DIFF     0
-          #define MENU_Y_DIFF     30
+          var MENU_X_START_L = (GAME_RESOLUTION_X/2 - 17 - 60 - 10);
+          var MENU_X_START_R = (GAME_RESOLUTION_X/2 + 60 - 10);
+          var MENU_Y_START   = (GAME_RESOLUTION_Y - (DOUBLE_SIZE ? 180 : 130));
+          var MENU_X_DIFF    = 0;
+          var MENU_Y_DIFF    = 30;
+/*          
           menu_item_draw(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF, play_string,
                          MENU_RIGHT, FALSE,
                          LEVEL_EVENT(GC_RUN_LEVEL_SET));
@@ -881,14 +885,27 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           menu_item_draw(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF, back_string,
                          MENU_LEFT, FALSE,
                          LEVEL_EVENT(GI_MENU_BACK_POP));
-          #undef MENU_X_START_L
-          #undef MENU_X_START_R
-          #undef MENU_Y_START
-          #undef MENU_X_DIFF
-          #undef MENU_Y_DIFF
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF);
+          this.menu_item_draw(play_string,
+                              MENU_RIGHT, FALSE,
+                              new MenuEvent(GC_RUN_LEVEL_SET));
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
+          this.menu_item_draw(level_hint,
+                              MENU_RIGHT, MENU_SAVE_BACK,
+                              new MenuEvent(GC_MENU_LEVEL_HINT, [FALSE]));
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+          this.menu_item_draw(select_string,
+                              MENU_RIGHT, FALSE,
+                              new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_draw(back_string,
+                              MENU_LEFT, FALSE,
+                              new MenuEvent(GI_MENU_BACK_POP));
         }
       }
       break;
+/*
     // Intermediate
     case 2:
       {
@@ -899,7 +916,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
                            "DPDV19DPDV20DPLPDPDV21DPDV22LPDPDPDPLPDPDPLPLPLPUPUPUV23UPUV24UPUV25UPLPUV26UPUV" \
                            "27UPUV28UPUV29UPRPUPV30UPUV31UPLPLPDPDPLPLPLPDPV32DPDV33DPLPDPDV34DPLP"
         int lev = 0;
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 27, -1);
+        lev += this.menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 27, -1);
         assert(lev == 35);
         if(!DOUBLE_SIZE) {
           #define MENU_X_START_L (GAME_RESOLUTION_X/2 +20 - 17 - 60)
@@ -972,7 +989,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         menu_level_draw_pipe(5, ADV_START_X+2, ADV_START_Y+4);
         menu_level_draw_pipe(0, ADV_START_X+3, ADV_START_Y+4);
         menu_level_draw_level(10,level_act,level_last,level_set,ADV_START_X+4, ADV_START_Y+4);
-        menu_level_run_path_draw_line("DPRPRPDPV11DPD",
+        this.menu_level_run_path_draw_line("DPRPRPDPV11DPD",
                                       level_act,  level_last, level_set, ADV_START_X+4, ADV_START_Y+4);
         menu_level_draw_level(12,level_act,level_last,level_set,ADV_START_X+6, ADV_START_Y+8);
         menu_level_draw_pipe(0, ADV_START_X-1, ADV_START_Y);
@@ -1112,16 +1129,16 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV00DPDV01DPDV02DPLPDV03DPDV04DPDV05DPRPDV06DPDV07DPDV08DPLPLPDV09DPDV10"
         int lev = 0;
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 2, -1);
+        lev += this.menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 2, -1);
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV11DPRPRPDV12DPDV13DPDV14DPDV15DPRPDV16DPDV17DPRPDV18"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 8, -1);
+        lev += this.menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 8, -1);
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV19DPRPRPDV20DPRPRPDPV21DPLPLPDV22DPRPRPDV23DPLPLPDV24DPRPDV25DPRPRPRPDV26DPDV27DPDV28DPDV29"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 15, -1);
+        lev += this.menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 15, -1);
         #undef  LEVEL_LINE
         #define LEVEL_LINE "DPDV29DPRPRPDV30DPRPRPDPDPLPLPLPDV31"
-        lev += menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 23, -1);
+        lev += this.menu_level_run_path_draw_line(LEVEL_LINE, level_act,  level_last, level_set, 23, -1);
         if(!DOUBLE_SIZE) {
           #define MENU_X_START_L (GAME_RESOLUTION_X/2 - 17 - 60 - 60)
           #define MENU_X_START_R (GAME_RESOLUTION_X/2 + 60 - 60)
