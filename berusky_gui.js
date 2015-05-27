@@ -708,11 +708,10 @@ GameGui.prototype.menu_level_run_path_draw_line = function(path, level_act,
   while(path[i]) {
     switch(path[i]) {
       case LEVEL:
-        {
-          var tmp = [];
-          tmp[0] = path[i+1];
-          tmp[1] = path[i+2];
-          this.menu_level_draw_level(parseInt(tmp,10),level_act,level_last,level_set,sx,sy);
+        { 
+          var tmp = path.substring(i+1,i+3);
+          this.menu_level_draw_level(parseInt(tmp,10),
+                                     level_act,level_last,level_set,sx,sy);
           i += 3;
           levels++;
         }
@@ -872,20 +871,7 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           var MENU_Y_START   = (GAME_RESOLUTION_Y - (DOUBLE_SIZE ? 180 : 130));
           var MENU_X_DIFF    = 0;
           var MENU_Y_DIFF    = 30;
-/*          
-          menu_item_draw(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF, play_string,
-                         MENU_RIGHT, FALSE,
-                         LEVEL_EVENT(GC_RUN_LEVEL_SET));
-          menu_item_draw(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF, level_hint,
-                         MENU_RIGHT, MENU_SAVE_BACK,
-                         LEVEL_EVENT(GC_MENU_LEVEL_HINT, FALSE));
-          menu_item_draw(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF, select_string,
-                         MENU_RIGHT, FALSE,
-                         LEVEL_EVENT(GC_RUN_LEVEL_SELECT, level_last, profile.level_spr_x ,profile.level_spr_y));
-          menu_item_draw(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF, back_string,
-                         MENU_LEFT, FALSE,
-                         LEVEL_EVENT(GI_MENU_BACK_POP));
-*/
+
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+0*MENU_Y_DIFF);
           this.menu_item_draw(play_string,
                               MENU_RIGHT, FALSE,
