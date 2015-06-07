@@ -80,9 +80,9 @@ var PROFILE_LAST_ADVANCED     = "l3"
 var PROFILE_LAST_IMPOSSIBLE   = "l4"
 function PlayerProfile(name) {
   this.level_last_names = [ "l0l", "l1l", "l2l", "l3l", "l4l"];
-  this.level_last       = [0,45,30,17,0]; // Last finished level
+  this.level_last       = [0,0,0,0,0]; // Last finished level
   this.level_selected_names = [ "l0s", "l1s", "l2s", "l3s", "l4s"];
-  this.level_selected  = [0,45,30,17,0]; // Selected level
+  this.level_selected  = [0,0,0,0,0]; // Selected level
   this.level_set_selected = 0;
   this.profile_name = name;
 }
@@ -1457,7 +1457,7 @@ GameGui.prototype.level_finish = function()
   if(this.game.is_resolved()) {
     var level_last = this.store.levelset_get(level_set).levelnum_get();
     /* level is 0...(level_num-1) */
-    if(level+2 < level_last) {
+    if(level+1 < level_last) {
       /* Select next level */
       this.profile.selected_level_finished();
       /* There are more levels to finish */
