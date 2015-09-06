@@ -116,9 +116,9 @@ level_load_callback = function() {
                                 LEVEL_LEVEL_SIZE*2 +
                                 LEVEL_PLAYER_SIZE*2);
 
-  var floor = Uint16Array(LEVEL_FLOOR_SIZE);
-  var level = Uint16Array(LEVEL_LEVEL_SIZE);
-  var players = Uint16Array(LEVEL_PLAYER_SIZE);
+  var floor = new Uint16Array(LEVEL_FLOOR_SIZE);
+  var level = new Uint16Array(LEVEL_LEVEL_SIZE);
+  var players = new Uint16Array(LEVEL_PLAYER_SIZE);
 
   for(var i = 0; i < LEVEL_FLOOR_SIZE; i++)
     floor[i] = level_data.getUint16(i*2, true);

@@ -1,3 +1,5 @@
+- save recently selected level to storage
+
 - fonts - do we wait for font loading? (missing fonts on first load)
 - profile load/save 
 

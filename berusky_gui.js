@@ -39,12 +39,14 @@ var MENU_SAVE_BACK         = 0x4
 var MENU_DRAW_ONLY         = 0x8
 var MENU_TEXT_DIFF_X       = 10
 var MENU_TEXT_DIFF_Y       = 5
+
 function MenuFunction(obj, func, param1, param2) {
   this.obj = obj;
   this.func = func;
   this.param1 = param1;
   this.param2 = param2;
 }
+
 MenuFunction.prototype.run = function(st)
 {
   if(this.func) {
@@ -71,6 +73,7 @@ function MenuEvent(type, params) {
     this.params = Array();
   }
 }
+
 var LEVEL_SET_NUM             = 5
 var PROFILE_NAME              = "name"
 var PROFILE_LAST_TRAINING     = "l0"
@@ -78,13 +81,14 @@ var PROFILE_LAST_EASY         = "l1"
 var PROFILE_LAST_INTERMEDIATE = "l2"
 var PROFILE_LAST_ADVANCED     = "l3"
 var PROFILE_LAST_IMPOSSIBLE   = "l4"
-function PlayerProfile(name) {
-  this.level_last_names = [ "l0l", "l1l", "l2l", "l3l", "l4l"];
-  this.level_last       = [0,0,0,0,0]; // Last finished level
-  this.level_selected_names = [ "l0s", "l1s", "l2s", "l3s", "l4s"];
-  this.level_selected  = [0,0,0,0,0]; // Selected level
-  this.level_set_selected = 0;
-  this.profile_name = name;
+
+function PlayerProfile(name) {  
+  if(!this.load()) {
+    this.level_last         = [0,0,0,0,0]; // Last finished level  
+    this.level_selected     = [0,0,0,0,0]; // Selected level
+    this.level_set_selected = 0;
+  }
+  this.profile_name       = name;  
 }
 // fill level_set_selected and level_selected
 PlayerProfile.prototype.level_set_select = function(level_set_num)
@@ -128,15 +132,20 @@ PlayerProfile.prototype.selected_level_finished = function()
 }
 PlayerProfile.prototype.load = function(name)
 {
+  var profile = JSON.parse(localStorage.getItem("profile"));
+  if(profile) {
+    this.level_last         = profile.level_last;
+    this.level_selected     = profile.level_selected;  
+    this.profile_name       = profile.profile_name;
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 PlayerProfile.prototype.save = function()
 {
-  var profile_string = "profile_name = " + this.profile_name + ";";
-  for(var i = 0; i < LEVEL_SET_NUM; i++); {
-    profile_string += this.profile_name + "$" + this.level_last_names[i] + "=" + this.level_last + ";";
-    profile_string += this.profile_name + "$" + this.level_selected_names[i] + "=" + this.level_selected  + ";";
-  }
-  document.cookie = profile_string;
+  localStorage.setItem("profile", JSON.stringify(this));
 }
 /*
   this.level_set_names = [ "l0", "l1", "l2", "l3", "l4"];
