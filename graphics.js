@@ -365,11 +365,9 @@ Graph.prototype.init = function()
 
   this.stage = new PIXI.Stage(0x0);
   this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y, rendererOptions);
-  
-  // Put the renderer on screen in the corner
-  this.renderer.view.style.position = "absolute";
-  this.renderer.view.style.top = "0px";
-  this.renderer.view.style.left = "0px";
+  this.renderer.view.position = "absolute";                   
+  this.renderer.view.width = "100%";
+  this.renderer.view.height = "100%";
   
   this.resize();
   

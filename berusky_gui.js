@@ -280,6 +280,10 @@ GameGui.prototype.Resize = function() {
   this.graph.resize();
 }
 
+GameGui.prototype.GetView = function() {
+  return this.graph.get_renderer().view;
+}
+
 // -------------------------------------------------------
 // Game UI - clean up management
 // -------------------------------------------------------

@@ -85,7 +85,6 @@ MattockStatus.prototype.clear = function()
 function Game() {
   this.graph = new Graph();
   this.graph.init();
-  document.body.appendChild(this.graph.get_renderer().view);
   this.repo = new ObjectsRepository();
   this.level = new Level(this.graph, this.repo);
   this.input = new Input(this);

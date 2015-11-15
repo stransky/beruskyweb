@@ -26,14 +26,20 @@
 <script type="text/javascript" src="berusky_gui.js"></script>
 
 <body>
+  <div id="game_frame" style="text-align: center;">
+  </div>
+
   <script>
   var gui = new GameGui();
+
+  var view = gui.GetView();
+  document.getElementById("game_frame").appendChild(view);
 
   function GameGuiLoop() {
     gui.GameGuiLoop();
     window.requestAnimationFrame(GameGuiLoop);
   }
- 
+
   // launch the beast
   window.addEventListener("resize",  function() { gui.Resize(); });
   window.requestAnimationFrame(GameGuiLoop);
