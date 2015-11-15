@@ -530,7 +530,7 @@ GameGui.prototype.menu_main = function(state, data, data1)
                                GAME_RESOLUTION_Y/2 - 0);
 */
         this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
-                               GAME_RESOLUTION_Y/2 + 50);
+                               GAME_RESOLUTION_Y/2 + 40);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
 
         this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
@@ -543,11 +543,12 @@ GameGui.prototype.menu_main = function(state, data, data1)
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);
         this.graph.print("berusky version " + VERSION + " (C) Anakreon 1997-2014\n");
         this.graph.print("distributed under GPLv2\n");
-
+/* Temporary disable - not finished yet
         var PROFILE_Y_DIFF  = (20);
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, height+PROFILE_Y_DIFF);
         this.graph.print("Selected profile: " + this.profile.profile_name);
+*/
       }
       break;
     case MENU_LEAVE:
@@ -830,15 +831,17 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(play_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SET));
+/*
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(level_hint,
                               MENU_RIGHT, MENU_SAVE_BACK,
                               new MenuEvent(GC_MENU_LEVEL_HINT, [FALSE]));
-          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
-          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
                               MENU_LEFT, FALSE,
                               new MenuEvent(GI_MENU_BACK_POP));
@@ -892,15 +895,17 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(play_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SET));
+/*
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(level_hint,
                               MENU_RIGHT, MENU_SAVE_BACK,
                               new MenuEvent(GC_MENU_LEVEL_HINT, [ FALSE ]));
-          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
-          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
                               MENU_LEFT, FALSE,
                               new MenuEvent(GI_MENU_BACK_POP));
@@ -929,18 +934,18 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(play_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SET));
-                         
+/*
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(level_hint,
                               MENU_RIGHT, MENU_SAVE_BACK,
                               new MenuEvent(GC_MENU_LEVEL_HINT, [ FALSE ]));
-                         
-          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
                               MENU_RIGHT, FALSE,
                               new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
                          
-          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
                               MENU_LEFT, FALSE,
                               new MenuEvent(GI_MENU_BACK_POP));
@@ -1048,18 +1053,18 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(play_string,
                          MENU_RIGHT, FALSE,
                          new MenuEvent(GC_RUN_LEVEL_SET));
-
+/*
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(level_hint,
                          MENU_RIGHT, MENU_SAVE_BACK,
                          new MenuEvent(GC_MENU_LEVEL_HINT, [ FALSE ]));
-
-          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
                          MENU_RIGHT, FALSE,
                          new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
 
-          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
                          MENU_LEFT, FALSE,
                          new MenuEvent(GI_MENU_BACK_POP));
@@ -1120,18 +1125,18 @@ GameGui.prototype.menu_level_run_path_draw = function(level_set, level_act, leve
           this.menu_item_draw(play_string,
                          MENU_RIGHT, FALSE,
                          new MenuEvent(GC_RUN_LEVEL_SET));
-
+/*
           this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(level_hint,
                          MENU_RIGHT, MENU_SAVE_BACK,
                          new MenuEvent(GC_MENU_LEVEL_HINT, [ FALSE ]));
-
-          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+2*MENU_Y_DIFF);
+*/
+          this.menu_item_set_pos(MENU_X_START_R, MENU_Y_START+1*MENU_Y_DIFF);
           this.menu_item_draw(select_string,
                          MENU_RIGHT, FALSE,
                          new MenuEvent(GC_RUN_LEVEL_SELECT, [ level_last ]));
 
-          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+3*MENU_Y_DIFF);
+          this.menu_item_set_pos(MENU_X_START_L, MENU_Y_START+2*MENU_Y_DIFF);
           this.menu_item_draw(back_string,
                          MENU_LEFT, FALSE,
                          new MenuEvent(GI_MENU_BACK_POP));
