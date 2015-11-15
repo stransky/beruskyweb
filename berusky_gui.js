@@ -258,6 +258,7 @@ function GameGui() {
   this.level_sprite_table = Array();
   this.level_running = false;
 }
+
 GameGui.prototype.GameGuiLoop = function() {
   if(!this.loaded && this.graph.is_loaded()) {
     this.loaded = true;
@@ -274,6 +275,11 @@ GameGui.prototype.GameGuiLoop = function() {
   }
   this.graph.render();
 }
+
+GameGui.prototype.Resize = function() {
+  this.graph.resize();
+}
+
 // -------------------------------------------------------
 // Game UI - clean up management
 // -------------------------------------------------------

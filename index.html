@@ -11,7 +11,7 @@
 			background-color: #000000;
 		}
 	</style>
-	<script src="pixi/bin/pixi.dev.js"></script>
+	<script src="pixi/bin/pixi.js"></script>
 </head>
 
 <script type="text/javascript" src="defines.js"></script>
@@ -26,15 +26,17 @@
 <script type="text/javascript" src="berusky_gui.js"></script>
 
 <body>
-  <script>  
+  <script>
   var gui = new GameGui();
-  
+
   function GameGuiLoop() {
     gui.GameGuiLoop();
-    requestAnimFrame(GameGuiLoop);
+    window.requestAnimationFrame(GameGuiLoop);
   }
-    // launch the beast
-  requestAnimFrame(GameGuiLoop);
+ 
+  // launch the beast
+  window.addEventListener("resize",  function() { gui.Resize(); });
+  window.requestAnimationFrame(GameGuiLoop);
   </script>
 </body>
 </html>

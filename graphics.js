@@ -343,10 +343,36 @@ Graph.prototype.end_sprite_load = function(level_set, callback, callback_params)
                    MENU_SPRIT_END, callback, callback_params);
 }
 
+Graph.prototype.resize = function() {
+ 
+  // Determine which screen dimension is most constrained
+  ratio = Math.min(window.innerWidth/GAME_RESOLUTION_X,
+                   window.innerHeight/GAME_RESOLUTION_Y);
+ 
+  // Scale the view appropriately to fill that dimension
+  this.stage.scale.x = this.stage.scale.y = ratio;
+ 
+  // Update the renderer dimensions
+  this.renderer.resize(Math.ceil(GAME_RESOLUTION_X * ratio),
+                       Math.ceil(GAME_RESOLUTION_Y * ratio));
+}
+
 Graph.prototype.init = function()
 {
+  var rendererOptions = {
+    resolution: window.devicePixelRatio
+  }
+
   this.stage = new PIXI.Stage(0x0);
-  this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y);
+  this.renderer = PIXI.autoDetectRenderer(GAME_RESOLUTION_X, GAME_RESOLUTION_Y, rendererOptions);
+  
+  // Put the renderer on screen in the corner
+  this.renderer.view.style.position = "absolute";
+  this.renderer.view.style.top = "0px";
+  this.renderer.view.style.left = "0px";
+  
+  this.resize();
+  
   this.menu_sprites_load();
   this.game_sprites_load();
 

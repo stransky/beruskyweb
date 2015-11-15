@@ -3,13 +3,11 @@ function pixi_display_DisplayObject_confirmNew(obj) {
     var expect = chai.expect;
 
     expect(obj).to.be.an.instanceof(PIXI.DisplayObject);
-    expect(obj).to.respondTo('setInteractive');
+    //expect(obj).to.respondTo('setInteractive');
     //expect(obj).to.respondTo('addFilter');
     //expect(obj).to.respondTo('removeFilter');
     expect(obj).to.respondTo('updateTransform');
-
-    expect(obj).to.have.property('last', obj);
-    expect(obj).to.have.property('first', obj);
+    expect(obj).to.respondTo('setParent');
 
     expect(obj).to.contain.property('position');
     pixi_core_Point_confirm(obj.position, 0, 0);
@@ -33,11 +31,9 @@ function pixi_display_DisplayObject_confirmNew(obj) {
     expect(obj).to.have.property('renderable');
     expect(obj).to.have.property('stage');
 
-    expect(obj).to.have.deep.property('worldTransform.length', 9);
-    pixi_core_Matrix_confirmNewMat3(obj.worldTransform);
-    expect(obj).to.have.deep.property('localTransform.length', 9);
-    pixi_core_Matrix_confirmNewMat3(obj.localTransform);
+    expect(obj).to.have.deep.property('worldTransform');
+    pixi_core_Matrix_confirmNewMatrix(obj.worldTransform);
 
-    expect(obj).to.have.deep.property('color.length', 0);
-    expect(obj).to.have.property('dynamic', true);
+    //expect(obj).to.have.deep.property('color.length', 0);
+    //expect(obj).to.have.property('dynamic', true);
 }
