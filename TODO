@@ -1,4 +1,13 @@
+Ask player name at start (Profile)
+  - selection
+
+Touch/Zoom support (for mobile phones)
+  - normal mode (Firefox Marketplace)
+
 - save recently selected level to storage
+- change profile -  extra menu:
+  - new profile (name)
+  - change profile
 
 - fonts - do we wait for font loading? (missing fonts on first load)
 - profile load/save 

@@ -82,7 +82,7 @@ var PROFILE_LAST_INTERMEDIATE = "l2"
 var PROFILE_LAST_ADVANCED     = "l3"
 var PROFILE_LAST_IMPOSSIBLE   = "l4"
 
-function PlayerProfile(name) {  
+function PlayerProfile(name) {
   if(!this.load()) {
     this.level_last         = [0,0,0,0,0]; // Last finished level  
     this.level_selected     = [0,0,0,0,0]; // Selected level
@@ -520,27 +520,34 @@ GameGui.prototype.menu_main = function(state, data, data1)
 */
         this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
         var new_game = "play";
-        var profiles = "change profile";
+        var profiles = "player profile";
         var settings = "settings";
         var help = "help";
         var MENU_X_DIFF  = 0;
         var MENU_Y_DIFF  = (DOUBLE_SIZE ? 45 : 35);
+/* Temporary disable - not finished yet
         this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
                                GAME_RESOLUTION_Y/2 - 0);
+*/
+        this.menu_item_set_pos(GAME_RESOLUTION_X/2 - 70,
+                               GAME_RESOLUTION_Y/2 + 50);
         this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+
         this.menu_item_draw(new_game, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_NEW_GAME));
+/* Temporary disable - not finished yet
         this.menu_item_draw(profiles, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_PROFILES));
         this.menu_item_draw(settings, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_SETTINGS));
         this.menu_item_draw(help, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_HELP, [ false ]));
+ */
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, GAME_RESOLUTION_Y - 60);
         this.graph.print("berusky version " + VERSION + " (C) Anakreon 1997-2014\n");
         this.graph.print("distributed under GPLv2\n");
+
         var PROFILE_Y_DIFF  = (20);
         this.graph.font_alignment_set(MENU_CENTER);
         this.graph.font_start_set(0, height+PROFILE_Y_DIFF);
-        //this.graph.print("Selected profile: " + profile.profile_name);
-        this.graph.print("Selected profile: ");
+        this.graph.print("Selected profile: " + this.profile.profile_name);
       }
       break;
     case MENU_LEAVE:
@@ -1334,6 +1341,45 @@ GameGui.prototype.menu_levelset_end = function(state)
       break;
   }
 }
+GameGui.prototype.player_profile = function(state, data, data1)
+{
+  switch(state) {
+    case MENU_RETURN:
+    case MENU_ENTER:
+      {
+        this.menu_enter(this, GameGui.prototype.menu_new_game, data, data1);
+        this.graph.clear();        
+        var spr = this.graph.sprite_insert(MENU_SPRIT_LOGO);
+        var width = spr.width;
+        var height = spr.height;
+        this.graph.sprite_move(spr, (GAME_RESOLUTION_X-width)/2, 0);
+        var MENU_X_START = (GAME_RESOLUTION_X/2 - 70);
+        var MENU_Y_START = (GAME_RESOLUTION_Y/2);
+        
+        this.graph.font_set(FONT_DEFAULT);
+        this.graph.font_alignment_set(MENU_CENTER);
+        
+        this.graph.font_start_set(0, MENU_Y_START - 50);        
+        this.graph.print("Active profile: " + this.profile.profile_name);
+        var new_profile     = "New profile";
+        var change_profile  = "Switch profile";
+        var back            = "back";
+        
+        var MENU_X_DIFF = 0;
+        var MENU_Y_DIFF = 35;
+        this.menu_item_set_pos(MENU_X_START, MENU_Y_START);
+        this.menu_item_set_diff(MENU_X_DIFF, MENU_Y_DIFF);
+        this.menu_item_draw(new_profile, MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 0 ]));
+        this.menu_item_draw(change_profile , MENU_LEFT, MENU_SAVE_BACK, new MenuEvent(GC_MENU_RUN_LEVEL, [ 1 ]));
+        this.menu_item_draw(back, MENU_LEFT, 0, new MenuEvent(GI_MENU_BACK_POP));
+      }
+      break;
+    case MENU_LEAVE:
+      break;
+    default:
+      break;
+  }
+}
 GameGui.prototype.callback = function(event)
 {
   var ev = event.type;
@@ -1368,16 +1414,18 @@ GameGui.prototype.callback = function(event)
       level_run(&tmp_queue, (char *)ev.param_point_get(PARAM_0));
       break;
 */
-/*
     case GC_MENU_PROFILES:
-      menu_profiles(MENU_ENTER);
+      this.player_profile(MENU_ENTER);
       break;
+/*      
     case GC_MENU_PROFILE_CREATE:
       menu_profile_create(ev.param_int_get(PARAM_0));
       break;
     case GC_MENU_PROFILE_SELECT:
       menu_profile_select(ev.param_int_get(PARAM_0), ev.param_int_get(PARAM_1));
       break;
+*/      
+/*      
     case GC_MENU_SETTINGS:
       menu_settings(MENU_ENTER, ev.param_int_get(PARAM_0));
       break;
@@ -1431,13 +1479,6 @@ GameGui.prototype.callback = function(event)
       break;
     case GC_RUN_EDITOR:
       run_editor();
-      break;
-    case GI_SPRITE_DRAW:
-    case GI_STRING_DRAW:
-    case GI_CHECKBOX_SWITCH:
-    case GI_HIGHLIGHT_EVENT:
-    case GI_KEY_DOWN:
-      menu_services(p_queue, &tmp_queue, ev);
       break;
 */
     case GI_MENU_BACK_POP:
