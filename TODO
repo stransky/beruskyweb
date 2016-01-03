@@ -1,3 +1,5 @@
+BUG: - menu - only first character is active (react on mouse)
+
 Quit actual level (some menu?)
 Scale mode - menu reflects the mouse only on small part of the sprite (begining)
 
